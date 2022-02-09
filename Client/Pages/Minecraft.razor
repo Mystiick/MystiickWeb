@@ -1,0 +1,53 @@
+@page "/minecraft"
+@using MystiickWeb.Shared.Models
+@inject HttpClient Http
+
+<PageTitle>Minecraft Server Status</PageTitle>
+
+<h1>Minecraft Server Status</h1>
+
+@if (loading) {
+    <div class="spinner-border" role="status" id="loading">
+        <span class="sr-only">&nbsp;</span>
+    </div>
+}
+@if (model != null) {
+    
+    <div>
+        <h3>Server Online</h3>
+        <span>Online: @model.CountOnline / @model.CountMaximum</span>
+        <ul>
+            @foreach (var player in model.OnlinePlayers)
+            {
+                <li>@player</li>
+            }
+        </ul>
+    </div>
+}
+@if (error != null) {
+    <span class="text-danger">@error</span>
+}
+
+@code {
+    private MinecraftServerData? model;
+    private string? error;
+    private bool loading;
+
+    protected override async Task OnInitializedAsync() 
+    {
+        loading = true;
+
+        try
+        {
+            model = await Http.GetFromJsonAsync<MinecraftServerData>("api/minecraft");
+        }
+        catch
+        {
+            error = "An unexpected error has occurred connecting to the server";
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+}
