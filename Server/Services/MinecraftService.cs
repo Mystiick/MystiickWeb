@@ -12,18 +12,20 @@ public class MinecraftService : IDisposable
 {
     private readonly ILogger<MinecraftService> _logger;
     private readonly RconClient _client;
+    private readonly IConfiguration _config;
 
-    public MinecraftService(ILogger<MinecraftService> logger)
+    public MinecraftService(ILogger<MinecraftService> logger, IConfiguration config)
     {
         _logger = logger;
-        //_client = RconClient.Create("127.0.0.1", 25575);
+        _config = config;
+        _client = RconClient.Create(_config[Secrets.MINECRAFT_RCON_IP], int.Parse(_config[Secrets.MINECRAFT_RCON_PORT]));
     }
 
     public async Task<MinecraftServerData> GetServerData()
     {
         await _client.ConnectAsync();
         
-        bool authenticated = await _client.AuthenticateAsync("test");
+        bool authenticated = await _client.AuthenticateAsync(_config[Secrets.MINECRAFT_RCON_PASSWORD]);
         
         if (authenticated)
         {
@@ -34,7 +36,7 @@ public class MinecraftService : IDisposable
 
             return ParseData(list, day, time, difficulty);
         }
-        else 
+        else
         {
             throw new UnauthorizedAccessException("Unable to authenticate to Minecraft RCON");
         }
