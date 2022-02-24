@@ -21,30 +21,48 @@ public class MinecraftService : IDisposable
         _client = RconClient.Create(_config[Secrets.MINECRAFT_RCON_IP], int.Parse(_config[Secrets.MINECRAFT_RCON_PORT]));
     }
 
-    public async Task<MinecraftServerData> GetServerData()
+    private async Task Connect()
     {
         await _client.ConnectAsync();
-        
         bool authenticated = await _client.AuthenticateAsync(_config[Secrets.MINECRAFT_RCON_PASSWORD]);
-        
-        if (authenticated)
-        {
-            var list = await _client.ExecuteCommandAsync("list");
-            var day = await _client.ExecuteCommandAsync("time query day");
-            var time = await _client.ExecuteCommandAsync("time query daytime");
-            var difficulty = await _client.ExecuteCommandAsync("difficulty");
 
-            return ParseData(list, day, time, difficulty);
-        }
-        else
+        if (!authenticated)
         {
             throw new UnauthorizedAccessException("Unable to authenticate to Minecraft RCON");
         }
     }
 
+    public async Task<MinecraftServerData> GetServerData()
+    {
+        await Connect();
+        
+        var list = await _client.ExecuteCommandAsync("list");
+        var day = await _client.ExecuteCommandAsync("time query day");
+        var time = await _client.ExecuteCommandAsync("time query daytime");
+        var difficulty = await _client.ExecuteCommandAsync("difficulty");
+
+        return ParseServerData(list, day, time, difficulty);
+    }
+
+    public async Task<MinecraftPlayer> GetPlayerData(string name)
+    {
+        await Connect();
+
+        var level = await _client.ExecuteCommandAsync($"data get entity {name} XpLevel");
+        var hunger = await _client.ExecuteCommandAsync($"data get entity {name} foodLevel");
+        var health = (await _client.ExecuteCommandAsync($"data get entity {name} Health")).Replace("f", "");
+
+        if (new[] {level, hunger, health}.Any(x => x == "No entity was found"))
+        {
+            throw new KeyNotFoundException(name);
+        }
+
+        return ParsePlayerData(name, level, hunger, health);
+    }
+
     /// <summary></summary>
     /// <param ref="list">String resembeling: // There are # of a max of # players online: {0}, {1}, {2}</param>
-    private MinecraftServerData ParseData(string list, string day, string time, string difficulty)
+    private MinecraftServerData ParseServerData(string list, string day, string time, string difficulty)
     {
         var output = new MinecraftServerData();
         var words = list.Split(' ');
@@ -54,16 +72,28 @@ public class MinecraftService : IDisposable
 
         if (output.CountOnline > 0)
         {
-            output.OnlinePlayers = words.Skip(10).Select(x => x.Replace(",", "")).ToArray();
+            output.OnlinePlayerNames = words.Skip(10).Select(x => x.Replace(",", "")).ToArray();
         }
         else 
         {
-            output.OnlinePlayers = new string[0];
+            output.OnlinePlayerNames = new string[0];
         }
 
         output.Day = int.Parse(day.Substring("The time is ".Length));
         output.Time = int.Parse(time.Substring("The time is ".Length)) / 1000 + 6;
         output.Difficulty = difficulty.Substring("The difficulty is ".Length);
+
+        return output;
+    }
+
+    private MinecraftPlayer ParsePlayerData(string name, string level, string hunger, string health)
+    {
+        var output = new MinecraftPlayer();
+        
+        output.Name = name;
+        output.Level = int.Parse(level.Substring(level.IndexOf("data: ") + 6));
+        output.Hunger = int.Parse(hunger.Substring(hunger.IndexOf("data: ") + 6)) / 2f;
+        output.Health = float.Parse(health.Substring(health.IndexOf("data: ") + 6)) / 2f;
 
         return output;
     }

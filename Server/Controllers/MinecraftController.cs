@@ -19,8 +19,24 @@ public class MinecraftController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<MinecraftServerData> Get()
+    public async Task<MinecraftServerData> GetPlayers()
     {
-        return await _service.GetServerData();
+        var output = await _service.GetServerData();
+        var players = new List<MinecraftPlayer>();
+
+        foreach(string name in output.OnlinePlayerNames)
+        {
+            players.Add(await _service.GetPlayerData(name));
+        }
+
+        output.OnlinePlayers = players.ToArray();
+
+        return output;
+    }
+
+    [HttpGet("{name}")]
+    public async Task<MinecraftPlayer> GetPlayerData(string name)
+    {
+        return await _service.GetPlayerData(name);
     }
 }

@@ -16,12 +16,11 @@
     <div>
         <h3>Server Online</h3>
         <span>Online: @model.CountOnline / @model.CountMaximum</span>
-        <ul>
-            @foreach (var player in model.OnlinePlayers)
-            {
-                <li>@player</li>
-            }
-        </ul>
+
+        @foreach (var player in model.OnlinePlayers) {
+            <MinecraftPlayerCard Player="@player" />
+        }
+        
     </div>
 }
 @if (error != null) {
