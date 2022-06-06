@@ -6,33 +6,42 @@
 
 <h1>Minecraft Server Status</h1>
 
-@if (loading) {
+@if (loading)
+{
     <div class="spinner-border" role="status" id="loading">
         <span class="sr-only">&nbsp;</span>
     </div>
 }
-@if (model != null) {
-    
+@if (model != null)
+{
+
     <div>
         <h3>Server Online</h3>
         <span>Online: @model.CountOnline / @model.CountMaximum</span>
 
-        @foreach (var player in model.OnlinePlayers) {
+        @foreach (var player in model.OnlinePlayers)
+        {
             <MinecraftPlayerCard Player="@player" />
         }
-        
+
     </div>
 }
-@if (error != null) {
+@if (error != null)
+{
     <span class="text-danger">@error</span>
+}
+@if (message != null)
+{
+    <br />
+    <span class="text-danger">@message</span>
 }
 
 @code {
     private MinecraftServerData? model;
-    private string? error;
+    private string? error, message;
     private bool loading;
 
-    protected override async Task OnInitializedAsync() 
+    protected override async Task OnInitializedAsync()
     {
         loading = true;
 
@@ -40,9 +49,12 @@
         {
             model = await Http.GetFromJsonAsync<MinecraftServerData>("api/minecraft");
         }
-        catch
+        catch (Exception ex)
         {
             error = "An unexpected error has occurred connecting to the server";
+#if DEBUG
+message = ex.Message;
+#endif
         }
         finally
         {
