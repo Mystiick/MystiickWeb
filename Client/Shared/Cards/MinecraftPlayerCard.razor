@@ -1,0 +1,43 @@
+@using MystiickWeb.Shared.Models;
+
+@inject HttpClient Http
+
+<div class="card col-sm-4">
+    <div class="card-body">
+
+@if (Player != null) {
+        <h5>@Player.Name</h5>
+        
+        <div>@GetEmojis(Player.Health, "&#128147;", "&#128148;", "&#128420;")</div>
+        <div>@GetEmojis(Player.Hunger, "&#127831;", "&#129348;", "&#10060;")</div>
+}
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public MinecraftPlayer Player { get; set; }
+
+    public MarkupString GetEmojis(float value, string full, string half, string empty)
+    {
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+        for(int i = 1; i <= 10; i++)
+        {
+            if (i <= Math.Floor(value))
+            {
+                sb.Append(full);
+            }
+            else if (i - .5f == value)
+            {
+                sb.Append(half);
+            }
+            else
+            {
+                sb.Append(empty);
+            }
+        }
+
+        return (MarkupString)sb.ToString();
+    }
+}
