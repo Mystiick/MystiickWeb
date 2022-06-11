@@ -1,13 +1,31 @@
-using Microsoft.AspNetCore.ResponseCompression;
 using MystiickWeb.Server.Services;
+using MystiickWeb.Server.Clients.Images;
+using MystiickWeb.Shared.Configs;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+// Services
 builder.Services.AddSingleton<MinecraftService>();
+builder.Services.AddSingleton<ImageService>();
+
+// Clients
+builder.Services.AddSingleton<ImageDataClient>();
+
+// Configs
+builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey));
+builder.Configuration.AddJsonFile("appsettings.json", false);
+builder.Configuration.AddJsonFile("appsettings.development.json", true);
+
+builder.Logging.AddConfiguration(builder.Configuration);
+
+#if DEBUG
+builder.Logging.AddSimpleConsole(config => config.SingleLine = true);
+#endif
 
 var app = builder.Build();
 

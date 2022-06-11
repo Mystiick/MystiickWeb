@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shared\MystiickWeb.Shared.csproj" />
+    <ProjectReference Include="..\MystiickWeb.Shared\MystiickWeb.Shared.csproj" />
   </ItemGroup>
 
 </Project>

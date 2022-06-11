@@ -1,0 +1,72 @@
+﻿@page "/photography"
+@using MystiickWeb.Shared.Models
+
+@inherits BasePage
+
+<PageTitle>Photography</PageTitle>
+<h1>Photography</h1>
+@if (Error != string.Empty)
+{
+    <div class="text-danger">@Error</div>
+}
+@if (Message != string.Empty)
+{
+    <div class="text-danger">@Message</div>
+}
+@if (IsLoading)
+{
+    <div class="spinner-border" role="status" id="loading">
+        <span class="sr-only">&nbsp;</span>
+    </div>
+}
+
+<div class="row">
+    <div class="col-1 d-grid gap-2 border-end">
+        @if (categories != null)
+        {
+            @foreach (ImageCategory cat in categories)
+            {
+                <button class="btn btn-outline-primary mb-1" @onclick="@(x => LoadImages(cat.Name))">
+                    <span>@cat.Name</span>
+                    <span>(@cat.Count)</span>
+                </button>
+            }
+        }
+    </div>
+
+    <div class="col-11">
+        Images go here
+    </div>
+</div>
+
+@code {
+    public ImageCategory[]? categories;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        try
+        {
+            categories = await Http.GetFromJsonAsync<ImageCategory[]>("api/image/categories");
+            Console.WriteLine("Success");
+        }
+        catch (Exception ex)
+        {
+            Error = "An unexpected error has occurred connecting to the server";
+#if DEBUG
+    Message = ex.Message;
+#endif
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    protected async Task LoadImages(string category)
+    {
+        await Task.CompletedTask;
+    }
+
+}

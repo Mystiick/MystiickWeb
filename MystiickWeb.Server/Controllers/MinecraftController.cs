@@ -18,7 +18,7 @@ public class MinecraftController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
+    [HttpGet("")]
     public async Task<MinecraftServerData> GetPlayers()
     {
         var output = await _service.GetServerData();

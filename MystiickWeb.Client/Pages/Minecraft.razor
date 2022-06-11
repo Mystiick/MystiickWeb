@@ -5,6 +5,15 @@
 <PageTitle>Minecraft Server Status</PageTitle>
 
 <h1>Minecraft Server Status</h1>
+@if (error != null)
+{
+    <div class="text-danger">@error</div>
+}
+@if (message != null)
+{
+    <div class="text-danger">@message</div>
+}
+
 
 @if (loading)
 {
@@ -26,15 +35,7 @@
 
     </div>
 }
-@if (error != null)
-{
-    <span class="text-danger">@error</span>
-}
-@if (message != null)
-{
-    <br />
-    <span class="text-danger">@message</span>
-}
+
 
 @code {
     private MinecraftServerData? model;
@@ -47,7 +48,7 @@
 
         try
         {
-            model = await Http.GetFromJsonAsync<MinecraftServerData>("api/minecraft");
+            model = await Http.GetFromJsonAsync<MinecraftServerData>("api/minecraft/");
         }
         catch (Exception ex)
         {
