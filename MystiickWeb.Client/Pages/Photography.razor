@@ -26,7 +26,7 @@
         {
             @foreach (ImageCategory cat in categories)
             {
-                <button class="btn btn-outline-primary mb-1" @onclick="@(x => LoadImages(cat.Name))">
+                <button class="btn btn-outline-primary mb-1" @onclick="@(x => LoadThumbnails(cat.Name))">
                     <span>@cat.Name</span>
                     <span>(@cat.Count)</span>
                 </button>
@@ -35,38 +35,37 @@
     </div>
 
     <div class="col-11">
-        Images go here
+        @if (images != null)
+        {
+            @foreach (string img in images)
+            {
+                <img src="/api/image/@img" />
+                
+                <br/>
+            }
+        }
+
+        @if (imagesLoading)
+        {
+            <div class="spinner-border" role="status" id="loading">
+                <span class="sr-only">&nbsp;</span>
+            </div>
+        }
     </div>
 </div>
 
 @code {
     public ImageCategory[]? categories;
+    public string[]? images;
+    public bool imagesLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
-        IsLoading = true;
-
-        try
-        {
-            categories = await Http.GetFromJsonAsync<ImageCategory[]>("api/image/categories");
-            Console.WriteLine("Success");
-        }
-        catch (Exception ex)
-        {
-            Error = "An unexpected error has occurred connecting to the server";
-#if DEBUG
-    Message = ex.Message;
-#endif
-        }
-        finally
-        {
-            IsLoading = false;
-        }
+        categories = await GetFromApiAsync<ImageCategory[]>("api/image/categories");
     }
 
-    protected async Task LoadImages(string category)
+    protected async Task LoadThumbnails(string category)
     {
-        await Task.CompletedTask;
+        images = await GetFromApiAsync<string[]>($"api/image/categories/{category}");
     }
-
 }

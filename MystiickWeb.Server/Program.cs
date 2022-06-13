@@ -15,6 +15,7 @@ builder.Services.AddSingleton<ImageService>();
 
 // Clients
 builder.Services.AddSingleton<ImageDataClient>();
+builder.Services.AddSingleton<ImageFileClient>();
 
 // Configs
 builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey));

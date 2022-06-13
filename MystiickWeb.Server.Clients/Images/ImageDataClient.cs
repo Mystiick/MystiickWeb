@@ -21,12 +21,10 @@ public class ImageDataClient
         _configs = configs.Value;
     }
 
-    public void DoWork()
-    {
-        _logger.LogInformation("ImageDataClient.DoWork() Called");
-        _logger.LogInformation(_configs.ImageDatabase);
-    }
-
+    /// <summary>
+    /// Gets an array of all categories and a count of how many images use that category form the database.
+    /// </summary>
+    /// <returns></returns>
     public async Task<ImageCategory[]> GetCategories()
     {
         var output = new List<ImageCategory>();
@@ -46,5 +44,44 @@ public class ImageDataClient
         }
 
         return output.ToArray();
+    }
+
+    public async Task<string[]> GetImagesByCategory(string category)
+    {
+        var output = new List<string>();
+
+        using var connection = new MySqlConnection(_configs.ImageDatabase);
+        await connection.OpenAsync();
+
+        var command = new MySqlCommand(@"select GUID from Image where Category = @category", connection);
+        command.Parameters.AddWithValue("@category", category);
+        
+        await command.PrepareAsync();
+        DbDataReader reader = await command.ExecuteReaderAsync();
+
+        foreach (DbDataRecord rec in reader)
+        {
+            output.Add(rec["GUID"].ToString() ?? "");
+        }
+
+        return output.ToArray();
+    }
+
+    /// <summary>
+    /// Gets the file path of a given image by GUID
+    /// </summary>
+    /// <param name="guid"></param>
+    public async Task<string> GetImagePathByGUID(string guid, bool thumbnail)
+    {
+        using var connection = new MySqlConnection(_configs.ImageDatabase);
+        await connection.OpenAsync();
+
+        var command = new MySqlCommand(@"select ImagePath, ThumbnailPath from Image where GUID = @guid", connection);
+        command.Parameters.AddWithValue("@guid", guid);
+
+        await command.PrepareAsync();
+        DbDataReader reader = await command.ExecuteReaderAsync();
+
+        return reader.Cast<DbDataRecord>().First()[thumbnail ? "ThumbnailPath" : "ImagePath"].ToString() ?? "";
     }
 }

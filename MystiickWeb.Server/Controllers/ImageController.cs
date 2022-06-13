@@ -18,19 +18,23 @@ public class ImageController : ControllerBase
         _service = service;
     }
 
-    [HttpGet("{imageGuid}")]
-    public FileContentResult GetImage(string imageGuid)
+    [HttpGet("{guid}")]
+    public async Task<FileContentResult> GetImage(string guid, bool thumbnail = true)
     {
-        var output = System.IO.File.ReadAllBytes("C:\\temp\\img\\archive\\X1-L4.jpg");
-        _service.GetImageByGUID("");
-        //base.Ok(
+        ImageResult output = await _service.GetImageByGUID(guid, thumbnail);
 
-        return base.File(output, "image/jpeg");
+        return base.File(output.Data, output.ContentType);
     }
 
     [HttpGet("categories")]
     public async Task<ImageCategory[]> GetCategories()
     {
         return await _service.GetCategories();
+    }
+
+    [HttpGet("categories/{category}")]
+    public async Task<string[]> GetImagesByCategory(string category)
+    {
+        return await _service.GetImagesByCategory(category);
     }
 }
