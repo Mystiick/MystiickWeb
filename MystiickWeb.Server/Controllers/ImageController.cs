@@ -33,7 +33,7 @@ public class ImageController : ControllerBase
     }
 
     [HttpGet("categories/{category}")]
-    public async Task<string[]> GetImagesByCategory(string category)
+    public async Task<ImageResult[]> GetImagesByCategory(string category)
     {
         return await _service.GetImagesByCategory(category);
     }

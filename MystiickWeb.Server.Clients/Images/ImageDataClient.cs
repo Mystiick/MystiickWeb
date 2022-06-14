@@ -46,14 +46,20 @@ public class ImageDataClient
         return output.ToArray();
     }
 
-    public async Task<string[]> GetImagesByCategory(string category)
+    public async Task<ImageResult[]> GetImagesByCategory(string category)
     {
-        var output = new List<string>();
+        const string query = @"select i.GUID, i.Category, i.Subcategory, GROUP_CONCAT(it.TagName) as 'Tags'
+                              from Image i
+                              left join ImageTag it on it.ImageID = i.ID
+                              where Category = @category
+                              group by i.GUID";
+        var output = new List<ImageResult>();
+
 
         using var connection = new MySqlConnection(_configs.ImageDatabase);
         await connection.OpenAsync();
 
-        var command = new MySqlCommand(@"select GUID from Image where Category = @category", connection);
+        var command = new MySqlCommand(query, connection);
         command.Parameters.AddWithValue("@category", category);
         
         await command.PrepareAsync();
@@ -61,7 +67,12 @@ public class ImageDataClient
 
         foreach (DbDataRecord rec in reader)
         {
-            output.Add(rec["GUID"].ToString() ?? "");
+            output.Add(new ImageResult() {
+                GUID = rec["GUID"].ToString() ?? "",
+                Tags = (rec["Tags"].ToString() ?? "").Split(','),
+                Category = rec["Category"].ToString() ?? "",
+                Subcategory = rec["Subcategory"].ToString() ?? ""
+            });
         }
 
         return output.ToArray();

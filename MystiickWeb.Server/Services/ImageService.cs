@@ -34,7 +34,7 @@ public class ImageService
         return new[] { new ImageCategory() { Name = "Favorites" } }.Concat(output).ToArray();
     }
 
-    public async Task<string[]> GetImagesByCategory(string category)
+    public async Task<ImageResult[]> GetImagesByCategory(string category)
     {
         return await _dataClient.GetImagesByCategory(category);
     }
