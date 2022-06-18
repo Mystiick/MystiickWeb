@@ -22,12 +22,12 @@
 }
 
 <div class="row">
-    <div class="col-1 d-grid gap-2 border-end">
+    <div class="col-xl-2 gap-2 border-end">
         @if (categories != null)
         {
             @foreach (ImageCategory cat in categories)
             {
-                <button class="btn btn-outline-primary mb-1" @onclick="@(x => LoadThumbnails(cat.Name))">
+                <button class="btn btn-outline-primary mb-1 w-100" @onclick="@(x => LoadThumbnails(cat.Name))">
                     <span>@cat.Name</span>
                     <span>(@cat.Count)</span>
                 </button>
@@ -35,24 +35,21 @@
         }
     </div>
 
-    <div class="col-11">
+    <div class="col-xl-10">
         @if (images != null)
         {
-
-
             <div class="">
-                <div class="row row-cols-auto">
+                <div class="row">
 
                     @foreach (ImageResult img in images)
                     {
-                        <div class="col">
+                        <div class="col-xxl-2 col-xl-3 col-lg-6">
                             <ImageCard Image="img" />
                         </div>
                     }
 
                 </div>
             </div>
-
         }
 
         @if (imagesLoading)

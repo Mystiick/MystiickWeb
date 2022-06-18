@@ -1,11 +1,11 @@
 ﻿@using MystiickWeb.Shared.Models;
 
-<span class="card image-card m-1 p-2">
+<div class="card image-card m-1 p-2 w-100">
     @if (Image != null)
     {
         <img src="/api/image/@Image.GUID"/>
     }
-</span>
+</div>
 
 @code {
     [Parameter]
