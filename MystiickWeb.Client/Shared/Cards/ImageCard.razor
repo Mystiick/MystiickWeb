@@ -1,9 +1,19 @@
 ﻿@using MystiickWeb.Shared.Models;
 
-<div class="card image-card m-1 p-2 w-100">
+<div class="card image-card m-2 w-100">
     @if (Image != null)
     {
-        <img src="/api/image/@Image.GUID"/>
+        <img src="/api/image/@Image.GUID" />
+        <div>
+            @if (string.IsNullOrWhiteSpace(Image.Subcategory))
+            {
+                <p>&nbsp;</p>
+            }
+            else
+            {
+                <p>@Image.Subcategory</p>
+            }
+        </div>
     }
 </div>
 
@@ -14,4 +24,3 @@
         get; set;
     }
 }
-

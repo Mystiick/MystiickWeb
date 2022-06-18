@@ -1,10 +1,11 @@
 ﻿.image-card {
-    
+    overflow:hidden;
+    height: 20em
 }
     .image-card .link {
         color: blue
     }
 
-    img {
-        
+    .image-card img {
+        object-fit:cover
     }

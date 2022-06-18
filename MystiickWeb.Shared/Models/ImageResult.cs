@@ -8,4 +8,5 @@ public class ImageResult
     public string[] Tags { get; set; } = Array.Empty<string>();
     public string Category { get; set; } = string.Empty;
     public string Subcategory { get; set; } = string.Empty;
+    public DateTime Created { get; set; }
 }

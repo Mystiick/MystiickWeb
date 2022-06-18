@@ -48,7 +48,7 @@ public class ImageDataClient
 
     public async Task<ImageResult[]> GetImagesByCategory(string category)
     {
-        const string query = @"select i.GUID, i.Category, i.Subcategory, GROUP_CONCAT(it.TagName) as 'Tags'
+        const string query = @"select i.GUID, i.Category, i.Subcategory, GROUP_CONCAT(it.TagName) as 'Tags', Created
                               from Image i
                               left join ImageTag it on it.ImageID = i.ID
                               where Category = @category
@@ -71,7 +71,8 @@ public class ImageDataClient
                 GUID = rec["GUID"].ToString() ?? "",
                 Tags = (rec["Tags"].ToString() ?? "").Split(','),
                 Category = rec["Category"].ToString() ?? "",
-                Subcategory = rec["Subcategory"].ToString() ?? ""
+                Subcategory = rec["Subcategory"].ToString() ?? "",
+                Created = DateTime.Parse(rec["Created"].ToString() ?? "")
             });
         }
 
