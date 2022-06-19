@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace MystiickWeb.Shared.Models;
 
-namespace MystiickWeb.Shared.Models
+public class ImageCategory
 {
-    public class ImageCategory
-    {
-        public string Name { get; set; } = "";
-        public int Count { get; set; } = 0;
-    }
+    public string Name { get; init; } = "";
+    public int Count { get; init; } = 0;
 }

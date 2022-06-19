@@ -71,6 +71,8 @@
 
     protected async Task LoadThumbnails(string category)
     {
+        // Set to null first to clear out existing list, preventing images from popping in over the old ones, one at a time
+        images = null;
         images = await GetFromApiAsync<ImageResult[]>($"api/image/categories/{category}");
     }
 }

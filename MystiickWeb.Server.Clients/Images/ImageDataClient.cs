@@ -48,11 +48,12 @@ public class ImageDataClient
 
     public async Task<ImageResult[]> GetImagesByCategory(string category)
     {
-        const string query = @"select i.GUID, i.Category, i.Subcategory, GROUP_CONCAT(it.TagName) as 'Tags', Created
+        const string query = @"select i.GUID, i.Category, i.Subcategory, GROUP_CONCAT(it.TagName) as 'Tags', Created, ist.*
                               from Image i
-                              left join ImageTag it on it.ImageID = i.ID
+                              left join ImageTag it on it.ImageID = i.ImageID
+                              left join ImageSettings ist on ist.ImageID = i.ImageID
                               where Category = @category
-                              group by i.GUID";
+                              group by i.GUID, ist.ImageSettingsID";
         var output = new List<ImageResult>();
 
 
@@ -72,7 +73,16 @@ public class ImageDataClient
                 Tags = (rec["Tags"].ToString() ?? "").Split(','),
                 Category = rec["Category"].ToString() ?? "",
                 Subcategory = rec["Subcategory"].ToString() ?? "",
-                Created = DateTime.Parse(rec["Created"].ToString() ?? "")
+                Created = DateTime.Parse(rec["Created"].ToString() ?? ""),
+                Camera = new CameraSettings()
+                {
+                    Model = rec["Model"].ToString() ?? "",
+                    Flash = bool.Parse(rec["Flash"].ToString() ?? ""),
+                    ISO = uint.Parse(rec["ISO"].ToString() ?? ""),
+                    ShutterSpeed = rec["ShutterSpeed"].ToString() ?? "",
+                    Aperature = rec["Aperature"].ToString() ?? "",
+                    FocalLength = rec["FocalLength"].ToString() ?? "",
+                }
             });
         }
 

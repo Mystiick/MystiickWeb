@@ -20,12 +20,13 @@ public class ImageFileClient
     {
         _logger.LogInformation("Reading file: {filePath}", filePath);
 
+        var file = await File.ReadAllBytesAsync(filePath);
+
         var output = new ImageResult()
         {
-            Data = await File.ReadAllBytesAsync(filePath)
+            Data = file,
+            ContentType = Image.DetectFormat(file).DefaultMimeType
         };
-
-        output.ContentType = Image.DetectFormat(output.Data).DefaultMimeType;
 
         return output;
 
