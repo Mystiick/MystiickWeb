@@ -37,4 +37,16 @@ public class ImageController : ControllerBase
     {
         return await _service.GetImagesByCategory(category);
     }
+
+    [HttpGet("subcategories/{subcategory}")]
+    public async Task<ImageResult[]> GetImagesBySubcategory(string subcategory)
+    {
+        return await _service.GetImagesBySubcategory(subcategory);
+    }
+
+    [HttpGet("tags/{tag}")]
+    public async Task<ImageResult[]> GetImagesByTag(string tag)
+    {
+        return await _service.GetImagesByTag(tag);
+    }
 }

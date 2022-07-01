@@ -11,7 +11,7 @@ public class BasePage : ComponentBase
     public string Message { get; set; } = "";
     public string DebugMessage { get; set; } = "";
 
-    [Inject] public HttpClient Http { get; set; } = null;
+    [Inject] public HttpClient Http { get; set; }
 
     public BasePage()
     {

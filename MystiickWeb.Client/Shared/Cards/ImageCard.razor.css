@@ -1,11 +1,13 @@
 ﻿.image-card {
-    overflow:hidden;
-    height: 20em
+    overflow: hidden;
+    height: 90%;
+    display: flex;
 }
-    .image-card .link {
-        color: blue
-    }
 
     .image-card img {
-        object-fit:cover
+        object-fit: cover
     }
+
+.pointer {
+    cursor: pointer
+}

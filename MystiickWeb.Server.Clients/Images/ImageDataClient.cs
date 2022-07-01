@@ -21,6 +21,14 @@ public class ImageDataClient
         _configs = configs.Value;
     }
 
+    private const string SelectImageResultSql = @"select i.GUID, i.Category, i.Subcategory, GROUP_CONCAT(it.TagName) as 'Tags', Created, ist.*
+                                                  from Image i
+                                                  left join ImageTag it on it.ImageID = i.ImageID
+                                                  left join ImageSettings ist on ist.ImageID = i.ImageID";
+
+    private const string GroupByImageResultSql = "group by i.GUID, ist.ImageSettingsID";
+
+
     /// <summary>
     /// Gets an array of all categories and a count of how many images use that category form the database.
     /// </summary>
@@ -37,8 +45,9 @@ public class ImageDataClient
 
         foreach (DbDataRecord rec in reader)
         {
-            output.Add(new ImageCategory() { 
-                Name = rec["Category"].ToString() ?? "No Category", 
+            output.Add(new ImageCategory()
+            {
+                Name = rec["Category"].ToString() ?? "No Category",
                 Count = int.Parse(rec["Count"].ToString() ?? "0")
             });
         }
@@ -48,29 +57,50 @@ public class ImageDataClient
 
     public async Task<ImageResult[]> GetImagesByCategory(string category)
     {
-        const string query = @"select i.GUID, i.Category, i.Subcategory, GROUP_CONCAT(it.TagName) as 'Tags', Created, ist.*
-                              from Image i
-                              left join ImageTag it on it.ImageID = i.ImageID
-                              left join ImageSettings ist on ist.ImageID = i.ImageID
-                              where Category = @category
-                              group by i.GUID, ist.ImageSettingsID";
-        var output = new List<ImageResult>();
+        const string query = SelectImageResultSql + " where Category = @category " + GroupByImageResultSql;
 
+        var param = new MySqlParameter("@category", category);
+
+        return await GetImageData(query, param);
+    }
+
+    public async Task<ImageResult[]> GetImagesBySubcategory(string subcategory)
+    {
+        const string query = SelectImageResultSql + " where SubCategory = @subcategory " + GroupByImageResultSql;
+
+        var param = new MySqlParameter("@subcategory", subcategory);
+
+        return await GetImageData(query, param);
+    }
+
+    public async Task<ImageResult[]> GetImagesByTag(string tag)
+    {
+        const string query = SelectImageResultSql + " where i.ImageID in (select ImageID from ImageTag where TagName = @tag) " + GroupByImageResultSql;
+
+        var param = new MySqlParameter("@tag", tag);
+
+        return await GetImageData(query, param);
+    }
+
+    public async Task<ImageResult[]> GetImageData(string query, MySqlParameter param)
+    {
+        var output = new List<ImageResult>();
 
         using var connection = new MySqlConnection(_configs.ImageDatabase);
         await connection.OpenAsync();
 
         var command = new MySqlCommand(query, connection);
-        command.Parameters.AddWithValue("@category", category);
-        
+        command.Parameters.Add(param);
+
         await command.PrepareAsync();
         DbDataReader reader = await command.ExecuteReaderAsync();
 
         foreach (DbDataRecord rec in reader)
         {
-            output.Add(new ImageResult() {
+            output.Add(new ImageResult()
+            {
                 GUID = rec["GUID"].ToString() ?? "",
-                Tags = (rec["Tags"].ToString() ?? "").Split(','),
+                Tags = (rec["Tags"].ToString() ?? "").Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray(),
                 Category = rec["Category"].ToString() ?? "",
                 Subcategory = rec["Subcategory"].ToString() ?? "",
                 Created = DateTime.Parse(rec["Created"].ToString() ?? ""),
@@ -87,7 +117,7 @@ public class ImageDataClient
         }
 
         return output.ToArray();
-    }
+    }    
 
     /// <summary>
     /// Gets the file path of a given image by GUID

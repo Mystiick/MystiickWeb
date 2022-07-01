@@ -38,4 +38,14 @@ public class ImageService
     {
         return await _dataClient.GetImagesByCategory(category);
     }
+
+    public async Task<ImageResult[]> GetImagesBySubcategory(string subcategory)
+    {
+        return await _dataClient.GetImagesBySubcategory(subcategory);
+    }
+
+    public async Task<ImageResult[]> GetImagesByTag(string tag)
+    {
+        return await _dataClient.GetImagesByTag(tag);
+    }
 }
