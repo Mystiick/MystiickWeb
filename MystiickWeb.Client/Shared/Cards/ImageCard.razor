@@ -3,7 +3,7 @@
 <div class="card image-card m-2 w-100">
     @if (Image != null)
     {
-        <img class="pointer" src="/api/image/@Image.GUID" @onclick="OnImageClicked" />
+        <img class="pointer" src="/api/image/@Image.GUID/img" @onclick="OnImageClicked" />
         <div>
             <span class="btn-link pointer" @onclick="@(x => OnSubcategoryClicked(Image.Subcategory))">@Image.Subcategory</span>
         </div>

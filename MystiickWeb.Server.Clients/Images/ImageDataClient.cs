@@ -7,6 +7,7 @@ using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models;
 
 using System.Data.Common;
+using System.Linq;
 
 namespace MystiickWeb.Server.Clients.Images;
 
@@ -24,9 +25,9 @@ public class ImageDataClient
     private const string SelectImageResultSql = @"select i.GUID, i.Category, i.Subcategory, GROUP_CONCAT(it.TagName) as 'Tags', Created, ist.*
                                                   from Image i
                                                   left join ImageTag it on it.ImageID = i.ImageID
-                                                  left join ImageSettings ist on ist.ImageID = i.ImageID";
+                                                  left join ImageSettings ist on ist.ImageID = i.ImageID ";
 
-    private const string GroupByImageResultSql = "group by i.GUID, ist.ImageSettingsID";
+    private const string GroupByImageResultSql = " group by i.GUID, ist.ImageSettingsID";
 
 
     /// <summary>
@@ -53,6 +54,15 @@ public class ImageDataClient
         }
 
         return output.ToArray();
+    }
+
+    public async Task<ImageResult> GetImageByGuid(string guid)
+    {
+        const string query = SelectImageResultSql + " where GUID = @guid " + GroupByImageResultSql;
+
+        var param = new MySqlParameter("@guid", guid);
+
+        return (await GetImageData(query, param)).First();
     }
 
     public async Task<ImageResult[]> GetImagesByCategory(string category)
@@ -123,17 +133,17 @@ public class ImageDataClient
     /// Gets the file path of a given image by GUID
     /// </summary>
     /// <param name="guid"></param>
-    public async Task<string> GetImagePathByGUID(string guid, bool thumbnail)
+    public async Task<string> GetImagePathByGuid(string guid, bool thumbnail)
     {
         using var connection = new MySqlConnection(_configs.ImageDatabase);
         await connection.OpenAsync();
 
-        var command = new MySqlCommand(@"select ImagePath, ThumbnailPath from Image where GUID = @guid", connection);
+        var command = new MySqlCommand(@"select ImagePath, ThumbnailPath, PreviewPath from Image where GUID = @guid", connection);
         command.Parameters.AddWithValue("@guid", guid);
 
         await command.PrepareAsync();
         DbDataReader reader = await command.ExecuteReaderAsync();
 
-        return reader.Cast<DbDataRecord>().First()[thumbnail ? "ThumbnailPath" : "ImagePath"].ToString() ?? "";
+        return reader.Cast<DbDataRecord>().First()[thumbnail ? "ThumbnailPath" : "PreviewPath"].ToString() ?? "";
     }
 }

@@ -1,11 +1,13 @@
 ﻿@page "/photography"
+@page "/photography/{imageGuid}"
 @using MystiickWeb.Shared.Models
 
 @inherits BasePage
-
+@inject NavigationManager NavigationManager
 
 <PageTitle>Photography</PageTitle>
-<h1>Photography</h1>
+<h1 class="inline-block">Photography</h1>
+
 @if (Error != string.Empty)
 {
     <div class="text-danger">@Error</div>
@@ -14,59 +16,105 @@
 {
     <div class="text-danger">@Message</div>
 }
+
 @if (IsLoading)
 {
-    <div class="spinner-border" role="status" id="loading">
+    <span class="spinner-border" role="status" id="loading">
         <span class="sr-only">&nbsp;</span>
-    </div>
+    </span>
 }
 
-<div class="row">
-    <div class="col-xl-2 gap-2 border-end">
-        @if (categories != null)
-        {
-            @foreach (ImageCategory cat in categories)
+@if (string.IsNullOrWhiteSpace(imageGuid))
+{
+    <div class="row">
+        <div class="col-xl-2 gap-2 border-end">
+            @if (categories != null)
             {
-                <button class="btn btn-outline-primary mb-1 w-100" @onclick="@(x => LoadThumbnails(cat.Name))">
-                    <span>@cat.Name</span>
-                    <span>(@cat.Count)</span>
-                </button>
+                @foreach (ImageCategory cat in categories)
+                {
+                    <button class="btn btn-outline-primary mb-1 w-100" @onclick="@(x => LoadThumbnails(cat.Name))">
+                        <span>@cat.Name</span>
+                        <span>(@cat.Count)</span>
+                    </button>
+                }
             }
-        }
-    </div>
+        </div>
 
-    <div class="col-xl-10">
-        @if (images != null)
-        {
-            <div class="">
-                <div class="row">
-                    @foreach (ImageResult img in images)
-                    {
-                        <div class="col-xxl-2 col-xl-3 col-lg-6">
-                            <ImageCard Image="img" OnImageClick="ShowPreview" OnSubcategoryClick="LoadThumbnailsBySubcategory" OnTagClick="LoadThumbnailsByTag" />
-                        </div>
-                    }
+        <div class="col-xl-10">
+            @if (images != null)
+            {
+                <div class="">
+                    <div class="row">
+                        @foreach (ImageResult img in images)
+                        {
+                            <div class="col-xxl-2 col-xl-3 col-lg-6">
+                                <ImageCard Image="img" OnImageClick="ShowPreview" OnSubcategoryClick="LoadThumbnailsBySubcategory" OnTagClick="LoadThumbnailsByTag" />
+                            </div>
+                        }
+                    </div>
                 </div>
-            </div>
-        }
+            }
 
-        @if (imagesLoading)
-        {
-            <div class="spinner-border" role="status" id="loading">
-                <span class="sr-only">&nbsp;</span>
-            </div>
-        }
+            @if (imagesLoading)
+            {
+                <div class="spinner-border" role="status" id="loading">
+                    <span class="sr-only">&nbsp;</span>
+                </div>
+            }
+        </div>
     </div>
-</div>
+}
+else if (@previewImage != null)
+{
+    <div>
+        <div>
+            <img src="/api/image/@imageGuid/img?thumbnail=false">
+        </div>
+        
+        <div>
+            <span>Date Taken:</span>
+            <span>@previewImage.Created</span>
+        </div>
+        <div>
+            <span>Camera:</span>
+            <span>@previewImage.Camera.Model</span>
+        </div>
+        <div>
+            <span>ISO:</span>
+            <span>@previewImage.Camera.ISO</span>
+        </div>
+        <div>
+            <span>Aperature:</span>
+            <span>@previewImage.Camera.Aperature</span>
+        </div>
+        <div>
+            <span>Focal Length:</span>
+            <span>@(previewImage.Camera.FocalLength)mm</span>
+        </div>
+        <div>
+            <span>Shutter Speed:</span>
+            <span>@previewImage.Camera.ShutterSpeed Seconds</span>
+        </div>
+    </div>
+}
 
 @code {
     public ImageCategory[]? categories;
     public ImageResult[]? images;
     public bool imagesLoading = false;
+    public ImageResult? previewImage;
+
+    [Parameter]
+    public string? imageGuid { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         categories = await GetFromApiAsync<ImageCategory[]>("api/image/categories");
+
+        if (!string.IsNullOrEmpty(imageGuid))
+        {
+            previewImage = await GetFromApiAsync<ImageResult>($"api/image/{imageGuid}");
+        }
     }
 
     protected async Task LoadThumbnails(string category)
@@ -89,10 +137,9 @@
         images = await GetFromApiAsync<ImageResult[]>($"api/image/tags/{tag}");
     }
 
-    protected async Task ShowPreview(ImageResult image)
+    protected void ShowPreview(ImageResult image)
     {
-        Console.WriteLine($"{image.GUID} clicked!");
-        await Task.CompletedTask;
+        previewImage = image;
+        NavigationManager.NavigateTo($"photography/{image.GUID}");
     }
-
 }

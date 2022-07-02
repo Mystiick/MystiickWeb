@@ -14,10 +14,16 @@ public class ImageService
         _fileClient = fileClient;
     }
 
-    public async Task<ImageResult> GetImageByGUID(string id, bool thumbnail)
+    public async Task<ImageResult> GetImageByGuid(string guid)
     {
         // Get the image's file path
-        string path = await _dataClient.GetImagePathByGUID(id, thumbnail);
+        return await _dataClient.GetImageByGuid(guid);
+    }
+
+    public async Task<ImageResult> GetImageFileByGuid(string id, bool thumbnail)
+    {
+        // Get the image's file path
+        string path = await _dataClient.GetImagePathByGuid(id, thumbnail);
 
         // Load image from the path above
         return await _fileClient.LoadImage(path);

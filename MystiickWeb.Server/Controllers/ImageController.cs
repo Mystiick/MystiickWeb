@@ -19,9 +19,15 @@ public class ImageController : ControllerBase
     }
 
     [HttpGet("{guid}")]
-    public async Task<FileContentResult> GetImage(string guid, bool thumbnail = true)
+    public async Task<ImageResult> GetImage(string guid)
     {
-        ImageResult output = await _service.GetImageByGUID(guid, thumbnail);
+        return await _service.GetImageByGuid(guid);
+    }
+
+    [HttpGet("{guid}/img")]
+    public async Task<FileContentResult> GetImageFile(string guid, bool thumbnail = true)
+    {
+        ImageResult output = await _service.GetImageFileByGuid(guid, thumbnail);
 
         return base.File(output.Data, output.ContentType);
     }
