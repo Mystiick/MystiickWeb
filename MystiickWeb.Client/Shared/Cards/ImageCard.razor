@@ -1,0 +1,51 @@
+﻿@using MystiickWeb.Shared.Models;
+
+<div class="card image-card m-2 w-100">
+    @if (Image != null)
+    {
+        <img class="pointer" src="/api/image/@Image.GUID/img" @onclick="OnImageClicked" />
+        <div>
+            <span class="btn-link pointer" @onclick="@(x => OnSubcategoryClicked(Image.Subcategory))">@Image.Subcategory</span>
+        </div>
+        <div>
+            @if (Image.Tags.Any())
+            {
+                <span>Tags:</span>
+                @foreach (var tag in Image.Tags)
+                {
+                    <span class="btn-link pointer" @onclick="@(x => OnTagClicked(tag))">@tag</span><span>&nbsp;</span>
+                }
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] 
+    public ImageResult? Image { get; set; }
+
+    [Parameter] 
+    public EventCallback<ImageResult> OnImageClick { get; set; }
+
+    [Parameter] 
+    public EventCallback<string> OnSubcategoryClick { get; set; }
+
+    [Parameter] 
+    public EventCallback<string> OnTagClick { get; set; }
+
+    
+    public async Task OnImageClicked(MouseEventArgs arg)
+    {
+        await OnImageClick.InvokeAsync(Image);
+    }
+
+    public async Task OnSubcategoryClicked(string subcategroy)
+    {
+        await OnSubcategoryClick.InvokeAsync(subcategroy);
+    }
+
+    public async Task OnTagClicked(string tag)
+    {
+        await OnTagClick.InvokeAsync(tag);
+    }
+}
