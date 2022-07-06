@@ -10,6 +10,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MystiickWeb.Shared", "Mysti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MystiickWeb.Server.Clients", "MystiickWeb.Server.Clients\MystiickWeb.Server.Clients.csproj", "{888833D1-634B-44BB-BF8E-38C4D2662FFB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "quickstart", "quickstart", "{7F90958F-53C0-4FA5-A80A-73177A4759C3}"
+	ProjectSection(SolutionItems) = preProject
+		quickstart\create-database.sql = quickstart\create-database.sql
+		quickstart\docker-compose.yml = quickstart\docker-compose.yml
+		quickstart\quickstart-dev.sh = quickstart\quickstart-dev.sh
+		quickstart\quickstop.sh = quickstart\quickstop.sh
+		quickstart\README.md = quickstart\README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
