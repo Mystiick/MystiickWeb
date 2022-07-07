@@ -1,36 +1,42 @@
 ﻿<nav aria-label="@Label">
     <ul class="pagination flex-wrap">
-        <li class="page-item @(PageNumber == 0 ? "disabled" : "")"><a class="page-link" href="" @onclick="() => { if (PageNumber > 0) PageNumber--; }" @onclick:preventDefault>&laquo;</a></li>
+        <li class="page-item @(PageNumber == 0 ? "disabled" : "")"><a class="page-link" href="" @onclick="() => { if (PageNumber > 0) UpdatePage(PageNumber - 1); }" @onclick:preventDefault>&laquo;</a></li>
 
         @for (int i = 0; i < LastPage + 1; i++)
         {
             // Need to capture the page number locally since i keeps getting incremented
             int page = i;
 
-            <li class="page-item @(PageNumber == i ? "active" : "")"><a class="page-link" href="" @onclick="(() => PageNumber = page)" @onclick:preventDefault>@(i+1)</a></li>
+            <li class="page-item @(PageNumber == i ? "active" : "")"><a class="page-link" href="" @onclick="(() => UpdatePage(page))" @onclick:preventDefault>@(i+1)</a></li>
         }
 
-        <li class="page-item @(PageNumber == LastPage ? "disabled" : "")"><a class="page-link" href="" @onclick="() => { if (PageNumber < LastPage) PageNumber++; }" @onclick:preventDefault>&raquo;</a></li>
+        <li class="page-item @(PageNumber == LastPage ? "disabled" : "")"><a class="page-link" href="" @onclick="() => { if (PageNumber < LastPage) UpdatePage(PageNumber + 1); }" @onclick:preventDefault>&raquo;</a></li>
     </ul>
 </nav>
 
 @ChildContent
 
 @code {
-    [Parameter]
-    public string Label { get; set; } = "";
+        [Parameter]
+        public string Label { get; set; } = "";
 
-    [Parameter]
-    public IEnumerable<object>? Items { get; set; }
+        [Parameter]
+        public IEnumerable<object>? Items { get; set; }
 
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+        [Parameter]
+        public RenderFragment? ChildContent { get; set; }
 
-    [Parameter]
-    public int PageSize { get; set; } = 5;
+        [Parameter]
+        public int PageSize { get; set; } = 5;
 
-    [Parameter]
-    public int PageNumber { get; set; }
+        [Parameter]
+        public int PageNumber { get; set; }
+
+        [Parameter]
+        public string Name { get; set; } = "";
+
+        [Inject]
+        private Services.CacheService _cache { get; set; }
 
     public IEnumerable<object> DisplayItems
     {
@@ -50,6 +56,25 @@
         get
         {
             return (Items?.Count() - 1) / PageSize ?? 0;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        // Look for a cached version of the paginator and load the page number if it exists
+        if (!string.IsNullOrWhiteSpace(this.Name) && _cache.Contains(this.Name))
+        {
+            this.PageNumber = _cache.Load<int>(this.Name);
+        }
+    }
+
+    public void UpdatePage(int newNumber)
+    {
+        this.PageNumber = newNumber;
+
+        if (!string.IsNullOrWhiteSpace(this.Name))
+        {
+            _cache.Save<int>(this.Name, newNumber);
         }
     }
 }
