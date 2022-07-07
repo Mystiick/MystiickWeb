@@ -1,9 +1,8 @@
 ﻿@page "/photography"
-@page "/photography/{imageGuid}"
-@using MystiickWeb.Shared.Models
-
+@page "/photography/{ImageGuid}"
 @inherits BasePage
-@inject NavigationManager NavigationManager
+
+@using MystiickWeb.Shared.Models
 
 <PageTitle>Photography</PageTitle>
 <h1 class="inline-block">Photography</h1>
@@ -24,18 +23,33 @@
     </span>
 }
 
-@if (string.IsNullOrWhiteSpace(imageGuid))
+@if (string.IsNullOrWhiteSpace(ImageGuid))
 {
     <div class="row">
         <div class="col-xl-2 gap-2 border-end">
             @if (categories != null)
             {
+                <h3 class="p-2">Categories</h3>
                 @foreach (ImageCategory cat in categories)
                 {
                     <button class="btn btn-outline-primary mb-1 w-100" @onclick="@(x => LoadThumbnails(cat.Name))">
                         <span>@cat.Name</span>
                         <span>(@cat.Count)</span>
                     </button>
+                }
+
+                @if (subcategories != null && subcategories.Count() > 0)
+                {
+                    <div class="border-bottom p-2"></div>
+
+                    <h4 class="p-2">Subcategories</h4>
+                    @foreach (ImageCategory cat in subcategories)
+                    {
+                        <button class="btn btn-outline-primary mb-1 w-100" @onclick="@(x => LoadThumbnailsBySubcategory(cat.Name))">
+                            <span>@cat.Name</span>
+                            <span>(@cat.Count)</span>
+                        </button>
+                    }
                 }
             }
         </div>
@@ -61,7 +75,7 @@ else if (@previewImage != null)
 {
     <div>
         <div>
-            <img src="/api/image/@imageGuid/img?thumbnail=false">
+            <img src="/api/image/@ImageGuid/img?thumbnail=false">
         </div>
 
         <div>
@@ -89,58 +103,4 @@ else if (@previewImage != null)
             <span>@previewImage.Camera.ShutterSpeed Seconds</span>
         </div>
     </div>
-}
-
-@code {
-    public ImageCategory[]? categories;
-    public ImageResult[]? images;
-    public bool imagesLoading = false;
-    public ImageResult? previewImage;
-
-    public Paginator imagePager = new Paginator();
-
-    [Parameter]
-    public string? imageGuid { get; set; }
-    [Inject]
-    private Services.CacheService _cache { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        categories = await GetFromApiAsync<ImageCategory[]>("api/image/categories");
-
-        if (!string.IsNullOrEmpty(imageGuid))
-        {
-            previewImage = await GetFromApiAsync<ImageResult>($"api/image/{imageGuid}");
-        }
-    }
-
-    public override async Task<T> GetFromApiAsync<T>(string path)
-    {
-        // Set to null first to clear out existing list, preventing images from popping in over the old ones, one at a time
-        images = null;
-        _cache.Delete("ImagePager");
-
-        return await base.GetFromApiAsync<T>(path);
-    }
-
-    protected async Task LoadThumbnails(string category)
-    {
-        images = await GetFromApiAsync<ImageResult[]>($"api/image/categories/{category}");
-    }
-
-    protected async Task LoadThumbnailsBySubcategory(string subcategory)
-    {
-        images = await GetFromApiAsync<ImageResult[]>($"api/image/subcategories/{subcategory}");
-    }
-
-    protected async Task LoadThumbnailsByTag(string tag)
-    {
-        images = await GetFromApiAsync<ImageResult[]>($"api/image/tags/{tag}");
-    }
-
-    protected void ShowPreview(ImageResult image)
-    {
-        previewImage = image;
-        NavigationManager.NavigateTo($"photography/{image.GUID}");
-    }
 }

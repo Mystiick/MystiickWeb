@@ -36,7 +36,7 @@
         public string Name { get; set; } = "";
 
         [Inject]
-        private Services.CacheService _cache { get; set; }
+        private Services.CacheService _cache { get; set; } = new();
 
     public IEnumerable<object> DisplayItems
     {

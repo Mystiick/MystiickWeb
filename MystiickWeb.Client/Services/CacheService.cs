@@ -2,7 +2,7 @@
 
 public class CacheService
 {
-    private Dictionary<string, object> _cache = new();
+    private readonly Dictionary<string, object> _cache = new();
 
     public void Save<T>(string key, T value) where T : notnull
     {
