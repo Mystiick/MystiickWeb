@@ -127,7 +127,7 @@ public class ImageDataClient
         }
 
         return output.ToArray();
-    }    
+    }
 
     /// <summary>
     /// Gets the file path of a given image by GUID

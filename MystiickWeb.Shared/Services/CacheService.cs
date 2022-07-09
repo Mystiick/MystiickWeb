@@ -1,4 +1,4 @@
-﻿namespace MystiickWeb.Client.Services;
+﻿namespace MystiickWeb.Shared.Services;
 
 public class CacheService
 {

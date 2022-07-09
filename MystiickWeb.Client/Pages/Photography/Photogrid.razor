@@ -1,10 +1,13 @@
-﻿@page "/photography"
-@page "/photography/{ImageGuid}"
+﻿@page "/photogrid"
+@page "/photogrid/{ImageGuid}"
+@page "/photogrid/category/{Category}"
+@page "/photogrid/subcategory/{Subcategory}"
+@page "/photogrid/tag/{Tag}"
 @inherits BasePage
 
 @using MystiickWeb.Shared.Models
 
-<PageTitle>Photography</PageTitle>
+<PageTitle>Photo Grid</PageTitle>
 <h1 class="inline-block">Photography</h1>
 
 @if (Error != string.Empty)
@@ -32,10 +35,10 @@
                 <h3 class="p-2">Categories</h3>
                 @foreach (ImageCategory cat in categories)
                 {
-                    <button class="btn btn-outline-primary mb-1 w-100" @onclick="@(x => LoadThumbnails(cat.Name))">
+                    <a class="btn btn-outline-primary mb-1 w-100" href="photogrid/category/@cat.Name" @onclick="() => _cache.Delete(imagePager.Name)">
                         <span>@cat.Name</span>
                         <span>(@cat.Count)</span>
-                    </button>
+                    </a>
                 }
 
                 @if (subcategories != null && subcategories.Count() > 0)
@@ -45,10 +48,10 @@
                     <h4 class="p-2">Subcategories</h4>
                     @foreach (ImageCategory cat in subcategories)
                     {
-                        <button class="btn btn-outline-primary mb-1 w-100" @onclick="@(x => LoadThumbnailsBySubcategory(cat.Name))">
+                        <a class="btn btn-outline-primary mb-1 w-100" href="photogrid/subcategory/@cat.Name" @onclick="() => _cache.Delete(imagePager.Name)">
                             <span>@cat.Name</span>
                             <span>(@cat.Count)</span>
-                        </button>
+                        </a>
                     }
                 }
             }

@@ -1,4 +1,6 @@
-﻿<nav aria-label="@Label">
+﻿@using MystiickWeb.Shared.Services
+
+<nav aria-label="@Label">
     <ul class="pagination flex-wrap">
         <li class="page-item @(PageNumber == 0 ? "disabled" : "")"><a class="page-link" href="" @onclick="() => { if (PageNumber > 0) UpdatePage(PageNumber - 1); }" @onclick:preventDefault>&laquo;</a></li>
 
@@ -17,26 +19,14 @@
 @ChildContent
 
 @code {
-        [Parameter]
-        public string Label { get; set; } = "";
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public IEnumerable<object>? Items { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public int PageSize { get; set; } = 5;
+    [Parameter] public int PageNumber { get; set; }
+    [Parameter] public string Name { get; set; } = "";
 
-        [Parameter]
-        public IEnumerable<object>? Items { get; set; }
-
-        [Parameter]
-        public RenderFragment? ChildContent { get; set; }
-
-        [Parameter]
-        public int PageSize { get; set; } = 5;
-
-        [Parameter]
-        public int PageNumber { get; set; }
-
-        [Parameter]
-        public string Name { get; set; } = "";
-
-        [Inject]
-        private Services.CacheService _cache { get; set; } = new();
+    [Inject] private CacheService _cache { get; set; } = new();
 
     public IEnumerable<object> DisplayItems
     {
