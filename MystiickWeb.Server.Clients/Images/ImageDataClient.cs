@@ -49,7 +49,7 @@ public class ImageDataClient
             output.Add(new ImageCategory()
             {
                 Name = rec["Category"].ToString() ?? "No Category",
-                Count = int.Parse(rec["Count"].ToString() ?? "0")
+                Count = (long)rec["Count"]
             });
         }
 
@@ -118,19 +118,19 @@ public class ImageDataClient
         {
             output.Add(new ImageResult()
             {
-                GUID = rec["GUID"].ToString() ?? "",
+                GUID = (Guid)rec["GUID"],
                 Tags = (rec["Tags"].ToString() ?? "").Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray(),
-                Category = rec["Category"].ToString() ?? "",
-                Subcategory = rec["Subcategory"].ToString() ?? "",
-                Created = DateTime.Parse(rec["Created"].ToString() ?? ""),
+                Category = (string)rec["Category"],
+                Subcategory = (string)rec["Subcategory"],
+                Created = (DateTime)rec["Created"],
                 Camera = new CameraSettings()
                 {
-                    Model = rec["Model"].ToString() ?? "",
-                    Flash = bool.Parse(rec["Flash"].ToString() ?? ""),
-                    ISO = uint.Parse(rec["ISO"].ToString() ?? ""),
-                    ShutterSpeed = rec["ShutterSpeed"].ToString() ?? "",
-                    Aperature = rec["Aperature"].ToString() ?? "",
-                    FocalLength = rec["FocalLength"].ToString() ?? "",
+                    Model = (string)rec["Model"],
+                    Flash = (bool)rec["Flash"],
+                    ISO = (short)rec["ISO"],
+                    ShutterSpeed = (string)rec["ShutterSpeed"],
+                    Aperature = (string)rec["Aperature"],
+                    FocalLength = (string)rec["FocalLength"],
                 }
             });
         }
@@ -153,6 +153,6 @@ public class ImageDataClient
         await command.PrepareAsync();
         DbDataReader reader = await command.ExecuteReaderAsync();
 
-        return reader.Cast<DbDataRecord>().First()[thumbnail ? "ThumbnailPath" : "PreviewPath"].ToString() ?? "";
+        return (string)reader.Cast<DbDataRecord>().First()[thumbnail ? "ThumbnailPath" : "PreviewPath"];
     }
 }
