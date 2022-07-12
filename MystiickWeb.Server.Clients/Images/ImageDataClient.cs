@@ -65,6 +65,15 @@ public class ImageDataClient
         return (await GetImageData(query, param)).First();
     }
 
+    public async Task<ImageResult> GetImageByID(uint id)
+    {
+        const string query = SelectImageResultSql + " where i.ImageID = @id " + GroupByImageResultSql;
+
+        var param = new MySqlParameter("@id", id);
+
+        return (await GetImageData(query, param)).First();
+    }
+
     public async Task<ImageResult[]> GetImagesByCategory(string category)
     {
         const string query = SelectImageResultSql + " where Category = @category " + GroupByImageResultSql;

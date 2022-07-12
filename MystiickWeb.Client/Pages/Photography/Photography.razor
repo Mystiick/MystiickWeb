@@ -5,6 +5,22 @@
 
 <h1>Photography</h1>
 
+@if (Error != string.Empty)
+{
+    <div class="text-danger">@Error</div>
+}
+@if (Message != string.Empty)
+{
+    <div class="text-danger">@Message</div>
+}
+
+@if (IsLoading)
+{
+    <span class="spinner-border" role="status" id="loading">
+        <span class="sr-only">&nbsp;</span>
+    </span>
+}
+
 <a href="/photogrid">View All</a>
 
 <div class="border-bottom"></div>
@@ -23,10 +39,10 @@
             }
 
             <div class="row">                
-                @foreach (Attachment<ImageResult> attachment in post.Attachments)
+                @foreach (ImageResult attachment in post.Attachments)
                 {
                     <div class="col-xxl-2 col-lg-4 col-md-6">
-                        <ImageCard Image="attachment.RelatedObject" />
+                        <ImageCard Image="attachment" />
                     </div>
                 }
             </div>
@@ -34,53 +50,10 @@
     }
 }
 @code {
-    private Post<ImageResult>[]? Posts;
-    ImageResult[]? img;
+    private ImagePost[]? Posts;
 
     protected override async Task OnInitializedAsync()
     {
-        img = new ImageResult[] {
-            await GetFromApiAsync<ImageResult>($"api/image/170d6a6f-a4e8-4ea5-beb2-7e8ef4834fe0"),
-            await GetFromApiAsync<ImageResult>($"api/image/011a8b97-3881-4301-92b5-038b3710cdbe"),
-            await GetFromApiAsync<ImageResult>($"api/image/1f399945-1c15-4505-88c6-b3e0e6cf8c55"),
-            await GetFromApiAsync<ImageResult>($"api/image/17c24ae0-5b96-496b-8dee-6e24638f2371"),
-            await GetFromApiAsync<ImageResult>($"api/image/263619b7-a195-409c-b959-3abccb77b6e7"),
-            await GetFromApiAsync<ImageResult>($"api/image/2b12f41f-2965-40c7-99a4-f0de19a9e1bb")
-        };
-
-        Posts = new Post<ImageResult>[]
-        {
-            new Post<ImageResult>()
-            {
-                Title = "Test Post 1",
-                CreatedDate = DateTime.Now,
-                Text = "Lipsum\\ndipsum\\nmore text".Split(new string[] {"\\n" }, StringSplitOptions.TrimEntries),
-                Attachments = img.Skip(1).Take(3).Select(x => new Attachment<ImageResult>() { RelatedObject = x}).ToArray()
-            },
-            new Post<ImageResult>()
-            {
-                Title = "4th of July",
-                CreatedDate = new DateTime(2022, 7, 8),
-                Text = new string[] {
-                    @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ut ante volutpat, rutrum ante id, aliquet lectus. Vivamus feugiat sollicitudin dolor, non pretium velit efficitur consequat. 
-                        Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. 
-                        Sed consectetur arcu ex, eget dictum sem accumsan sit amet. 
-                        Etiam euismod elit et felis elementum, id finibus tortor maximus. 
-                        Quisque ac commodo libero, ac tincidunt lorem. Quisque orci purus, malesuada sit amet posuere sed, varius non lectus.", 
-                    @"Donec dapibus augue urna, at rutrum nunc tempus a. Duis vehicula arcu et velit blandit, sodales condimentum purus ultrices. Ut neque enim, interdum posuere diam ut, tempor rutrum risus. 
-                        Pellentesque efficitur placerat tellus at molestie. Nam consectetur, urna aliquet porta facilisis, tellus orci suscipit nibh, ac efficitur nibh tellus ut massa. 
-                        Phasellus eu tristique metus. Duis vehicula volutpat vehicula. Fusce pellentesque, est et placerat bibendum, velit massa interdum urna, eget lacinia tortor libero et lorem. Sed pharetra massa sed sapien dignissim malesuada. 
-                        Proin facilisis varius nulla, eu semper erat facilisis non. Suspendisse eget laoreet massa, ut iaculis augue. Fusce ut elit lacus. Morbi euismod odio nec nisi volutpat placerat. Praesent interdum massa a eleifend tristique."
-                },
-                Attachments = img.Take(2).Select(x => new Attachment<ImageResult>() { RelatedObject = x}).ToArray()
-            },
-            new Post<ImageResult>()
-            {
-                Title = "4th of July",
-                CreatedDate = new DateTime(2022, 6, 27),
-                Text = new string[] { @"Summer vacation this year was headed back to Venice, Florida. We stayed in a VRBO near the beach and snapped some cool pictures." },
-                Attachments = img.Skip(2).Select(x => new Attachment<ImageResult>() { RelatedObject = x}).ToArray()
-            }
-        };
+        Posts = await GetFromApiAsync<ImagePost[]>("api/post/photography");
     }
 }
