@@ -24,7 +24,7 @@ public class PostDataClient
 
     private const string SelectPosts = @"select p.PostID, p.PostTitle, p.PostText, p.Created, GROUP_CONCAT(pa.ObjectID) as AttachmentIDs
                                          from Post p
-                                         join PostAttachment pa on p.PostID = pa.PostID
+                                         left join PostAttachment pa on p.PostID = pa.PostID
                                          where PostType = 'photography'
                                          group by p.PostID
                                          order by Created desc";
@@ -48,7 +48,7 @@ public class PostDataClient
                 Title = (string)rec["PostTitle"],
                 Text = ((string)rec["PostText"]).Split(new string[] { "\\n" }, StringSplitOptions.TrimEntries),
                 CreatedDate = (DateTime)rec["Created"],
-                AttachmentIDs = ((string)rec["AttachmentIDs"]).Split(',').Select(x => uint.Parse(x)).ToArray()
+                AttachmentIDs = (rec["AttachmentIDs"].ToString() ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).Select(x => uint.Parse(x)).ToArray()
             });
         }
 

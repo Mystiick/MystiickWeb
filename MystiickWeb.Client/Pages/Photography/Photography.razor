@@ -3,7 +3,8 @@
 
 @using MystiickWeb.Shared.Models;
 
-<h1>Photography</h1>
+<PageTitle>Photography</PageTitle>
+<h1 class="inline-block">Photography</h1>
 
 @if (Error != string.Empty)
 {
@@ -21,9 +22,9 @@
     </span>
 }
 
-<a href="/photogrid">View All</a>
-
-<div class="border-bottom"></div>
+<div class="border-bottom">
+    <p>A collection of posts showcasing some of my favorite pictures I've taken. If you want to see all of the pictures I've uploaded you can <a href="/photogrid">View All</a> here.</p>
+</div>
 
 @if (Posts != null)
 {

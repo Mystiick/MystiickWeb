@@ -50,6 +50,10 @@
     color: white;
 }
 
+    .nav-link {
+        padding: 1em
+    }
+
 @media (min-width: 641px) {
     .navbar-toggler {
         display: none;
