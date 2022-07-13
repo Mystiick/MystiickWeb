@@ -7,7 +7,7 @@ namespace MystiickWeb.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PostController
+public class PostController : Controller
 {
 
     private readonly ILogger<PostController> _logger;
@@ -19,9 +19,16 @@ public class PostController
         _postService = postService;
     }
 
-    [HttpGet("photography")]
-    public async Task<ImagePost[]> GetPhotographyPosts()
+    [HttpGet("top/{count}")]
+    public async Task<ActionResult<ImagePost[]>> GetTopPosts(int count)
     {
-        return await _postService.GetAllImagePosts();
+        // TODO: Update to a generic GetAllPosts
+        return Ok((await _postService.GetAllImagePosts()).Take(count).ToArray());
+    }
+
+    [HttpGet("photography")]
+    public async Task<ActionResult<ImagePost[]>> GetPhotographyPosts()
+    {
+        return Ok(await _postService.GetAllImagePosts());
     }
 }

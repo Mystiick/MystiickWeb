@@ -14,13 +14,8 @@
     <div class="text-danger">@message</div>
 }
 
+<LoadingSpinner IsLoading="loading" />
 
-@if (loading)
-{
-    <div class="spinner-border" role="status" id="loading">
-        <span class="sr-only">&nbsp;</span>
-    </div>
-}
 @if (model != null)
 {
 

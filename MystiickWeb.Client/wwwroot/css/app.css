@@ -70,3 +70,7 @@ a, .btn-link {
 .nowrap {
     white-space: nowrap
 }
+
+.nav-link {
+    padding: 1em
+}

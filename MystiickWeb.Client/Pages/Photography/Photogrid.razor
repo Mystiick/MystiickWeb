@@ -19,12 +19,7 @@
     <div class="text-danger">@Message</div>
 }
 
-@if (IsLoading)
-{
-    <span class="spinner-border" role="status" id="loading">
-        <span class="sr-only">&nbsp;</span>
-    </span>
-}
+<LoadingSpinner IsLoading="IsLoading" />
 
 @if (string.IsNullOrWhiteSpace(ImageGuid))
 {
