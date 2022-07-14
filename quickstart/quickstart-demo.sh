@@ -15,7 +15,3 @@ docker cp ./create-database.sql quickstart-database-1:/tmp/create-database.sql
 # Execute the script
 echo Executing ./create-database.sql
 docker exec quickstart-database-1 sh -c "mysql -h localhost -u root --password=mysqlpw < /tmp/create-database.sql"
-
-if [ ! -f "../MystiickWeb.Server/appsettings.development.json" ]; then
-	cp ../MystiickWeb.Server/appsettings.json ../MystiickWeb.Server/appsettings.development.json
-fi

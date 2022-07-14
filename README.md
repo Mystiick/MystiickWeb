@@ -15,7 +15,7 @@ Repository for the Server and Client for {URL}. This website contains some small
 ### Dev
 To stand up a development environment, you can run `./quickstart-dev.sh` in [quickstart](./quickstart/). This will stand up a mysql database container (port 3306) and adminer container (http://localhost:8080). It will also create an `appsettings.dev.json` file for you that can be modified as needed for local development.
 
-Since adminer is hosted inside the same docker-compose file, you'll need to access it using the server `quickstart-database-1` instead of `localhost`, which is what your appsettings will need to use. This is due to the network adapter for the containers using Docker's network, not the parent system's.
+Since adminer is hosted inside the same docker-compose file, you'll need to access it using the server `mwdb` instead of `localhost`, which is what your appsettings will need to use. This is due to the network adapter for the containers using Docker's network, not the parent system's.
 
 ### Demo
 To startup a demo application with some sample seeded data, you can run `./quickstart.sh` in [quickstart](./quickstart/), and stop and clean up with `./quickstop.sh`.

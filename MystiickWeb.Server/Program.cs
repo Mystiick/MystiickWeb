@@ -24,6 +24,7 @@ builder.Services.AddSingleton<PostDataClient>();
 builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey));
 builder.Configuration.AddJsonFile("appsettings.json", false);
 builder.Configuration.AddJsonFile("appsettings.development.json", true);
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Logging.AddConfiguration(builder.Configuration);
 
@@ -42,7 +43,7 @@ else
 {
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    app.UseHsts(); 
 }
 
 app.UseHttpsRedirection();
