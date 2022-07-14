@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 
 using MystiickWeb.Shared.Models;
 
@@ -18,7 +17,7 @@ public class ImageFileClient
 
     public async Task<ImageResult> LoadImage(string filePath)
     {
-        _logger.LogInformation("Reading file: {filePath}", filePath);
+        _logger.LogDebug("Reading file: {filePath}", filePath);
 
         var file = await File.ReadAllBytesAsync(filePath);
 

@@ -1,0 +1,104 @@
+﻿@page "/photogrid"
+@page "/photogrid/{ImageGuid}"
+@page "/photogrid/category/{Category}"
+@page "/photogrid/subcategory/{Subcategory}"
+@page "/photogrid/tag/{Tag}"
+@inherits BasePage
+
+@using MystiickWeb.Shared.Models
+
+<PageTitle>Photo Grid</PageTitle>
+<h1 class="inline-block">Photo Grid</h1>
+
+@if (Error != string.Empty)
+{
+    <div class="text-danger">@Error</div>
+}
+@if (Message != string.Empty)
+{
+    <div class="text-danger">@Message</div>
+}
+
+<LoadingSpinner IsLoading="IsLoading" />
+
+@if (string.IsNullOrWhiteSpace(ImageGuid))
+{
+    <div class="row">
+        <div class="col-xl-2 gap-2 border-end">
+            @if (categories != null)
+            {
+                <h3 class="p-2">Categories</h3>
+                @foreach (ImageCategory cat in categories)
+                {
+                    <a class="btn btn-outline-primary mb-1 w-100" href="photogrid/category/@cat.Name" @onclick="() => _cache.Delete(imagePager.Name)">
+                        <span>@cat.Name</span>
+                        <span>(@cat.Count)</span>
+                    </a>
+                }
+
+                @if (subcategories != null && subcategories.Count() > 0)
+                {
+                    <div class="border-bottom p-2"></div>
+
+                    <h4 class="p-2">Subcategories</h4>
+                    @foreach (ImageCategory cat in subcategories)
+                    {
+                        <a class="btn btn-outline-primary mb-1 w-100" href="photogrid/subcategory/@cat.Name" @onclick="() => _cache.Delete(imagePager.Name)">
+                            <span>@cat.Name</span>
+                            <span>(@cat.Count)</span>
+                        </a>
+                    }
+                }
+            }
+        </div>
+
+        <div class="col-xl-10">
+            @if (images != null)
+            {
+                <Paginator @ref="imagePager" Label="Photo pager" Items="images" PageSize="30" Name="ImagePager">
+                    <div class="row">
+                        @foreach (ImageResult img in imagePager.DisplayItems)
+                        {
+                            <div class="col-xxl-2 col-xl-3 col-lg-6">
+                                <ImageCard Image="img" OnImageClick="ShowPreview" OnSubcategoryClick="LoadThumbnailsBySubcategory" OnTagClick="LoadThumbnailsByTag" />
+                            </div>
+                        }
+                    </div>
+                </Paginator>
+            }
+        </div>
+    </div>
+}
+else if (@previewImage != null)
+{
+    <div>
+        <div>
+            <img src="/api/image/@ImageGuid/img?thumbnail=false">
+        </div>
+
+        <div>
+            <span>Date Taken:</span>
+            <span>@previewImage.Created</span>
+        </div>
+        <div>
+            <span>Camera:</span>
+            <span>@previewImage.Camera.Model</span>
+        </div>
+        <div>
+            <span>ISO:</span>
+            <span>@previewImage.Camera.ISO</span>
+        </div>
+        <div>
+            <span>Aperature:</span>
+            <span>@previewImage.Camera.Aperature</span>
+        </div>
+        <div>
+            <span>Focal Length:</span>
+            <span>@(previewImage.Camera.FocalLength)mm</span>
+        </div>
+        <div>
+            <span>Shutter Speed:</span>
+            <span>@previewImage.Camera.ShutterSpeed Seconds</span>
+        </div>
+    </div>
+}

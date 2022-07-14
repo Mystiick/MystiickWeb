@@ -1,4 +1,5 @@
 using MystiickWeb.Server.Services;
+using MystiickWeb.Server.Clients;
 using MystiickWeb.Server.Clients.Images;
 using MystiickWeb.Shared.Configs;
 
@@ -12,10 +13,12 @@ builder.Services.AddRazorPages();
 // Services
 builder.Services.AddSingleton<MinecraftService>();
 builder.Services.AddSingleton<ImageService>();
+builder.Services.AddSingleton<PostService>();
 
 // Clients
 builder.Services.AddSingleton<ImageDataClient>();
 builder.Services.AddSingleton<ImageFileClient>();
+builder.Services.AddSingleton<PostDataClient>();
 
 // Configs
 builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey));

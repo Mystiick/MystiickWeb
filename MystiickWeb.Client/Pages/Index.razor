@@ -1,5 +1,52 @@
 ﻿@page "/"
+@inherits BasePage
 
-<PageTitle>Index</PageTitle>
+@using MystiickWeb.Shared.Models
 
-<h1>Hello, @@name!</h1>
+<PageTitle>Kaisan Studio</PageTitle>
+
+<div class="row">
+    <h4>Hello, @@name!</h4>
+
+    <div class="col-xxl-10 col-xl-8">
+        <p>Welcome to Kaisan Studio, a portfolio website for my photography and programming projects. This website has been built by me using <a href="https://blazor.net" target="_blank">Blazor .NET</a>, hosted on an Ubuntu server in my home office.</p>
+
+        <p>
+            The <a href="/photography">Photography</a> page is a collection of posts showcasing some pictures taken by me. I currently have a Nikon D3500, and I use the kit 18-55mm and 70-300mm lenses.
+            You can click each picture to view a larger image, which also has some additional information about the composition of the image.
+        </p>
+
+        <p><a href="https://github.com/Mystiick">Projects</a> is currently just a link to my Github, until I implement a Tools blog post page.</p>
+
+        <p>
+            My <a href="/minecraft">Minecraft</a> server is currently offline, so it returns an error trying to connect to display the information about it.
+        </p>
+    </div>
+
+    <div class="col-xxl-2 col-xl-4 card">
+
+        <h4>New Posts</h4>
+
+        <LoadingSpinner IsLoading="IsLoading" />
+
+        @if (NewPosts != null)
+        {
+            @foreach(BasePost post in NewPosts)
+            {
+                <div class="card m-2">
+                    <span class="badge bg-secondary">@post.PostType</span>
+                    <p>@post.Title <br/> @post.CreatedDate.ToShortDateString()</p>
+                </div>
+            }            
+        }
+    </div>
+</div>
+
+@code {
+    private BasePost[]? NewPosts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        NewPosts = await GetFromApiAsync<BasePost[]>("api/post/top/5");
+    }
+}

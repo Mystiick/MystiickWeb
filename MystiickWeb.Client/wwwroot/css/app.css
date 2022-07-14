@@ -66,3 +66,11 @@ a, .btn-link {
 .inline-block {
     display: inline-block
 }
+
+.nowrap {
+    white-space: nowrap
+}
+
+.nav-link {
+    padding: 1em
+}

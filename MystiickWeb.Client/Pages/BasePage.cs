@@ -18,7 +18,7 @@ public class BasePage : ComponentBase
         Http = new HttpClient();
     }
 
-    public async Task<T?> GetFromApiAsync<T>(string path)
+    public virtual async Task<T> GetFromApiAsync<T>(string path)
     {
         T? output = default;
 

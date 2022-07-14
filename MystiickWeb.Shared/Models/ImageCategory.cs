@@ -3,5 +3,5 @@
 public class ImageCategory
 {
     public string Name { get; init; } = "";
-    public int Count { get; init; } = 0;
+    public long Count { get; init; } = 0;
 }
