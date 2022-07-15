@@ -10,8 +10,8 @@ sleep 10s
 echo 10s
 sleep 10s
 
-docker cp ./create-database.sql quickstart-database-1:/tmp/create-database.sql
+docker cp ./create-database.sql mwdb:/tmp/create-database.sql
 
 # Execute the script
 echo Executing ./create-database.sql
-docker exec quickstart-database-1 sh -c "mysql -h localhost -u root --password=mysqlpw < /tmp/create-database.sql"
+docker exec mwdb sh -c "mysql -h localhost -u root --password=mysqlpw < /tmp/create-database.sql"
