@@ -13,7 +13,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "quickstart", "quickstart", "{7F90958F-53C0-4FA5-A80A-73177A4759C3}"
 	ProjectSection(SolutionItems) = preProject
 		quickstart\create-database.sql = quickstart\create-database.sql
+		quickstart\dev-docker-compose.yml = quickstart\dev-docker-compose.yml
 		quickstart\docker-compose.yml = quickstart\docker-compose.yml
+		quickstart\quickstart-demo.sh = quickstart\quickstart-demo.sh
 		quickstart\quickstart-dev.sh = quickstart\quickstart-dev.sh
 		quickstart\quickstop.sh = quickstart\quickstop.sh
 		quickstart\README.md = quickstart\README.md

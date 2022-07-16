@@ -19,5 +19,10 @@ RUN chmod -R a+rwx /app/
 
 COPY --from=build /app .
 
+ENV ASPNETCORE_URLS=http://*:80
+# ENV ASPNETCORE_URLS=https://*:443
+EXPOSE 80
+EXPOSE 443
+
 USER dotnet
 ENTRYPOINT [ "dotnet", "MystiickWeb.Server.dll" ]

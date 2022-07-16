@@ -27,7 +27,8 @@ public class ImageDataClient
                                                   left join ImageTag it on it.ImageID = i.ImageID
                                                   left join ImageSettings ist on ist.ImageID = i.ImageID ";
 
-    private const string GroupByImageResultSql = " group by i.GUID, ist.ImageSettingsID";
+    private const string GroupByImageResultSql = " group by i.GUID, ist.ImageSettingsID ";
+    private const string OrderByImageResultSql = " order by i.Created desc ";
 
 
     /// <summary>
@@ -58,7 +59,7 @@ public class ImageDataClient
 
     public async Task<ImageResult> GetImageByGuid(string guid)
     {
-        const string query = SelectImageResultSql + " where GUID = @guid " + GroupByImageResultSql;
+        const string query = SelectImageResultSql + " where GUID = @guid " + GroupByImageResultSql + OrderByImageResultSql;
 
         var param = new MySqlParameter("@guid", guid);
 
@@ -67,7 +68,7 @@ public class ImageDataClient
 
     public async Task<ImageResult> GetImageByID(uint id)
     {
-        const string query = SelectImageResultSql + " where i.ImageID = @id " + GroupByImageResultSql;
+        const string query = SelectImageResultSql + " where i.ImageID = @id " + GroupByImageResultSql + OrderByImageResultSql;
 
         var param = new MySqlParameter("@id", id);
 
@@ -76,7 +77,7 @@ public class ImageDataClient
 
     public async Task<ImageResult[]> GetImagesByCategory(string category)
     {
-        const string query = SelectImageResultSql + " where Category = @category " + GroupByImageResultSql;
+        const string query = SelectImageResultSql + " where Category = @category " + GroupByImageResultSql + OrderByImageResultSql;
 
         var param = new MySqlParameter("@category", category);
 
@@ -85,7 +86,7 @@ public class ImageDataClient
 
     public async Task<ImageResult[]> GetImagesBySubcategory(string subcategory)
     {
-        const string query = SelectImageResultSql + " where SubCategory = @subcategory " + GroupByImageResultSql;
+        const string query = SelectImageResultSql + " where SubCategory = @subcategory " + GroupByImageResultSql + OrderByImageResultSql;
 
         var param = new MySqlParameter("@subcategory", subcategory);
 
@@ -94,7 +95,7 @@ public class ImageDataClient
 
     public async Task<ImageResult[]> GetImagesByTag(string tag)
     {
-        const string query = SelectImageResultSql + " where i.ImageID in (select ImageID from ImageTag where TagName = @tag) " + GroupByImageResultSql;
+        const string query = SelectImageResultSql + " where i.ImageID in (select ImageID from ImageTag where TagName = @tag) " + GroupByImageResultSql + OrderByImageResultSql;
 
         var param = new MySqlParameter("@tag", tag);
 
