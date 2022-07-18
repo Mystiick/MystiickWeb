@@ -35,7 +35,11 @@
             {
                 <div class="card m-2">
                     <span class="badge bg-secondary">@post.PostType</span>
-                    <p>@post.Title <br/> @post.CreatedDate.ToShortDateString()</p>
+                    <p>
+                        <a href="/photography/@post.ID">@post.Title</a>
+                        <br/>
+                        @post.CreatedDate.ToShortDateString()
+                    </p>
                 </div>
             }            
         }

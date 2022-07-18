@@ -73,12 +73,13 @@ else if (@previewImage != null)
 {
     <div>
         <div>
-            <img src="/api/image/@ImageGuid/img?thumbnail=false">
+            <img src="/api/image/@ImageGuid/img?thumbnail=false" class="min-max">
         </div>
 
         <div>
             <span>Date Taken:</span>
             <span>@previewImage.Created</span>
+            <span class="hidden-but-not">@previewImage.ID</span>
         </div>
         <div>
             <span>Camera:</span>

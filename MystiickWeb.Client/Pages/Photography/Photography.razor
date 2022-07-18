@@ -1,4 +1,5 @@
 ﻿@page "/photography"
+@page "/photography/{ID}"
 @inherits BasePage
 
 @using MystiickWeb.Shared.Models;
@@ -48,8 +49,17 @@
 @code {
     private ImagePost[]? Posts;
 
-    protected override async Task OnInitializedAsync()
+    [Parameter] public string ID { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
     {
-        Posts = await GetFromApiAsync<ImagePost[]>("api/post/photography");
+        if (!string.IsNullOrWhiteSpace(ID))
+        {
+            Posts = new ImagePost[] { await GetFromApiAsync<ImagePost>($"api/post/photography/{ID}") };
+        }
+        else
+        {
+            Posts = await GetFromApiAsync<ImagePost[]>("api/post/photography");
+        }
     }
 }

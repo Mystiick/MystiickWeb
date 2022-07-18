@@ -31,4 +31,10 @@ public class PostController : Controller
     {
         return Ok(await _postService.GetAllImagePosts());
     }
+
+    [HttpGet("photography/{id}")]
+    public async Task<ActionResult<ImagePost[]>> GetPhotographyPostByID(int id)
+    {
+        return Ok(await _postService.GetImagePost(id));
+    }
 }

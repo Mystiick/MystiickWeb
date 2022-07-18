@@ -22,7 +22,7 @@ public class ImageDataClient
         _configs = configs.Value;
     }
 
-    private const string SelectImageResultSql = @"select i.GUID, i.Category, i.Subcategory, GROUP_CONCAT(it.TagName) as 'Tags', Created, ist.*
+    private const string SelectImageResultSql = @"select i.ImageID, i.GUID, i.Category, i.Subcategory, GROUP_CONCAT(it.TagName) as 'Tags', Created, ist.*
                                                   from Image i
                                                   left join ImageTag it on it.ImageID = i.ImageID
                                                   left join ImageSettings ist on ist.ImageID = i.ImageID ";
@@ -119,6 +119,7 @@ public class ImageDataClient
         {
             output.Add(new ImageResult()
             {
+                ID = (uint)rec["ImageID"],
                 GUID = (Guid)rec["GUID"],
                 Tags = (rec["Tags"].ToString() ?? "").Split(',').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray(),
                 Category = (string)rec["Category"],
