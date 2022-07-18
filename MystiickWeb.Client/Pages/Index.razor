@@ -1,15 +1,17 @@
 ﻿@page "/"
 @inherits BasePage
 
-@using MystiickWeb.Shared.Models
+@using MystiickWeb.Shared.Models;
+@using MystiickWeb.Shared.Models.Posts;
 
 <PageTitle>Kaisan Studio</PageTitle>
 
 <div class="row">
-    <h4>Hello, @@name!</h4>
 
     <div class="col-xxl-10 col-xl-8">
-        <p>Welcome to Kaisan Studio, a portfolio website for my photography and programming projects. This website has been built by me using <a href="https://blazor.net" target="_blank">Blazor .NET</a>, hosted on an Ubuntu server in my home office.</p>
+        <h3>Hello, @@name!</h3>
+
+        <p>Welcome to Kaisan Studio, a portfolio website for my programming and photography projects. This website has been built by me using <a href="https://blazor.net" target="_blank">Blazor .NET</a>, hosted on an Ubuntu server in my home office.</p>
 
         <p>
             The <a href="/photography">Photography</a> page is a collection of posts showcasing some pictures taken by me. I currently have a Nikon D3500, and I use the kit 18-55mm and 70-300mm lenses.
@@ -21,28 +23,38 @@
         <p>
             My <a href="/minecraft">Minecraft</a> server is currently offline, so it returns an error trying to connect to display the information about it.
         </p>
+
+        <h3>Who am I?</h3>
+
+        <p>
+            I'm Jake, currently working on a handful of programming projects as well as venturing into amateur photography. 
+            On my free time, I like to play games as well as pretend that <a href="https://github.com/Mystiick/SmallGames">I make them</a>, I'm working on a custom ECS engine built on top of Monogame to learn the ins and outs of the engine.
+            Progress is slow, but extremely rewarding once you finish that feature you've been working on and it just works.
+        </p>
+
+        <h3>What is Kaisan?</h3>
+        <p>
+            Kaisan is originally just a name that came up when clicking "Random" while creating a WoW character, which I adoped as a username here and there ever since. 
+            I like it because it is really close to <a href="https://en.wikipedia.org/wiki/Kaizen">Kaizen</a>, which is Japanese for "Improvement", and has been adopted as a meaning for continual improvement.
+            Kaisan is also a literal translation for "mountian founder" in Japanese, which is just plain cool.
+        </p>
     </div>
 
-    <div class="col-xxl-2 col-xl-4 card">
+    <div class="col-xxl-2 col-xl-4">
 
-        <h4>New Posts</h4>
+        <div class="card p-1">
+            <h4>New Posts</h4>
 
-        <LoadingSpinner IsLoading="IsLoading" />
+            <LoadingSpinner IsLoading="IsLoading" />
 
-        @if (NewPosts != null)
-        {
-            @foreach(BasePost post in NewPosts)
+            @if (NewPosts != null)
             {
-                <div class="card m-2">
-                    <span class="badge bg-secondary">@post.PostType</span>
-                    <p>
-                        <a href="/photography/@post.ID">@post.Title</a>
-                        <br/>
-                        @post.CreatedDate.ToShortDateString()
-                    </p>
-                </div>
-            }            
-        }
+                @foreach(BasePost post in NewPosts)
+                {
+                    <PostPreview Post="post" />
+                }            
+            }
+        </div>
     </div>
 </div>
 

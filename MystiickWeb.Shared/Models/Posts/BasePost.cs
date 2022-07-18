@@ -1,4 +1,4 @@
-﻿namespace MystiickWeb.Shared.Models;
+﻿namespace MystiickWeb.Shared.Models.Posts;
 
 public class BasePost
 {

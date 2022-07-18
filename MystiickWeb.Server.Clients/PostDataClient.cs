@@ -3,8 +3,9 @@ using Microsoft.Extensions.Options;
 
 using MySql.Data.MySqlClient;
 
+using Constants = MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Configs;
-using MystiickWeb.Shared.Models;
+using MystiickWeb.Shared.Models.Posts;
 
 using System.Data.Common;
 
@@ -22,7 +23,7 @@ public class PostDataClient
         _configs = configs.Value;
     }
 
-    private const string SelectPosts = @"select p.PostID, p.PostTitle, p.PostText, p.Created, GROUP_CONCAT(pa.ObjectID) as AttachmentIDs
+    private const string SelectPosts = @"select p.PostID, p.PostTitle, p.PostText, p.Created, GROUP_CONCAT(pa.ObjectID) as AttachmentIDs, p.PostType
                                          from Post p
                                          left join PostAttachment pa on p.PostID = pa.PostID";
 
@@ -30,7 +31,35 @@ public class PostDataClient
     private const string WherePostID = " where p.PostID = @ID ";
     private const string GroupAndOrderPosts = " group by p.PostID order by Created desc " ;
 
-    public async Task<T[]> GetAllPosts<T>(string postType) where T : BasePost, new()
+
+    public async Task<BasePost[]> GetAllPosts()
+    {
+        var output = new List<BasePost>();
+
+        using var connection = new MySqlConnection(_configs.ImageDatabase);
+        await connection.OpenAsync();
+
+        var command = new MySqlCommand(SelectPosts + GroupAndOrderPosts, connection);
+
+        DbDataReader reader = await command.ExecuteReaderAsync();
+        foreach (DbDataRecord rec in reader)
+        {
+            switch ((string)rec["PostType"])
+            {
+                case Constants.Post.PostType_Photography:
+                    output.Add(PopulatePost<ImagePost>(rec));
+                    break;
+
+                case Constants.Post.PostType_Programming:
+                    output.Add(PopulatePost<ProgrammingPost>(rec));
+                    break;
+            }
+        }
+
+        return output.ToArray();
+    }
+
+    public async Task<T[]> GetAllPostsOfType<T>(string postType) where T : BasePost, new()
     {
         var output = new List<T>();
 

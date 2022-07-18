@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
 using MystiickWeb.Server.Services;
-using MystiickWeb.Shared.Models;
+using MystiickWeb.Shared.Models.Posts;
 
 namespace MystiickWeb.Server.Controllers;
 
@@ -22,8 +22,7 @@ public class PostController : Controller
     [HttpGet("top/{count}")]
     public async Task<ActionResult<ImagePost[]>> GetTopPosts(int count)
     {
-        // TODO: Update to a generic GetAllPosts
-        return Ok((await _postService.GetAllImagePosts()).Take(count).ToArray());
+        return Ok((await _postService.GetAllPosts()).Take(count).ToArray());
     }
 
     [HttpGet("photography")]
