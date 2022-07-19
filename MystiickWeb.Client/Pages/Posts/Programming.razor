@@ -18,6 +18,13 @@
 
 <LoadingSpinner IsLoading="IsLoading" />
 
+<div class="border-bottom">
+    <ul style="list-style: none;">
+        <li><a href="https://github.com/Mystiick">Github</a></li>
+        <li><a href="https://hub.docker.com/u/mystiick">Docker Hub</a></li>
+    </ul>
+</div>
+
 @if (Posts != null)
 {
     <Paginator @ref="postPager" Label="Photography post pager" Items="Posts" PageSize="2" Name="ProgrammingPostPager">
