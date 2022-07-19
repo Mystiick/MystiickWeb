@@ -1,0 +1,70 @@
+﻿@page "/photography"
+@page "/photography/{ID}"
+@inherits BasePage
+
+@using MystiickWeb.Shared.Constants;
+@using MystiickWeb.Shared.Models;
+@using MystiickWeb.Shared.Models.Posts;
+
+<PageTitle>Photography</PageTitle>
+<h1 class="inline-block">Photography</h1>
+
+@if (Error != string.Empty)
+{
+    <div class="text-danger">@Error</div>
+}
+@if (Message != string.Empty)
+{
+    <div class="text-danger">@Message</div>
+}
+
+<LoadingSpinner IsLoading="IsLoading" />
+
+<div class="border-bottom">
+    <p>A collection of posts showcasing some of my favorite pictures I've taken. If you want to see all of the pictures I've uploaded you can <a href="/photogrid">View All</a> here.</p>
+</div>
+
+@if (Posts != null)
+{
+    <Paginator @ref="postPager" Label="Photography post pager" Items="Posts" PageSize="2" Name="ImagePostPager">
+        @foreach (ImagePost post in postPager.DisplayItems)
+        {
+            <article class="p-2 border-bottom">
+                <h3>@post.Title</h3>
+                <h5>@post.CreatedDate.ToShortDateString()</h5>
+
+                @foreach (string paragraph in post.Text)
+                {
+                    <p>@paragraph</p>
+                }
+
+                <div class="row">                
+                    @foreach (ImageResult attachment in post.Attachments)
+                    {
+                        <div class="col-xxl-2 col-lg-4 col-md-6">
+                            <ImageCard Image="attachment" />
+                        </div>
+                    }
+                </div>
+            </article>
+        }
+    </Paginator>
+}
+@code {
+    private ImagePost[]? Posts;
+    private Paginator postPager;
+
+    [Parameter] public string ID { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(ID))
+        {
+            Posts = new ImagePost[] { await GetFromApiAsync<ImagePost>($"{ControllerConstants.Posts}/{ID}") };
+        }
+        else
+        {
+            Posts = await GetFromApiAsync<ImagePost[]>($"{ControllerConstants.Posts}?postType=photography");
+        }
+    }
+}

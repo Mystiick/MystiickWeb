@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
 
 using MystiickWeb.Client.Shared;
+using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Services;
 
-namespace MystiickWeb.Client.Pages.Photography
+namespace MystiickWeb.Client.Pages.Posts
 {
     public partial class Photogrid
     {
@@ -24,7 +25,7 @@ namespace MystiickWeb.Client.Pages.Photography
 
         protected override async Task OnInitializedAsync()
         {
-            categories = await GetFromApiAsync<ImageCategory[]>("api/image/categories");
+            categories = await GetFromApiAsync<ImageCategory[]>($"{ControllerConstants.Images}/categories");
         }
 
         protected override async Task OnParametersSetAsync()
@@ -34,19 +35,19 @@ namespace MystiickWeb.Client.Pages.Photography
             // Handle URL args
             if (!string.IsNullOrWhiteSpace(ImageGuid))
             {
-                previewImage = await GetFromApiAsync<ImageResult>($"api/image/{ImageGuid}");
+                previewImage = await GetFromApiAsync<ImageResult>($"{ControllerConstants.Images}/{ImageGuid}");
             }
             if (!string.IsNullOrWhiteSpace(Category))
             {
-                SetImages(await GetFromApiAsync<ImageResult[]>($"api/image/categories/{Category}"), true);
+                SetImages(await GetFromApiAsync<ImageResult[]>($"{ControllerConstants.Images}/categories/{Category}"), true);
             }
             if (!string.IsNullOrWhiteSpace(Subcategory))
             {
-                SetImages(await GetFromApiAsync<ImageResult[]>($"api/image/subcategories/{Subcategory}"), false);
+                SetImages(await GetFromApiAsync<ImageResult[]>($"{ControllerConstants.Images}/subcategories/{Subcategory}"), false);
             }
             if (!string.IsNullOrWhiteSpace(Tag))
             {
-                SetImages(await GetFromApiAsync<ImageResult[]>($"api/image/tags/{Tag}"), true);
+                SetImages(await GetFromApiAsync<ImageResult[]>($"{ControllerConstants.Images}/tags/{Tag}"), true);
             }
         }
 

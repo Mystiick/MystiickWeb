@@ -6,13 +6,13 @@ using MystiickWeb.Shared.Models;
 namespace MystiickWeb.Server.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class ImageController : ControllerBase
+[Route(Shared.Constants.ControllerConstants.Images)]
+public class ImagesController : ControllerBase
 {
-    private readonly ILogger<ImageController> _logger;
+    private readonly ILogger<ImagesController> _logger;
     private readonly ImageService _service;
 
-    public ImageController(ILogger<ImageController> logger, ImageService service)
+    public ImagesController(ILogger<ImagesController> logger, ImageService service)
     {
         _logger = logger;
         _service = service;

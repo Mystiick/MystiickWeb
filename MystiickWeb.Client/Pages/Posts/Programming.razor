@@ -1,0 +1,57 @@
+﻿@page "/programming/"
+@page "/programming/{ID}"
+@inherits BasePage
+
+@using MystiickWeb.Shared.Constants;
+@using MystiickWeb.Shared.Models.Posts;
+
+<h1 class="inline-block">Programming</h1>
+
+@if (Error != string.Empty)
+{
+    <div class="text-danger">@Error</div>
+}
+@if (Message != string.Empty)
+{
+    <div class="text-danger">@Message</div>
+}
+
+<LoadingSpinner IsLoading="IsLoading" />
+
+@if (Posts != null)
+{
+    <Paginator @ref="postPager" Label="Photography post pager" Items="Posts" PageSize="2" Name="ProgrammingPostPager">
+        @foreach (ProgrammingPost post in postPager.DisplayItems)
+        {
+            <article class="p-2 border-bottom">
+                <h3>@post.Title</h3>
+                <h5>@post.CreatedDate.ToShortDateString()</h5>
+
+                @foreach (string paragraph in post.Text)
+                {
+                    <p>@paragraph</p>
+                }
+            </article>
+        }
+    </Paginator>
+}
+
+
+@code {
+    private ProgrammingPost[]? Posts;
+    private Paginator postPager;
+
+    [Parameter] public string ID { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(ID))
+        {
+            Posts = new ProgrammingPost[] { await GetFromApiAsync<ProgrammingPost>($"{ControllerConstants.Posts}/{ID}") };
+        }
+        else
+        {
+            Posts = await GetFromApiAsync<ProgrammingPost[]>($"{ControllerConstants.Posts}?postType=programming");
+        }
+    }
+}

@@ -32,9 +32,9 @@ public class PostDataClient
     private const string GroupAndOrderPosts = " group by p.PostID order by Created desc " ;
 
 
-    public async Task<BasePost[]> GetAllPosts()
+    public async Task<IBasePost[]> GetAllPosts()
     {
-        var output = new List<BasePost>();
+        var output = new List<IBasePost>();
 
         using var connection = new MySqlConnection(_configs.ImageDatabase);
         await connection.OpenAsync();
@@ -44,24 +44,15 @@ public class PostDataClient
         DbDataReader reader = await command.ExecuteReaderAsync();
         foreach (DbDataRecord rec in reader)
         {
-            switch ((string)rec["PostType"])
-            {
-                case Constants.Post.PostType_Photography:
-                    output.Add(PopulatePost<ImagePost>(rec));
-                    break;
-
-                case Constants.Post.PostType_Programming:
-                    output.Add(PopulatePost<ProgrammingPost>(rec));
-                    break;
-            }
+            output.Add(DetermineAndPopulatePost(rec));
         }
 
         return output.ToArray();
     }
 
-    public async Task<T[]> GetAllPostsOfType<T>(string postType) where T : BasePost, new()
+    public async Task<IBasePost[]> GetAllPostsOfType(string postType)
     {
-        var output = new List<T>();
+        var output = new List<IBasePost>();
 
         using var connection = new MySqlConnection(_configs.ImageDatabase);
         await connection.OpenAsync();
@@ -72,13 +63,13 @@ public class PostDataClient
         DbDataReader reader = await command.ExecuteReaderAsync();
         foreach (DbDataRecord rec in reader)
         {
-            output.Add(PopulatePost<T>(rec));
+            output.Add(DetermineAndPopulatePost(rec));
         }
 
         return output.ToArray();
     }
 
-    public async Task<T> GetPost<T>(int id) where T : BasePost, new()
+    public async Task<IBasePost> GetPost(int id)
     {
         using var connection = new MySqlConnection(_configs.ImageDatabase);
         await connection.OpenAsync();
@@ -88,10 +79,20 @@ public class PostDataClient
 
         DbDataReader reader = await command.ExecuteReaderAsync();
 
-        return PopulatePost<T>(reader.Cast<DbDataRecord>().First());
+        return DetermineAndPopulatePost(reader.Cast<DbDataRecord>().First());
     }
 
-    private static T PopulatePost<T>(DbDataRecord rec) where T: BasePost, new()
+    private static IBasePost DetermineAndPopulatePost(DbDataRecord rec)
+    {
+        return ((string)rec["PostType"]).ToLower() switch
+        {
+            Constants.Post.PostType_Photography => PopulatePost<ImagePost>(rec),
+            Constants.Post.PostType_Programming => PopulatePost<ProgrammingPost>(rec),
+            _ => throw new NotImplementedException(),
+        };
+    }
+
+    private static T PopulatePost<T>(DbDataRecord rec) where T: IBasePost, new()
     {
         return new T()
         {

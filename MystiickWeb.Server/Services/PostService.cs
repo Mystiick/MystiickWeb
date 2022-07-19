@@ -18,43 +18,41 @@ public class PostService
         _imageDataClient = imageDataClient;
     }
 
-    public async Task<BasePost[]> GetAllPosts()
+    public async Task<IBasePost[]> GetAllPosts()
     {
-        BasePost[] output = await _postDataClient.GetAllPosts();
-
-        await ProcessAttachments(output);
-
-        return output;
-    }
-
-    public async Task<ImagePost[]> GetAllImagePosts()
-    {
-        ImagePost[] output = await _postDataClient.GetAllPostsOfType<ImagePost>("Photography");
-
-        foreach (ImagePost post in output)
+        IBasePost[] output = await _postDataClient.GetAllPosts();
+        foreach (var post in output)
         {
-            post.Attachments = await GetImageAttachments(post);
+            await ProcessAttachments(post);
         }
 
         return output;
     }
 
-    public async Task<ImagePost> GetImagePost(int id)
+    public async Task<IBasePost[]> GetAllPosts(string postType)
     {
-        ImagePost post = await _postDataClient.GetPost<ImagePost>(id);
-        post.Attachments = await GetImageAttachments(post);
+        IBasePost[] output = await _postDataClient.GetAllPostsOfType(postType);
+        foreach (IBasePost post in output)
+        {
+            await ProcessAttachments(post);
+        }
+
+        return output;
+    }
+
+    public async Task<IBasePost> GetPost(int id)
+    {
+        IBasePost post = await _postDataClient.GetPost(id);
+        await ProcessAttachments(post);
 
         return post;
     }
 
-    private async Task ProcessAttachments(BasePost[] posts)
+    private async Task ProcessAttachments(IBasePost post)
     {
-        foreach (var post in posts)
+        if (post.GetType() == typeof(ImagePost) && post.AttachmentIDs.Any())
         {
-            if (post.GetType() == typeof(ImagePost) && post.AttachmentIDs.Any())
-            {
-                ((ImagePost)post).Attachments = await GetImageAttachments((ImagePost)post);
-            }
+            ((ImagePost)post).Attachments = await GetImageAttachments((ImagePost)post);
         }
     }
 

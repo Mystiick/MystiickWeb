@@ -1,5 +1,6 @@
 @page "/minecraft"
-@using MystiickWeb.Shared.Models
+@using MystiickWeb.Shared.Constants;
+@using MystiickWeb.Shared.Models;
 @inject HttpClient Http
 
 <PageTitle>Minecraft Server Status</PageTitle>
@@ -43,7 +44,7 @@
 
         try
         {
-            model = await Http.GetFromJsonAsync<MinecraftServerData>("api/minecraft/");
+            model = await Http.GetFromJsonAsync<MinecraftServerData>(ControllerConstants.Minecraft);
         }
         catch (Exception ex)
         {

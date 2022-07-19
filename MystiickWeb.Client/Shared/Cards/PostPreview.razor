@@ -1,7 +1,6 @@
 ﻿@using MystiickWeb.Shared.Models.Posts;
 @using Constants = MystiickWeb.Shared.Constants;
 
-
 @if (Post != null)
 {
     <div class="card container m-2">
@@ -14,7 +13,7 @@
 
 @code {
 
-    [Parameter] public BasePost? Post { get; set; }
+    [Parameter] public IBasePost? Post { get; set; }
 
     protected string PeekText(string text)
     {
@@ -22,10 +21,9 @@
         return string.Join(". ", abc.Take(2));
     }
 
-
     protected string BuildLink()
     {
-        return Post?.PostType switch
+        return Post?.PostType.ToLower() switch
         {
             Constants.Post.PostType_Photography => $"/photography/{Post.ID}",
             Constants.Post.PostType_Programming => $"/programming/{Post.ID}",

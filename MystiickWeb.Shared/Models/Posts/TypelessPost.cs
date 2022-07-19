@@ -1,9 +1,12 @@
 ﻿namespace MystiickWeb.Shared.Models.Posts;
 
-public class BasePost
+/// <summary>
+/// Basic post needed to deserialize generic posts
+/// </summary>
+public class TypelessPost : IBasePost
 {
     public uint ID { get; set; }
-    public virtual string PostType { get; init; } = string.Empty;
+    public string PostType { get; init; } = "";
     public string Title { get; set; } = string.Empty;
     public string[] Text { get; set; } = Array.Empty<string>();
     public DateTime CreatedDate { get; set; }

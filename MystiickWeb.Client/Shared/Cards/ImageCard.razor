@@ -1,9 +1,10 @@
 ﻿@using MystiickWeb.Shared.Models;
+@using MystiickWeb.Shared.Constants;
 
 <div class="card image-card m-2 w-100">
     @if (Image != null)
     {
-        <img class="pointer" src="/api/image/@Image.GUID/img" @onclick="OnImageClicked" />
+        <img class="pointer" src="/@ControllerConstants.Images/@Image.GUID/img" @onclick="OnImageClicked" />
         <div class="p-1">
             <span class="btn-link pointer" @onclick="@(x => OnSubcategoryClicked(Image.Subcategory))">@Image.Subcategory</span>
         </div>
