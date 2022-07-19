@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 
 using MystiickWeb.Server.Services;
+using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
 
 namespace MystiickWeb.Server.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route(ControllerConstants.Minecraft)]
 public class MinecraftController : ControllerBase
 {
     private readonly ILogger<MinecraftController> _logger;

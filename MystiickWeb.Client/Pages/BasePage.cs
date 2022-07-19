@@ -26,12 +26,14 @@ public class BasePage : ComponentBase
 
         try
         {
+            Console.WriteLine(typeof(T));
             output = await Http.GetFromJsonAsync<T>(path);
         }
         catch (Exception ex)
         {
             Error = "An unexpected error has occurred connecting to the server";
 #if DEBUG
+            Console.WriteLine(ex.Message);
             DebugMessage = ex.Message;
 #endif
         }

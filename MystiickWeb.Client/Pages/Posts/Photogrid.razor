@@ -5,7 +5,8 @@
 @page "/photogrid/tag/{Tag}"
 @inherits BasePage
 
-@using MystiickWeb.Shared.Models
+@using MystiickWeb.Shared.Models;
+@using MystiickWeb.Shared.Constants;
 
 <PageTitle>Photo Grid</PageTitle>
 <h1 class="inline-block">Photo Grid</h1>
@@ -73,12 +74,13 @@ else if (@previewImage != null)
 {
     <div>
         <div>
-            <img src="/api/image/@ImageGuid/img?thumbnail=false">
+            <img src="/@ControllerConstants.Images/@ImageGuid/img?thumbnail=false" class="min-max">
         </div>
 
         <div>
             <span>Date Taken:</span>
             <span>@previewImage.Created</span>
+            <span class="hidden-but-not">@previewImage.ID</span>
         </div>
         <div>
             <span>Camera:</span>

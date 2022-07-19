@@ -2,6 +2,7 @@
 
 public class ImageResult
 {
+    public uint ID { get; init; } = 0;
     public Guid GUID { get; init; } = Guid.Empty;
     public byte[] Data { get; init; } = Array.Empty<byte>();
     public string ContentType { get; init; } = string.Empty;
