@@ -38,6 +38,19 @@
                 {
                     <p>@paragraph</p>
                 }
+
+                @if (post.Attachments.Any())
+                {
+                    <ul class="list-group">
+                        @foreach (Link link in post.Attachments)
+                        {
+                            <li class="list-group-item">
+                                <div class="oi oi-@(string.IsNullOrWhiteSpace(link.Icon) ? "external-link" : link.Icon)"></div>
+                                <a href="@link.Url" target="_blank">@link.Text</a>
+                            </li>
+                        }
+                    </ul>
+                }
             </article>
         }
     </Paginator>

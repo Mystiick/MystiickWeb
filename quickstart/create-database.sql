@@ -19,7 +19,7 @@ CREATE TABLE `Image` (
 
 
 CREATE TABLE `ImageSettings` (
-  `ImageSettingsID` int NOT NULL AUTO_INCREMENT,
+  `ImageSettingsID` int unsigned NOT NULL AUTO_INCREMENT,
   `ImageID` int unsigned NOT NULL,
   `Model` varchar(45) DEFAULT NULL,
   `Flash` tinyint(1) DEFAULT NULL,
@@ -44,6 +44,15 @@ CREATE TABLE `ImageTag` (
 
 
 SET NAMES utf8mb4;
+
+CREATE TABLE `Link` (
+  `LinkID` int unsigned NOT NULL AUTO_INCREMENT,
+  `LinkText` tinytext NOT NULL,
+  `LinkUrl` text NOT NULL,
+  `Icon` tinytext NOT NULL,
+  PRIMARY KEY (`LinkID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 
 CREATE TABLE `Post` (
   `PostID` int unsigned NOT NULL AUTO_INCREMENT,
