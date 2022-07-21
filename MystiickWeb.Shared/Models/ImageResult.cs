@@ -1,4 +1,6 @@
-﻿namespace MystiickWeb.Shared.Models;
+﻿using MystiickWeb.Shared.Models.Posts;
+
+namespace MystiickWeb.Shared.Models;
 
 public class ImageResult
 {

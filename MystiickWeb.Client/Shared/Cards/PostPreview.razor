@@ -3,7 +3,7 @@
 
 @if (Post != null)
 {
-    <div class="card container m-2">
+    <div class="card container mb-2">
         <span class="badge bg-secondary">@Post.PostType</span>
         <p class="post-title"><a href="@BuildLink()">@Post.Title</a></p>
         <p class="post-date">@Post.CreatedDate.ToShortDateString()</p>

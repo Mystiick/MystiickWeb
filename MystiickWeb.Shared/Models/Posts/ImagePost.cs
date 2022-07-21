@@ -8,6 +8,5 @@ public class ImagePost : IBasePost
     public string[] Text { get; set; } = Array.Empty<string>();
     public DateTime CreatedDate { get; set; }
     public uint[] AttachmentIDs { get; set; } = Array.Empty<uint>();
-
     public ImageResult[] Attachments { get; set; } = Array.Empty<ImageResult>();
 }

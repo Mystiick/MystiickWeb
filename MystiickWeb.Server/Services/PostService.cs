@@ -40,7 +40,7 @@ public class PostService
         return output;
     }
 
-    public async Task<IBasePost> GetPost(int id)
+    public async Task<IBasePost> GetPost(uint id)
     {
         IBasePost post = await _postDataClient.GetPost(id);
         await ProcessAttachments(post);
@@ -54,6 +54,10 @@ public class PostService
         {
             ((ImagePost)post).Attachments = await GetImageAttachments((ImagePost)post);
         }
+        else if (post.GetType() == typeof(ProgrammingPost) && post.AttachmentIDs.Any())
+        {
+            ((ProgrammingPost)post).Attachments = await GetLinkAttachments((ProgrammingPost)post);
+        }
     }
 
     private async Task<ImageResult[]> GetImageAttachments(ImagePost post)
@@ -63,6 +67,20 @@ public class PostService
         foreach (var id in post.AttachmentIDs)
         {
             attachments.Add(await _imageDataClient.GetImageByID(id));
+        }
+
+        post.Attachments = attachments.ToArray();
+
+        return attachments.ToArray();
+    }
+
+    private async Task<Link[]> GetLinkAttachments(ProgrammingPost post)
+    {
+        var attachments = new List<Link>();
+
+        foreach (var id in post.AttachmentIDs)
+        {
+            attachments.Add(await _postDataClient.GetLinkByID(id));
         }
 
         post.Attachments = attachments.ToArray();

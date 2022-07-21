@@ -46,7 +46,7 @@ public class PostsController : Controller
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<IBasePost>> GetPostByID(int id)
+    public async Task<ActionResult<IBasePost>> GetPostByID(uint id)
     {
         return Ok(await _postService.GetPost(id));
     }

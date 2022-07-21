@@ -8,4 +8,5 @@ public class ProgrammingPost : IBasePost
     public string[] Text { get; set; } = Array.Empty<string>();
     public DateTime CreatedDate { get; set; }
     public uint[] AttachmentIDs { get; set; } = Array.Empty<uint>();
+    public Link[] Attachments { get; set; } = Array.Empty<Link>();
 }
