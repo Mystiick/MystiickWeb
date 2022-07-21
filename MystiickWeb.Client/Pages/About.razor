@@ -1,0 +1,45 @@
+﻿@page "/about"
+@inherits BasePage
+
+<div class="container">
+    <h3>kaisan.studio is built with the following technologies</h3>
+
+
+    <div class="row">
+        <div class="col-xxl-4 p-3">
+            <h5>C# / Blazor</h5>
+            <p>
+                All web app and server code is written in C# using a <a href="https://docs.microsoft.com/en-us/aspnet/core/blazor/?view=aspnetcore-6.0" target="_blank">Blazor WebAssembly</a> SPA.
+                Blazor as a technology is still in its early infancy, but I wanted to take the time to learn the new technology that's pretty exciting: running C# (or any other compiled language) in the browser.
+                My background is heavy in .NET so choosing C# and Blazor was an easy decision to make.
+            </p>
+        </div>
+        <div class="col-xxl-4 p-3">
+            <h5>Bootstrap</h5>
+            <p>
+                <a href="https://getbootstrap.com/">Bootstrap</a> comes with Blazor out-of-the-box and since I know the basics of Bootstrap I decided to stick with it.
+                It's very flexible and easy to work with, so it's been a good choice to get up and running quickly with.
+            </p>
+        </div>
+        <div class="col-xxl-4 p-3">
+            <h5>Docker on an Ubuntu Server</h5>
+            <p>
+                One major goal for this website was to host it on Docker. 
+                The images are pushed to my <a href="https://hub.docker.com/r/mystiick/mystiickweb">Docker Hub</a> account, and the entire tech stack is stood up in a single Docker Compose.
+                I've avoided Kubernetes for now, but eventually may decide to venture into that realm depending on how complex I decide to make it.
+            </p>
+        </div>
+        <div class="col-xxl-4 p-3">
+            <h5>MySQL</h5>
+            <p>
+                My experience with databases is almost solely with MS SQL, so MySQL is not a far stretch from my experience but is still a small learning experience.
+                The queries are written by hand and not using any ORM. I plan on swapping it over to using Dapper if I stick with MySQL or swap to Postgres.
+                I would like to get experience with other databases, perhaps Postgres or Mongo so I may swap it out eventually.
+            </p>
+        </div>
+    </div>
+</div>
+
+@code {
+
+}
