@@ -29,6 +29,10 @@ builder.Configuration.AddJsonFile("appsettings.development.json", true);
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Logging.AddConfiguration(builder.Configuration);
+builder.Services.AddLogging(x =>
+{
+    x.AddFile(builder.Configuration.GetSection("Logging"));
+});
 
 #if DEBUG
 builder.Logging.AddSimpleConsole(config => config.SingleLine = true);

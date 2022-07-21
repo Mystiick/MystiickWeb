@@ -15,14 +15,16 @@ services:
       - data:/var/lib/mysql
     
   web:
-    image: mystiick/mystiickweb:0.1
+    image: mystiick/mystiickweb:0.3.1
     container_name: mystiickweb
     environment:
       ConnectionStrings__ImageDatabase: server=mwdb;userid=root;password=mysqlpw;database=mystiick
+      Logging__File__Path: /app/logs/mystiickweb.log
     ports:
       - 7080:80
     volumes:
       - ./samples:/img/
+      - ./logs:/app/logs/
 
 volumes:
   data:

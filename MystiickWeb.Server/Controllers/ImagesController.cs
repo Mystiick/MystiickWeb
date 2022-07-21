@@ -7,12 +7,12 @@ namespace MystiickWeb.Server.Controllers;
 
 [ApiController]
 [Route(Shared.Constants.ControllerConstants.Images)]
-public class ImagesController : ControllerBase
+public class ImagesController : BaseController
 {
     private readonly ILogger<ImagesController> _logger;
     private readonly ImageService _service;
 
-    public ImagesController(ILogger<ImagesController> logger, ImageService service)
+    public ImagesController(ILogger<ImagesController> logger, ImageService service) : base(logger)
     {
         _logger = logger;
         _service = service;

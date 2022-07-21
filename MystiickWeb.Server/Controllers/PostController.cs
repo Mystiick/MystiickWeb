@@ -8,13 +8,13 @@ namespace MystiickWeb.Server.Controllers;
 
 [ApiController]
 [Route(Shared.Constants.ControllerConstants.Posts)]
-public class PostsController : Controller
+public class PostsController : BaseController
 {
 
     private readonly ILogger<PostsController> _logger;
     private readonly PostService _postService;
 
-    public PostsController(ILogger<PostsController> logger, PostService postService)
+    public PostsController(ILogger<PostsController> logger, PostService postService) : base(logger)
     {
         _logger = logger;
         _postService = postService;
@@ -46,9 +46,9 @@ public class PostsController : Controller
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<IBasePost>> GetPostByID(uint id)
+    public async Task<IBasePost> GetPostByID(uint id)
     {
-        return Ok(await _postService.GetPost(id));
+        return await _postService.GetPost(id);
     }
 
     private async Task<IBasePost[]> GetTopPosts(int count)
