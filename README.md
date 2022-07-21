@@ -1,5 +1,5 @@
 # MystiickWeb Dashboard
-Repository for the Server and Client for {URL}. This website contains some small projects of mine built in Blazor
+Repository for the Server and Client for [kaisan.studio](https://kaisan.studio). This website contains some small projects of mine built in Blazor
  - Minecraft server status
     - The server is currently down since no one plays on it anymore. Maybe someday I'll stand up a mocked UI.
  - Photo Viewer
