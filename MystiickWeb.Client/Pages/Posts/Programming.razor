@@ -27,31 +27,32 @@
 
 @if (Posts != null)
 {
-    <Paginator @ref="postPager" Label="Photography post pager" Items="Posts" PageSize="2" Name="ProgrammingPostPager">
-        @foreach (ProgrammingPost post in postPager.DisplayItems)
+    <Paginator @ref="postPager"  Label="Photography post pager" Items="Posts" PageSize="2" Name="ProgrammingPostPager">
+        @if (postPager != null)
         {
-            <article class="p-2 border-bottom">
-                <h3>@post.Title</h3>
-                <h5>@post.CreatedDate.ToShortDateString()</h5>
+            @foreach (ProgrammingPost post in postPager.DisplayItems)
+            {
+                <article class="p-2 border-bottom">
+                    <h3>@post.Title</h3>
+                    <h5>@post.CreatedDate.ToShortDateString()</h5>
 
-                @foreach (string paragraph in post.Text)
-                {
-                    <p>@paragraph</p>
-                }
+                    @((MarkupString)Markdig.Markdown.ToHtml(post.Text))
 
-                @if (post.Attachments.Any())
-                {
-                    <ul class="list-group">
-                        @foreach (Link link in post.Attachments)
-                        {
-                            <li class="list-group-item">
-                                <div class="oi oi-@(string.IsNullOrWhiteSpace(link.Icon) ? "external-link" : link.Icon)"></div>
-                                <a href="@link.Url" target="_blank">@link.Text</a>
-                            </li>
-                        }
-                    </ul>
-                }
-            </article>
+                    @if (post.Attachments.Any())
+                    {
+                        <ul class="list-group">
+                            @foreach (Link link in post.Attachments)
+                            {
+                                <li class="list-group-item">
+                                    <div class="oi oi-@(string.IsNullOrWhiteSpace(link.Icon) ? "external-link" : link.Icon)"></div>
+                                    <a href="@link.Url" target="_blank">@link.Text</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </article>
+            }
+
         }
     </Paginator>
 }
@@ -59,7 +60,7 @@
 
 @code {
     private ProgrammingPost[]? Posts;
-    private Paginator postPager;
+    private Paginator? postPager;
 
     [Parameter] public string ID { get; set; } = string.Empty;
 
