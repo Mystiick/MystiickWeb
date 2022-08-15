@@ -8,12 +8,12 @@ namespace MystiickWeb.Server.Controllers;
 
 [ApiController]
 [Route(ControllerConstants.Minecraft)]
-public class MinecraftController : ControllerBase
+public class MinecraftController : BaseController
 {
     private readonly ILogger<MinecraftController> _logger;
     private readonly MinecraftService _service;
 
-    public MinecraftController(ILogger<MinecraftController> logger, MinecraftService service)
+    public MinecraftController(ILogger<MinecraftController> logger, MinecraftService service) : base(logger)
     {
         _logger = logger;
         _service = service;

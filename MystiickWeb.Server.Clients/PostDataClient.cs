@@ -117,7 +117,7 @@ public class PostDataClient
         {
             ID = (uint)rec["PostID"],
             Title = (string)rec["PostTitle"],
-            Text = ((string)rec["PostText"]).Split(new string[] { "\\n" }, StringSplitOptions.TrimEntries),
+            Text = (string)rec["PostText"],
             CreatedDate = (DateTime)rec["Created"],
             AttachmentIDs = (rec["AttachmentIDs"].ToString() ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).Select(x => uint.Parse(x)).ToArray()
         };
