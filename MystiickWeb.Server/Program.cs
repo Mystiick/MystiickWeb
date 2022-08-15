@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.FileProviders;
 
 using MystiickWeb.Server.Services;
 using MystiickWeb.Server.Clients;
@@ -58,7 +60,18 @@ else
 app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
-app.UseStaticFiles();
+
+
+FileExtensionContentTypeProvider content = new();
+content.Mappings[".pck"] = "application/octet-stream";
+
+app.UseStaticFiles(new StaticFileOptions() { 
+    ContentTypeProvider = content,
+    OnPrepareResponse = ctx =>
+    {
+        app.Logger.LogInformation("Static file: {PhysicalPath}", ctx.File.PhysicalPath);
+    }
+});
 
 app.UseRouting();
 
