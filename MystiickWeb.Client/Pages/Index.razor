@@ -13,7 +13,6 @@
         @greeting
     </div>
 
-
     <div class="col-xxl-2 col-xl-4">
 
         <div class="card p-2">
@@ -39,13 +38,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        greeting = (MarkupString)Markdig.Markdown.ToHtml(@"### Hello @name!
+        greeting = (MarkupString)Markdig.Markdown.ToHtml(@"### Hello, @name!
 
 Welcome to Kaisan Studio, a portfolio website for my programming and photography projects. This website has been built by me using [Blazor .NET](https://blazor.net), hosted on an Ubuntu server in my home office.
 
 [Programming](/programming) is a list of posts showcasing the personal projects I'm working on, and the progress I'm making as I make it.
 
-The [Photography](/photography) page is a collection of posts showcasing some pictures taken by me. I currently have a Nikon D3500, and I use the kit 18-55mm and 70-300mm lenses.  
+The [Photography](/photography) page is a collection of posts showcasing some pictures taken by me. I currently have a Nikon D3500, and I use the kit 18-55mm and 70-300mm lenses.
 You can click each picture to view a larger image, which also has some additional information about the composition of the image.
 
 My [Minecraft](/minecraft) server is currently offline, so it returns an error trying to connect to display the information about it.
@@ -56,9 +55,9 @@ On my free time, I like to play games as well as pretend that [I make them](http
 Progress is slow, but extremely rewarding once you finish that feature you've been working on and it just works.
 
 ### What is Kaisan?
-Kaisan is originally just a name that came up when clicking 'Random' while creating a WoW character, which I adoped as a username here and there ever since.  
-I like it because it is really close to [Kaizen](https://en.wikipedia.org/wiki/Kaizen), which is Japanese for 'Improvement', and has been adopted as a meaning for continual improvement.  
-Kaisan is also a literal translation for 'mountian founder' in Japanese, which is just plain cool.");
+Kaisan is originally just a name that came up when clicking 'Random' while creating a WoW character, which I adopted as a username here and there ever since.
+I like it because it is really close to [Kaizen](https://en.wikipedia.org/wiki/Kaizen), which is Japanese for 'Improvement', and has been adopted as a meaning for continual improvement.
+Kaisan is also a literal translation for 'mountain founder' in Japanese, which is just plain cool.");
 
         NewPosts = await GetFromApiAsync<TypelessPost[]>($"{ControllerConstants.Posts}?top=5");
     }
