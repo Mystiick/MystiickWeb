@@ -44,4 +44,13 @@ public class BasePage : ComponentBase
 
         return output;
     }
+
+    public virtual async Task<T> PostApiAsync<T>(string path, object payload)
+    {
+        Console.WriteLine(payload);
+
+        await Http.PostAsJsonAsync(path, payload);
+
+        return default;
+    }
 }

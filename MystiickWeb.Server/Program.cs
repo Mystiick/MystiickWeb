@@ -6,7 +6,9 @@ using MystiickWeb.Server.Services;
 using MystiickWeb.Server.Clients;
 using MystiickWeb.Server.Clients.Images;
 using MystiickWeb.Shared.Configs;
-
+using MystiickWeb.Shared.Models.User;
+using Microsoft.AspNetCore.Identity;
+using MystiickWeb.Server.Clients.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,10 @@ builder.Services.AddSingleton<PostService>();
 builder.Services.AddSingleton<ImageDataClient>();
 builder.Services.AddSingleton<ImageFileClient>();
 builder.Services.AddSingleton<PostDataClient>();
+
+// Identity
+builder.Services.AddIdentityCore<User>();
+builder.Services.AddScoped<IUserStore<User>, MystiickUserStore>();
 
 // Configs
 builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey));

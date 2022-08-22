@@ -4,5 +4,6 @@
     {
         public const string ConnectionStringsKey = "ConnectionStrings";
         public string ImageDatabase { get; set; } = "";
+        public string UserDatabase { get; set; } = "";
     }
 }
