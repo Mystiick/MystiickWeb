@@ -1,0 +1,4 @@
+# MystiickWeb.Shared
+This library project is responsible for any code that needs to be shared between the [MystiickWeb.Wasm](../MystiickWeb.Wasm/) and [MystiickWeb.Server](../MystiickWeb.Server/) projects. This can include any simple 0 dependency servcies (such as the memory cache service), and any Models that need to be shared between the two. Other projects and classes can depend on MystiickWeb.Shared to utilize the Models, Constants, or Services so data doesn't need to be translated back and forth.
+
+This project should never have any dependencies on other MystiickWeb.* projects, or any other references that deal with integration details.

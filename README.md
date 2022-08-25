@@ -6,10 +6,21 @@ Repository for the Server and Client for [kaisan.studio](https://kaisan.studio).
     - Module to view and download some photos taken by me. They are uploaded and tagged by an internal tool [ImageProcessor](https://github.com/Mystiick/ImageProcessor)
 
 ## Projects
- - [./MystiickWeb.Client](./MystiickWeb.Client) project for the web application that is run in the user's browser.
+ - [./MystiickWeb.Clients](./MystiickWeb.Clients) containins File/Data clients that integrate with files, databases, and other API implementation heavy classes.
+ - [./MystiickWeb.Core](./MystiickWeb.Core) contains Services that are used by the Web API controllers, and by each other. Also contains interfaces for the Services and Clients. Core mostly contains the business logic needed to run the Controllers.
  - [./MystiickWeb.Server](./MystiickWeb.Server) project for the server application that contains the web APIs that the client will call.
- - [./MystiickWeb.Server.Clients](./MystiickWeb.Server.Clients) project containing File/Data clients that integrate with files, databases, and other implementation heavy classes.
  - [./MystiickWeb.Shared](./MystiickWeb.Shared) contains models that are shared between projects, namely Client/Server models and configuration models.
+ - [./MystiickWeb.Wasm](./MystiickWeb.Wasm) project for the web application that is run in the user's browser.
+
+```
+Wasm    --
+ |       |
+Server  -- 
+ |       | -- Shared
+Core    --
+ |       |
+Clients --
+```
 
 ## Quickstart
 ### Dev
