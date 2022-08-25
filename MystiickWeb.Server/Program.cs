@@ -1,14 +1,15 @@
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 
-using MystiickWeb.Server.Services;
+using MystiickWeb.Core.Interfaces.Clients;
+using MystiickWeb.Core.Interfaces.Services;
+using MystiickWeb.Core.Services;
 using MystiickWeb.Server.Clients;
+using MystiickWeb.Server.Clients.Identity;
 using MystiickWeb.Server.Clients.Images;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.User;
-using Microsoft.AspNetCore.Identity;
-using MystiickWeb.Server.Clients.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,14 +18,14 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 // Services
-builder.Services.AddSingleton<MinecraftService>();
-builder.Services.AddSingleton<ImageService>();
-builder.Services.AddSingleton<PostService>();
+builder.Services.AddScoped<IMinecraftService, MinecraftService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 // Clients
-builder.Services.AddSingleton<ImageDataClient>();
-builder.Services.AddSingleton<ImageFileClient>();
-builder.Services.AddSingleton<PostDataClient>();
+builder.Services.AddScoped<IImageDataClient, ImageDataClient>();
+builder.Services.AddScoped<IImageFileClient, ImageFileClient>();
+builder.Services.AddScoped<IPostDataClient, PostDataClient>();
 
 // Identity
 builder.Services.AddIdentityCore<User>();

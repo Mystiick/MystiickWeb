@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-using MystiickWeb.Server.Services;
+using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared.Models.Posts;
 using Constants = MystiickWeb.Shared.Constants;
 
@@ -12,9 +12,9 @@ public class PostsController : BaseController
 {
 
     private readonly ILogger<PostsController> _logger;
-    private readonly PostService _postService;
+    private readonly IPostService _postService;
 
-    public PostsController(ILogger<PostsController> logger, PostService postService) : base(logger)
+    public PostsController(ILogger<PostsController> logger, IPostService postService) : base(logger)
     {
         _logger = logger;
         _postService = postService;

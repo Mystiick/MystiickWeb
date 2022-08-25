@@ -8,10 +8,11 @@ using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.Posts;
 
 using System.Data.Common;
+using MystiickWeb.Core.Interfaces.Clients;
 
 namespace MystiickWeb.Server.Clients;
 
-public class PostDataClient
+public class PostDataClient : IPostDataClient
 {
 
     private readonly ILogger<PostDataClient> _logger;

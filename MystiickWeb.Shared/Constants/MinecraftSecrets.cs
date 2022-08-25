@@ -1,6 +1,6 @@
-namespace MystiickWeb.Server;
+﻿namespace MystiickWeb.Shared.Constants;
 
-internal class Secrets
+public class MinecraftSecrets
 {
     public const string MINECRAFT_RCON_IP = "Minecraft:IP";
     public const string MINECRAFT_RCON_PORT = "Minecraft:RconPort";

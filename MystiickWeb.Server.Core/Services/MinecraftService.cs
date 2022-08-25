@@ -1,14 +1,19 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 
+// TODO: Move most of this to a Client, and remove RconSharp dependency
 using RconSharp;
 
 using MystiickWeb.Shared.Models;
+using MystiickWeb.Shared.Constants;
+using MystiickWeb.Core.Interfaces.Services;
+using MystiickWeb.Core.Interfaces;
 
-namespace MystiickWeb.Server.Services;
+namespace MystiickWeb.Core.Services;
 
-public class MinecraftService : IDisposable
+public class MinecraftService : IMinecraftService, IScopedService, IDisposable
 {
     private readonly ILogger<MinecraftService> _logger;
     private readonly RconClient _client;
@@ -18,13 +23,13 @@ public class MinecraftService : IDisposable
     {
         _logger = logger;
         _config = config;
-        _client = RconClient.Create(_config[Secrets.MINECRAFT_RCON_IP], int.Parse(_config[Secrets.MINECRAFT_RCON_PORT]));
+        _client = RconClient.Create(_config[MinecraftSecrets.MINECRAFT_RCON_IP], int.Parse(_config[MinecraftSecrets.MINECRAFT_RCON_PORT]));
     }
 
     private async Task Connect()
     {
         await _client.ConnectAsync();
-        bool authenticated = await _client.AuthenticateAsync(_config[Secrets.MINECRAFT_RCON_PASSWORD]);
+        bool authenticated = await _client.AuthenticateAsync(_config[MinecraftSecrets.MINECRAFT_RCON_PASSWORD]);
 
         if (!authenticated)
         {
@@ -98,7 +103,7 @@ public class MinecraftService : IDisposable
         return output;
     }
 
-#region " IDisposable Implementation "
+#region | IDisposable Implementation |
     private bool isDisposed;
 
     public void Dispose()

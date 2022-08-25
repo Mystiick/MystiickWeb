@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-using MystiickWeb.Server.Services;
+using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared.Models;
 
 namespace MystiickWeb.Server.Controllers;
@@ -10,9 +10,9 @@ namespace MystiickWeb.Server.Controllers;
 public class ImagesController : BaseController
 {
     private readonly ILogger<ImagesController> _logger;
-    private readonly ImageService _service;
+    private readonly IImageService _service;
 
-    public ImagesController(ILogger<ImagesController> logger, ImageService service) : base(logger)
+    public ImagesController(ILogger<ImagesController> logger, IImageService service) : base(logger)
     {
         _logger = logger;
         _service = service;

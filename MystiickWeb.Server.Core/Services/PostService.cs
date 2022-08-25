@@ -1,17 +1,20 @@
-﻿using MystiickWeb.Server.Clients;
-using MystiickWeb.Server.Clients.Images;
+﻿using Microsoft.Extensions.Logging;
+
+using MystiickWeb.Core.Interfaces;
+using MystiickWeb.Core.Interfaces.Clients;
+using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Models.Posts;
 
-namespace MystiickWeb.Server.Services;
+namespace MystiickWeb.Core.Services;
 
-public class PostService
+public class PostService : IPostService, IScopedService
 {
     private readonly ILogger<PostService> _logger;
-    private readonly PostDataClient _postDataClient;
-    private readonly ImageDataClient _imageDataClient;
+    private readonly IPostDataClient _postDataClient;
+    private readonly IImageDataClient _imageDataClient;
 
-    public PostService(ILogger<PostService> logger, PostDataClient postDataClient, ImageDataClient imageDataClient)
+    public PostService(ILogger<PostService> logger, IPostDataClient postDataClient, IImageDataClient imageDataClient)
     {
         _logger = logger;
         _postDataClient = postDataClient;

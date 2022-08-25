@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-using MystiickWeb.Server.Services;
+using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
 
@@ -11,9 +11,9 @@ namespace MystiickWeb.Server.Controllers;
 public class MinecraftController : BaseController
 {
     private readonly ILogger<MinecraftController> _logger;
-    private readonly MinecraftService _service;
+    private readonly IMinecraftService _service;
 
-    public MinecraftController(ILogger<MinecraftController> logger, MinecraftService service) : base(logger)
+    public MinecraftController(ILogger<MinecraftController> logger, IMinecraftService service) : base(logger)
     {
         _logger = logger;
         _service = service;

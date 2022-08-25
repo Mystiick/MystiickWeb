@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 
 using MySql.Data.MySqlClient;
 
+using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models;
 
@@ -11,7 +12,7 @@ using System.Linq;
 
 namespace MystiickWeb.Server.Clients.Images;
 
-public class ImageDataClient
+public class ImageDataClient : IImageDataClient
 {
     private readonly ILogger<ImageDataClient> _logger;
     private readonly ConnectionStrings _configs;
@@ -102,7 +103,7 @@ public class ImageDataClient
         return await GetImageData(query, param);
     }
 
-    public async Task<ImageResult[]> GetImageData(string query, MySqlParameter param)
+    private async Task<ImageResult[]> GetImageData(string query, MySqlParameter param)
     {
         var output = new List<ImageResult>();
 

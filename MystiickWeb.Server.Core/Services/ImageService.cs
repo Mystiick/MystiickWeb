@@ -1,14 +1,18 @@
-using MystiickWeb.Server.Clients.Images;
+using Microsoft.Extensions.Logging;
+
+using MystiickWeb.Core.Interfaces;
+using MystiickWeb.Core.Interfaces.Clients;
+using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared.Models;
 
-namespace MystiickWeb.Server.Services;
+namespace MystiickWeb.Core.Services;
 
-public class ImageService
+public class ImageService : IImageService, IScopedService
 {
-    private readonly ImageDataClient _dataClient;
-    private readonly ImageFileClient _fileClient;
+    private readonly IImageDataClient _dataClient;
+    private readonly IImageFileClient _fileClient;
 
-    public ImageService(ILogger<ImageService> logger, ImageDataClient dataClient, ImageFileClient fileClient)
+    public ImageService(ILogger<ImageService> logger, IImageDataClient dataClient, IImageFileClient fileClient)
     {
         _dataClient = dataClient;
         _fileClient = fileClient;

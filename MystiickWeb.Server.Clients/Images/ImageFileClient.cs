@@ -3,10 +3,11 @@
 using SixLabors.ImageSharp;
 
 using MystiickWeb.Shared.Models;
+using MystiickWeb.Core.Interfaces.Clients;
 
 namespace MystiickWeb.Server.Clients.Images;
 
-public class ImageFileClient
+public class ImageFileClient : IImageFileClient
 {
     private readonly ILogger<ImageFileClient> _logger;
 
