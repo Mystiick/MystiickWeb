@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MystiickWeb.Server.Core\MystiickWeb.Core.csproj" />
+    <ProjectReference Include="..\MystiickWeb.Core\MystiickWeb.Core.csproj" />
     <ProjectReference Include="..\MystiickWeb.Shared\MystiickWeb.Shared.csproj" />
   </ItemGroup>
 
