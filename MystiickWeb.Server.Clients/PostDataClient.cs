@@ -10,7 +10,7 @@ using MystiickWeb.Shared.Models.Posts;
 using System.Data.Common;
 using MystiickWeb.Core.Interfaces.Clients;
 
-namespace MystiickWeb.Server.Clients;
+namespace MystiickWeb.Clients;
 
 public class PostDataClient : IPostDataClient
 {

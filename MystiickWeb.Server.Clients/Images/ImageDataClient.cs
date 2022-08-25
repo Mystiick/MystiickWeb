@@ -10,7 +10,7 @@ using MystiickWeb.Shared.Models;
 using System.Data.Common;
 using System.Linq;
 
-namespace MystiickWeb.Server.Clients.Images;
+namespace MystiickWeb.Clients.Images;
 
 public class ImageDataClient : IImageDataClient
 {

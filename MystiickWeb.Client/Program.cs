@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using MystiickWeb.Client;
+using MystiickWeb.Wasm;
 using MystiickWeb.Shared.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

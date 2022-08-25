@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-using MystiickWeb.Client.Shared;
+using MystiickWeb.Wasm.Shared;
 using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Services;
 
-namespace MystiickWeb.Client.Pages.Posts
+namespace MystiickWeb.Wasm.Pages.Posts
 {
     public partial class Photogrid
     {

@@ -5,7 +5,7 @@ using SixLabors.ImageSharp;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Core.Interfaces.Clients;
 
-namespace MystiickWeb.Server.Clients.Images;
+namespace MystiickWeb.Clients.Images;
 
 public class ImageFileClient : IImageFileClient
 {

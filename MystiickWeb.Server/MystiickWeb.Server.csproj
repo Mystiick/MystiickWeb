@@ -17,10 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MystiickWeb.Client\MystiickWeb.Client.csproj" />
+    <ProjectReference Include="..\MystiickWeb.Client\MystiickWeb.Wasm.csproj" />
     <ProjectReference Include="..\MystiickWeb.Server.Core\MystiickWeb.Core.csproj" />
     <ProjectReference Include="..\MystiickWeb.Shared\MystiickWeb.Shared.csproj" />
-    <ProjectReference Include="..\MystiickWeb.Server.Clients\MystiickWeb.Server.Clients.csproj" />
+    <ProjectReference Include="..\MystiickWeb.Server.Clients\MystiickWeb.Clients.csproj" />
   </ItemGroup>
 
 </Project>

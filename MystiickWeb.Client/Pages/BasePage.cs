@@ -2,7 +2,7 @@
 
 using System.Net.Http.Json;
 
-namespace MystiickWeb.Client.Pages;
+namespace MystiickWeb.Wasm.Pages;
 
 public class BasePage : ComponentBase
 {

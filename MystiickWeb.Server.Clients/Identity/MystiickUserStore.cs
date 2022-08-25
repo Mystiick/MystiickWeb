@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
-using MystiickWeb.Server.Clients.Images;
+using MystiickWeb.Clients.Images;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.User;
 
-namespace MystiickWeb.Server.Clients.Identity;
+namespace MystiickWeb.Clients.Identity;
 
 public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>
 {

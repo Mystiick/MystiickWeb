@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.StaticFiles;
 using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Core.Services;
-using MystiickWeb.Server.Clients;
-using MystiickWeb.Server.Clients.Identity;
-using MystiickWeb.Server.Clients.Images;
+using MystiickWeb.Clients;
+using MystiickWeb.Clients.Identity;
+using MystiickWeb.Clients.Images;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.User;
 
