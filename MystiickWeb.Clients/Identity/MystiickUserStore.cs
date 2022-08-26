@@ -30,11 +30,12 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>
         using var connection = new MySqlConnection(_configs.UserDatabase);
         await connection.OpenAsync(cancellationToken);
 
-        var command = new MySqlCommand(@"insert into User (ID, Username, NormalizedUsername, PasswordHash) values (@ID, @Username, @NormalizedUsername, @PasswordHash)", connection);
+        var command = new MySqlCommand(@"insert into User (ID, Username, NormalizedUsername, PasswordHash, Created, Updated) values (@ID, @Username, @NormalizedUsername, @PasswordHash, @Created, @Created)", connection);
         command.Parameters.AddWithValue("@ID", user.ID);
         command.Parameters.AddWithValue("@Username", user.Username);
         command.Parameters.AddWithValue("@NormalizedUsername", user.NormalizedUsername);
         command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
+        command.Parameters.AddWithValue("@Created", DateTime.Now);
 
         await command.ExecuteNonQueryAsync(cancellationToken);
 
@@ -108,7 +109,7 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>
         return IdentityResult.Success;
     }
     #endregion
-
+    
     #region | Delete |
     public Task<IdentityResult> DeleteAsync(User user, CancellationToken cancellationToken)
     {

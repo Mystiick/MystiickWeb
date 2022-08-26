@@ -45,12 +45,38 @@ public class BasePage : ComponentBase
         return output;
     }
 
-    public virtual async Task<T> PostApiAsync<T>(string path, object payload)
+    public virtual async Task<T?> PostApiAsync<T>(string path, object payload)
     {
-        Console.WriteLine(payload);
+        T? output = default;
+        IsLoading = true;
 
-        await Http.PostAsJsonAsync(path, payload);
+        try
+        {
+            var result = await Http.PostAsJsonAsync(path, payload);
 
-        return default;
+            if (result.IsSuccessStatusCode)
+            {
+                output = await result.Content.ReadFromJsonAsync<T>();
+            }
+            else
+            {
+                Error = "An unexpected error has occurred connecting to the server";
+            }
+        }
+        catch (Exception ex)
+        {
+            Error = "An unexpected error has occurred connecting to the server";
+#if DEBUG
+            Console.WriteLine(ex.Message);
+            DebugMessage = ex.Message;
+#endif
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+
+        return output;
+
     }
 }

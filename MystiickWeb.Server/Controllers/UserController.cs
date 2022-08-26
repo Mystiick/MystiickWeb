@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
+using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared.Models.User;
 
 namespace MystiickWeb.Server.Controllers;
@@ -8,8 +10,12 @@ namespace MystiickWeb.Server.Controllers;
 [Route(Shared.Constants.ControllerConstants.Users)]
 public class UserController : BaseController
 {
-    public UserController(ILogger<UserController> logger) : base(logger)
+
+    private readonly IUserService _userService;
+
+    public UserController(ILogger<UserController> logger, IUserService userService) : base(logger)
     {
+        _userService = userService;
     }
 
     [HttpPost("login")]
@@ -21,4 +27,13 @@ public class UserController : BaseController
         await Task.CompletedTask;
     }
 
+    //TODO: [ValidateAntiForgeryToken]
+    [HttpPost("register")]
+    public async Task<List<string>> Register(Credential credentials)
+    {
+        if (ModelState.IsValid)
+            return await _userService.RegisterUser(credentials);
+        else
+            return new List<string>() { "An unexpected error has occurred" };
+    }
 }
