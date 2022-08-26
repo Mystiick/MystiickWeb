@@ -2,12 +2,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.StaticFiles;
 
-using MystiickWeb.Core.Interfaces.Clients;
-using MystiickWeb.Core.Interfaces.Services;
-using MystiickWeb.Core.Services;
-using MystiickWeb.Clients;
 using MystiickWeb.Clients.Identity;
-using MystiickWeb.Clients.Images;
+using MystiickWeb.Server.Extensions;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.User;
 
@@ -16,16 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-
-// Services
-builder.Services.AddScoped<IMinecraftService, MinecraftService>();
-builder.Services.AddScoped<IImageService, ImageService>();
-builder.Services.AddScoped<IPostService, PostService>();
-
-// Clients
-builder.Services.AddScoped<IImageDataClient, ImageDataClient>();
-builder.Services.AddScoped<IImageFileClient, ImageFileClient>();
-builder.Services.AddScoped<IPostDataClient, PostDataClient>();
+builder.Services.AddInjectables();
 
 // Identity
 builder.Services.AddIdentityCore<User>();
@@ -47,7 +34,7 @@ builder.Services.AddLogging(x =>
 builder.Logging.AddSimpleConsole(config => config.SingleLine = true);
 #endif
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -72,7 +59,8 @@ app.UseBlazorFrameworkFiles();
 FileExtensionContentTypeProvider content = new();
 content.Mappings[".pck"] = "application/octet-stream";
 
-app.UseStaticFiles(new StaticFileOptions() { 
+app.UseStaticFiles(new StaticFileOptions()
+{
     ContentTypeProvider = content,
     OnPrepareResponse = ctx =>
     {

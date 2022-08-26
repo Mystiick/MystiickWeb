@@ -4,9 +4,11 @@ using SixLabors.ImageSharp;
 
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Core.Interfaces.Clients;
+using MystiickWeb.Core;
 
 namespace MystiickWeb.Clients.Images;
 
+[Injectable(typeof(IImageFileClient))]
 public class ImageFileClient : IImageFileClient
 {
     private readonly ILogger<ImageFileClient> _logger;

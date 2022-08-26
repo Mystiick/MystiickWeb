@@ -7,7 +7,8 @@ using MystiickWeb.Shared.Models;
 
 namespace MystiickWeb.Core.Services;
 
-public class ImageService : IImageService, IScopedService
+[Injectable(typeof(IImageService))]
+public class ImageService : IImageService
 {
     private readonly IImageDataClient _dataClient;
     private readonly IImageFileClient _fileClient;

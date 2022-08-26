@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 
 using MySql.Data.MySqlClient;
 
+using MystiickWeb.Core;
 using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models;
@@ -12,6 +13,7 @@ using System.Linq;
 
 namespace MystiickWeb.Clients.Images;
 
+[Injectable(typeof(IImageDataClient))]
 public class ImageDataClient : IImageDataClient
 {
     private readonly ILogger<ImageDataClient> _logger;

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 
-using MystiickWeb.Core.Interfaces;
 using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared.Models;
@@ -8,7 +7,8 @@ using MystiickWeb.Shared.Models.Posts;
 
 namespace MystiickWeb.Core.Services;
 
-public class PostService : IPostService, IScopedService
+[Injectable(typeof(IPostService))]
+public class PostService : IPostService
 {
     private readonly ILogger<PostService> _logger;
     private readonly IPostDataClient _postDataClient;

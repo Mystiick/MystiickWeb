@@ -9,9 +9,11 @@ using MystiickWeb.Shared.Models.Posts;
 
 using System.Data.Common;
 using MystiickWeb.Core.Interfaces.Clients;
+using MystiickWeb.Core;
 
 namespace MystiickWeb.Clients;
 
+[Injectable(typeof(IPostDataClient))]
 public class PostDataClient : IPostDataClient
 {
 

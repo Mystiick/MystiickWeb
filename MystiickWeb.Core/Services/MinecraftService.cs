@@ -13,7 +13,8 @@ using MystiickWeb.Core.Interfaces;
 
 namespace MystiickWeb.Core.Services;
 
-public class MinecraftService : IMinecraftService, IScopedService, IDisposable
+[Injectable(typeof(IMinecraftService))]
+public class MinecraftService : IMinecraftService, IDisposable
 {
     private readonly ILogger<MinecraftService> _logger;
     private readonly RconClient _client;
