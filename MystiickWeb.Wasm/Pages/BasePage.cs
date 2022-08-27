@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 
+using MystiickWeb.Shared.Models;
+
 using System.Net.Http.Json;
 
 namespace MystiickWeb.Wasm.Pages;
@@ -10,6 +12,7 @@ public class BasePage : ComponentBase
     public string Error { get; set; } = "";
     public string Message { get; set; } = "";
     public string DebugMessage { get; set; } = "";
+    public List<string> ValidationMessages { get; set; } = new();
 
     [Inject] public HttpClient Http { get; set; }
 
@@ -18,7 +21,7 @@ public class BasePage : ComponentBase
         Http = new HttpClient();
     }
 
-    public virtual async Task<T> GetFromApiAsync<T>(string path)
+    public virtual async Task<T?> GetFromApiAsync<T>(string path)
     {
         T? output = default;
 
@@ -45,22 +48,29 @@ public class BasePage : ComponentBase
         return output;
     }
 
-    public virtual async Task<T?> PostApiAsync<T>(string path, object payload)
+    public virtual async Task<Response> PostApiAsync(string path, object request) => new Response(await PostApiAsync<Response>(path, request));
+    public virtual async Task<Response<T>> PostApiAsync<T>(string path, object request)
     {
-        T? output = default;
+        Response<T> output = new() { Success = false };
         IsLoading = true;
+        Error = string.Empty;
+        Message = string.Empty;
+        ValidationMessages.Clear();
 
         try
         {
-            var result = await Http.PostAsJsonAsync(path, payload);
+            var result = await Http.PostAsJsonAsync(path, request);
+            output.Success = result.IsSuccessStatusCode;
 
             if (result.IsSuccessStatusCode)
             {
-                output = await result.Content.ReadFromJsonAsync<T>();
+                // Don't try to parse a Response type. This is used to signify a typeless 
+                if (typeof(T) != typeof(Response))
+                    output.Value = await result.Content.ReadFromJsonAsync<T>();
             }
             else
             {
-                Error = "An unexpected error has occurred connecting to the server";
+                ValidationMessages = await result.Content.ReadFromJsonAsync<List<string>>() ?? new();
             }
         }
         catch (Exception ex)

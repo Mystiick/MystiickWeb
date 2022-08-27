@@ -1,6 +1,7 @@
 ﻿@page "/user/register"
 @inherits BasePage
 @using MystiickWeb.Shared.Constants;
+@using MystiickWeb.Shared.Models
 
 <h3>Register</h3>
 @if (Error != string.Empty)
@@ -14,7 +15,7 @@
 
 <LoadingSpinner IsLoading="IsLoading" />
 
-<div class="col-6 p-3">
+<div class="col-xxl-6 p-3 col-12">
 
     @if (validationErrors.ContainsKey(string.Empty))
     {
@@ -86,28 +87,27 @@
 
     private async Task OnClick()
     {
-        List<string> errors = new();
+        Response resp = new();
         validationErrors.Clear();
+        ValidationMessages.Clear();
 
         if (IsFormValid())
-            errors = await PostApiAsync<List<string>>($"{ControllerConstants.Users}/register", new { Username = username, Password = password, ConfirmPassword = confirm }) ?? new();
+            resp = await PostApiAsync($"{ControllerConstants.Users}/register", new { Username = username, Password = password, ConfirmPassword = confirm });
 
-        if (errors.Any())
-        {
-            foreach(var err in errors)
-            {
-                AddValidationError(string.Empty, err);
-            }
-        }
-        else
+        if (resp.Success)
         {
             // TODO: Just reset for now, do something better later
             username = string.Empty;
             password = string.Empty;
             confirm = string.Empty;
         }
-
-        await Task.CompletedTask;
+        else if (ValidationMessages.Any())
+        {
+            foreach (var err in ValidationMessages)
+            {
+                AddValidationError(string.Empty, err);
+            }
+        }
     }
 
     private bool IsFormValid()

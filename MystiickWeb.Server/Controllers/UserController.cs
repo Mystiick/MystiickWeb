@@ -29,11 +29,18 @@ public class UserController : BaseController
 
     //TODO: [ValidateAntiForgeryToken]
     [HttpPost("register")]
-    public async Task<List<string>> Register(Credential credentials)
+    public async Task<ActionResult<List<string>>> Register(Credential credentials)
     {
+        List<string> errors;
+
         if (ModelState.IsValid)
-            return await _userService.RegisterUser(credentials);
+            errors = await _userService.RegisterUser(credentials);
         else
-            return new List<string>() { "An unexpected error has occurred" };
+            errors = new List<string>() { "An unexpected error has occurred" };
+
+        if (errors.Any())
+            return BadRequest(errors);
+        else
+            return Ok();
     }
 }
