@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.StaticFiles;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using MystiickWeb.Clients.Identity;
 using MystiickWeb.Server.Extensions;
 using MystiickWeb.Shared.Configs;
+using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models.User;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +19,7 @@ builder.Services.AddInjectables();
 // Identity
 builder.Services.AddIdentityCore<User>();
 builder.Services.AddScoped<IUserStore<User>, MystiickUserStore>();
+builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
 
 // Configs
 builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey));
@@ -51,8 +54,17 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// Setup CSRF Token
+app.Use((context, next) =>
+{
+    IAntiforgery? antiforgery = app.Services.GetRequiredService<IAntiforgery>();
+    var tokens = antiforgery.GetAndStoreTokens(context);
+    context.Response.Cookies.Append(CookieConstants.AntiForgeryToken, tokens.RequestToken, new CookieOptions() { HttpOnly = false });
 
+    return next(context);
+});
+
+app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 
 

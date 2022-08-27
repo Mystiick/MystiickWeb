@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
+using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
 
 using System.Net.Http.Json;
@@ -15,6 +17,7 @@ public class BasePage : ComponentBase
     public List<string> ValidationMessages { get; set; } = new();
 
     [Inject] public HttpClient Http { get; set; }
+    [Inject] public IJSRuntime? JSRuntime { get; set; }
 
     public BasePage()
     {
@@ -59,6 +62,10 @@ public class BasePage : ComponentBase
 
         try
         {
+            // Get antiforgery token, and add it to the request
+            var token = await JSRuntime.InvokeAsync<string>("Cookie.get", CookieConstants.AntiForgeryToken);
+            Http.DefaultRequestHeaders.Add("X-CSRF-TOKEN", token);
+
             var result = await Http.PostAsJsonAsync(path, request);
             output.Success = result.IsSuccessStatusCode;
 

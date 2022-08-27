@@ -18,6 +18,7 @@ public class UserController : BaseController
         _userService = userService;
     }
 
+    [ValidateAntiForgeryToken]
     [HttpPost("login")]
     public async Task Login(Credential credentials)
     {
@@ -27,7 +28,7 @@ public class UserController : BaseController
         await Task.CompletedTask;
     }
 
-    //TODO: [ValidateAntiForgeryToken]
+    [ValidateAntiForgeryToken]
     [HttpPost("register")]
     public async Task<ActionResult<List<string>>> Register(Credential credentials)
     {
