@@ -18,33 +18,46 @@ internal abstract class BaseManager
         JS = js;
     }
 
-    public virtual async Task<T?> GetFromApiAsync<T>(string path)
+    protected virtual async Task<Response> GetFromApiAsync(string path) => new Response(await GetFromApiAsync<Response>(path));
+    protected virtual async Task<Response<T>> GetFromApiAsync<T>(string path)
     {
-        T? output = default;
+        Response<T> output = new() { Success = false };
 
         try
         {
             await GetCsrfToken();
-            output = await Http.GetFromJsonAsync<T>(path);
+
+            HttpResponseMessage response = await Http.GetAsync(path);
+            output.Success = response.IsSuccessStatusCode;
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Don't try to parse a Response type. This is used to signify a typeless 
+                if (typeof(T) != typeof(Response))
+                    output.Value = await response.Content.ReadFromJsonAsync<T>();
+            }
+            else
+            {
+                // Request was not successful, try to read any errors from the output if they exist
+                output.ValidationMessages.AddRange(await response.Content.ReadFromJsonAsync<List<string>>() ?? new());
+            }
+
         }
         catch (Exception ex)
         {
-            //Error = "An unexpected error has occurred connecting to the server";
+            output.Error = "An unexpected error has occurred connecting to the server";
+            output.Success = false;
 #if DEBUG
             Console.WriteLine(ex.Message);
-            //DebugMessage = ex.Message;
+            output.DebugMessage = ex.Message;
 #endif
-        }
-        finally
-        {
-
         }
 
         return output;
     }
 
-    public virtual async Task<Response> PostApiAsync(string path, object? request = null) => new Response(await PostApiAsync<Response>(path, request));
-    public virtual async Task<Response<T>> PostApiAsync<T>(string path, object? request = null)
+    protected virtual async Task<Response> PostApiAsync(string path, object? request = null) => new Response(await PostApiAsync<Response>(path, request));
+    protected virtual async Task<Response<T>> PostApiAsync<T>(string path, object? request = null)
     {
         Response<T> output = new() { Success = false };
 
@@ -53,25 +66,26 @@ internal abstract class BaseManager
             await GetCsrfToken();
 
             // POST request to server            
-            HttpResponseMessage result = await Http.PostAsJsonAsync(path, request);
-            output.Success = result.IsSuccessStatusCode;
+            HttpResponseMessage response = await Http.PostAsJsonAsync(path, request);
+            output.Success = response.IsSuccessStatusCode;
 
             // If the request was successful, parse the output and return it
-            if (result.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
                 // Don't try to parse a Response type. This is used to signify a typeless 
                 if (typeof(T) != typeof(Response))
-                    output.Value = await result.Content.ReadFromJsonAsync<T>();
+                    output.Value = await response.Content.ReadFromJsonAsync<T>();
             }
             else
             {
                 // Request was not successful, try to read any errors from the output if they exist
-                output.ValidationMessages.AddRange(await result.Content.ReadFromJsonAsync<List<string>>() ?? new());
+                output.ValidationMessages.AddRange(await response.Content.ReadFromJsonAsync<List<string>>() ?? new());
             }
         }
         catch (Exception ex)
         {
             output.Error = "An unexpected error has occurred connecting to the server";
+            output.Success = false;
 #if DEBUG
             Console.WriteLine(ex.Message);
             output.DebugMessage = ex.Message;

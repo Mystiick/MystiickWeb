@@ -2,6 +2,7 @@
 
 using SixLabors.ImageSharp;
 
+using MystiickWeb.Shared;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Core;

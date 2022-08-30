@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
 using Constants = MystiickWeb.Shared.Constants;
+using MystiickWeb.Shared;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.Posts;
 

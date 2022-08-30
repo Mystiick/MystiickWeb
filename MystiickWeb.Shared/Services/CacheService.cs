@@ -1,5 +1,6 @@
 ﻿namespace MystiickWeb.Shared.Services;
 
+[Injectable(typeof(CacheService), InjectableAttribute.InjectableSetting.Singleton)]
 public class CacheService
 {
     private readonly Dictionary<string, object> _cache = new();

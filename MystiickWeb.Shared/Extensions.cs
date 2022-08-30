@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
-using MystiickWeb.Core;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace MystiickWeb.Server.Extensions;
+namespace MystiickWeb.Shared.Extensions;
 
 public static class Extensions
 {
@@ -10,14 +10,14 @@ public static class Extensions
     /// Adds classes with <see cref="InjectableAttribute"/> to the Services collection.
     /// </summary>
     /// <param name="services"></param>
-    public static void AddInjectables(this IServiceCollection services)
+    public static IServiceCollection AddInjectables(this IServiceCollection services)
     {
-        foreach (Type service in AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).Where(x => x.IsDefined(typeof(InjectableAttribute), false)))
+        foreach (Type service in AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).Where(x => x.IsDefined(typeof(InjectableAttribute), true)))
         {
             var attr = service.GetCustomAttribute<InjectableAttribute>();
 
             if (attr == null)
-                return;
+                continue;
 
             switch (attr.Setting)
             {
@@ -33,5 +33,7 @@ public static class Extensions
             }
 
         }
+
+        return services;
     }
 }

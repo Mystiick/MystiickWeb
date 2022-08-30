@@ -2,6 +2,7 @@
 
 using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Core.Interfaces.Services;
+using MystiickWeb.Shared;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Models.Posts;
 

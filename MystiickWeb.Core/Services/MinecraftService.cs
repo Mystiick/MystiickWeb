@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 // TODO: Move most of this to a Client, and remove RconSharp dependency
 using RconSharp;
 
+using MystiickWeb.Shared;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Constants;
 using MystiickWeb.Core.Interfaces.Services;

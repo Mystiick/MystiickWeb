@@ -4,29 +4,34 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.StaticFiles;
 
 using MystiickWeb.Clients.Identity;
-using MystiickWeb.Server.Extensions;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Constants;
+using MystiickWeb.Shared.Extensions;
 using MystiickWeb.Shared.Models.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
+MystiickWeb.Core.Startup.Init();
+
+builder.Services
+    .AddInjectables()
+    .Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey));
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-builder.Services.AddInjectables();
 
-// Identity
+// Identity and services
 builder.Services.AddIdentityCore<User>();
-builder.Services.AddScoped<IUserStore<User>, MystiickUserStore>();
-builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
-builder.Services.AddAuthentication("cookies").AddCookie("cookies", x => x.LoginPath = "/user/login");
+builder.Services
+    .AddScoped<IUserStore<User>, MystiickUserStore>()
+    .AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN")
+    .AddAuthentication("cookies").AddCookie("cookies", x => x.LoginPath = "/user/login");
 
 // Configs
-builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey));
-builder.Configuration.AddJsonFile("appsettings.json", false);
-builder.Configuration.AddJsonFile("appsettings.development.json", true);
-builder.Configuration.AddEnvironmentVariables();
+builder.Configuration
+    .AddJsonFile("appsettings.json", false)
+    .AddJsonFile("appsettings.development.json", true)
+    .AddEnvironmentVariables();
 
 builder.Logging.AddConfiguration(builder.Configuration);
 builder.Services.AddLogging(x =>

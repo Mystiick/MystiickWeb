@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 
 using MystiickWeb.Core;
 using MystiickWeb.Core.Interfaces.Clients;
+using MystiickWeb.Shared;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models;
 

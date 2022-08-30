@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using MystiickWeb.Core.Interfaces;
 using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Core.Interfaces.Services;
+using MystiickWeb.Shared;
 using MystiickWeb.Shared.Models;
 
 namespace MystiickWeb.Core.Services;

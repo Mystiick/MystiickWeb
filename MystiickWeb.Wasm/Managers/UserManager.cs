@@ -1,5 +1,6 @@
 ﻿using Microsoft.JSInterop;
 
+using MystiickWeb.Shared;
 using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Models.User;
@@ -7,6 +8,7 @@ using MystiickWeb.Wasm.Auth;
 
 namespace MystiickWeb.Wasm.Managers;
 
+[Injectable(typeof(UserManager))]
 internal class UserManager : BaseManager
 {
     private MystiickAuthStateProvider _authState;

@@ -5,6 +5,9 @@
 @using MystiickWeb.Shared.Constants;
 @using MystiickWeb.Shared.Models;
 @using MystiickWeb.Shared.Models.Posts;
+@using MystiickWeb.Wasm.Managers;
+
+@inject PostManager _postManager;
 
 <PageTitle>Photography</PageTitle>
 
@@ -61,11 +64,11 @@
     {
         if (!string.IsNullOrWhiteSpace(ID))
         {
-            Posts = new ImagePost[] { await GetFromApiAsync<ImagePost>($"{ControllerConstants.Posts}/{ID}") };
+            Posts = new ImagePost[] { (await _postManager.GetPostByID<ImagePost>(ID)).Value ?? new() };
         }
         else
         {
-            Posts = await GetFromApiAsync<ImagePost[]>($"{ControllerConstants.Posts}?postType=photography");
+            Posts = (await _postManager.GetPostsByType<ImagePost>("photography")).Value;
         }
     }
 }
