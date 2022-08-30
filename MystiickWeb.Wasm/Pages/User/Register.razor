@@ -2,6 +2,11 @@
 @inherits BasePage
 @using MystiickWeb.Shared.Constants;
 @using MystiickWeb.Shared.Models;
+@using MystiickWeb.Shared.Models.User;
+@using MystiickWeb.Wasm.Managers;
+
+@inject UserManager _userManager;
+@inject NavigationManager _navigation;
 
 <h3>Register</h3>
 @if (Error != string.Empty)
@@ -92,27 +97,29 @@
         ValidationMessages.Clear();
 
         if (IsFormValid())
-            resp = await PostApiAsync($"{ControllerConstants.Users}/register", new { Username = username, Password = password, ConfirmPassword = confirm });
+            resp = await _userManager.RegisterUser(new Credential { Username = username, Password = password, ConfirmPassword = confirm });
 
         if (resp.Success)
         {
-            // TODO: Just reset for now, do something better later
-            username = string.Empty;
-            password = string.Empty;
-            confirm = string.Empty;
+            // Registration successful, navigate to the user 
+            _navigation.NavigateTo("/user");
         }
         else if (ValidationMessages.Any())
         {
+            // Add errros to header validation
             foreach (var err in ValidationMessages)
             {
                 AddValidationError(string.Empty, err);
             }
+
+            // Reset password fields
+            password = string.Empty;
+            confirm = string.Empty;
         }
     }
 
     private bool IsFormValid()
     {
-
         if (string.IsNullOrWhiteSpace(username))
             AddValidationError(nameof(username), "Field is required.");
 

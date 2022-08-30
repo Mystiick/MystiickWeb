@@ -1,11 +1,13 @@
 ﻿@page "/user/login"
 @inherits BasePage
-@inject NavigationManager _navigationManager;
-@inject MystiickAuthStateProvider asp;
 
 @using MystiickWeb.Wasm.Auth;
+@using MystiickWeb.Wasm.Managers;
 @using MystiickWeb.Shared.Constants;
 @using MystiickWeb.Shared.Models.User;
+
+@inject NavigationManager _navigationManager;
+@inject UserManager _userManager;
 
 <div class="container col-6">
     <h3>Login</h3>
@@ -29,13 +31,14 @@
 
     private async void OnClick()
     {
-        var response = await PostApiAsync($"{ControllerConstants.Users}/login", new Credential { Username = username, Password = password });
+        IsLoading = true;
+        var response = await _userManager.Login(new Credential { Username = username, Password = password });
+        
+        IsLoading = false;
 
         if (response.Success)
         {
             _navigationManager.NavigateTo("/user");
-            asp.NotifyAuthenticationStateChanged();
         }
-
     }
 }
