@@ -1,8 +1,12 @@
-﻿using MystiickWeb.Shared.Models.User;
+﻿using System.Security.Claims;
+
+using MystiickWeb.Shared.Models.User;
 
 namespace MystiickWeb.Core.Interfaces.Services;
 
 public interface IUserService
 {
+    Task<User?> LookupUserByName(string username);
+    Task<ClaimsIdentity> AuthenticateUser(Credential credential);
     Task<List<string>> RegisterUser(Credential credentials);
 }

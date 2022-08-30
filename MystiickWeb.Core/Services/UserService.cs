@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared.Models.User;
 
+using System.Security.Claims;
+
 namespace MystiickWeb.Core.Services;
 
 [Injectable(typeof(IUserService))]
@@ -16,6 +18,39 @@ public class UserService : IUserService
     {
         _logger = logger;
         _userManager = userManager;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
+    public async Task<User?> LookupUserByName(string username)
+    {
+        return await _userManager.FindByNameAsync(username);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="credentials"></param>
+    /// <returns></returns>
+    public async Task<ClaimsIdentity> AuthenticateUser(Credential credentials)
+    {
+        User? user = await LookupUserByName(credentials.Username);
+
+        if (user != null && await _userManager.CheckPasswordAsync(user, credentials.Password))
+        {
+            ClaimsIdentity output = new("cookies");
+            output.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()));
+            output.AddClaim(new Claim(ClaimTypes.Name, user.Username));
+            
+            return output;
+        }
+        else
+        {
+            throw new UnauthorizedAccessException("Invalid username or password");
+        }
     }
 
     /// <summary>

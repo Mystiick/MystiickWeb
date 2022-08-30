@@ -20,6 +20,7 @@ builder.Services.AddInjectables();
 builder.Services.AddIdentityCore<User>();
 builder.Services.AddScoped<IUserStore<User>, MystiickUserStore>();
 builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
+builder.Services.AddAuthentication("cookies").AddCookie("cookies", x => x.LoginPath = "/user/login");
 
 // Configs
 builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey));
@@ -54,12 +55,14 @@ else
     app.UseHsts();
 }
 
+app.UseAuthentication();
+
 // Setup CSRF Token
 app.Use((context, next) =>
 {
     IAntiforgery? antiforgery = app.Services.GetRequiredService<IAntiforgery>();
     var tokens = antiforgery.GetAndStoreTokens(context);
-    context.Response.Cookies.Append(CookieConstants.AntiForgeryToken, tokens.RequestToken, new CookieOptions() { HttpOnly = false });
+    context.Response.Cookies.Append(CookieConstants.AntiForgeryToken, tokens.RequestToken, new CookieOptions() { HttpOnly = false, IsEssential = true });
 
     return next(context);
 });
@@ -81,6 +84,7 @@ app.UseStaticFiles(new StaticFileOptions()
 });
 
 app.UseRouting();
+app.UseAuthorization();
 
 
 app.MapRazorPages();

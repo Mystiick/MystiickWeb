@@ -3,7 +3,6 @@ using Microsoft.JSInterop;
 
 using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
-
 using System.Net.Http.Json;
 
 namespace MystiickWeb.Wasm.Pages;
@@ -17,12 +16,13 @@ public class BasePage : ComponentBase
     public List<string> ValidationMessages { get; set; } = new();
 
     [Inject] public HttpClient Http { get; set; }
-    [Inject] public IJSRuntime? JSRuntime { get; set; }
+    [Inject] public IJSRuntime JSRuntime { get; set; }
+    [Inject] public ILogger<BasePage> Logger { get; set; }
 
-    public BasePage()
-    {
-        Http = new HttpClient();
-    }
+    // REASON: HttpClient and IJSRuntime are injected, so there is no need to set them to a value
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public BasePage() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     public virtual async Task<T?> GetFromApiAsync<T>(string path)
     {
@@ -32,7 +32,7 @@ public class BasePage : ComponentBase
 
         try
         {
-            Console.WriteLine(typeof(T));
+            await GetCsrfToken();
             output = await Http.GetFromJsonAsync<T>(path);
         }
         catch (Exception ex)
@@ -51,8 +51,8 @@ public class BasePage : ComponentBase
         return output;
     }
 
-    public virtual async Task<Response> PostApiAsync(string path, object request) => new Response(await PostApiAsync<Response>(path, request));
-    public virtual async Task<Response<T>> PostApiAsync<T>(string path, object request)
+    public virtual async Task<Response> PostApiAsync(string path, object? request = null) => new Response(await PostApiAsync<Response>(path, request));
+    public virtual async Task<Response<T>> PostApiAsync<T>(string path, object? request = null)
     {
         Response<T> output = new() { Success = false };
         IsLoading = true;
@@ -62,13 +62,13 @@ public class BasePage : ComponentBase
 
         try
         {
-            // Get antiforgery token, and add it to the request
-            var token = await JSRuntime.InvokeAsync<string>("Cookie.get", CookieConstants.AntiForgeryToken);
-            Http.DefaultRequestHeaders.Add("X-CSRF-TOKEN", token);
+            await GetCsrfToken();
 
-            var result = await Http.PostAsJsonAsync(path, request);
+            // POST request to server            
+            HttpResponseMessage result = await Http.PostAsJsonAsync(path, request);
             output.Success = result.IsSuccessStatusCode;
 
+            // If the request was successful, parse the output and return it
             if (result.IsSuccessStatusCode)
             {
                 // Don't try to parse a Response type. This is used to signify a typeless 
@@ -77,6 +77,7 @@ public class BasePage : ComponentBase
             }
             else
             {
+                // Request was not successful, try to read any errors from the output if they exist
                 ValidationMessages = await result.Content.ReadFromJsonAsync<List<string>>() ?? new();
             }
         }
@@ -96,4 +97,20 @@ public class BasePage : ComponentBase
         return output;
 
     }
+
+    private async Task GetCsrfToken()
+    {
+        // Get antiforgery token, and add it to the request
+        var token = await JSRuntime.InvokeAsync<string>("Cookie.get", CookieConstants.AntiForgeryToken);
+
+        // Remove the Antiforgery token if it already exists to put a clean one in
+        if (Http.DefaultRequestHeaders.Contains("X-CSRF-TOKEN"))
+            Http.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");
+
+        // Add Antiforgery token
+        Http.DefaultRequestHeaders.Add("X-CSRF-TOKEN", token);
+
+        Console.WriteLine("Token: " + token);
+    }
+
 }

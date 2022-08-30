@@ -1,0 +1,54 @@
+﻿@using System.Security.Claims;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization;
+
+@using MystiickWeb.Shared.Constants;
+@using MystiickWeb.Shared.Models.User;
+@using MystiickWeb.Wasm.Auth;
+
+@page "/user"
+@inherits BasePage
+@attribute [Authorize]
+@inject NavigationManager _navigationManager;
+@inject MystiickAuthStateProvider asp;
+
+<h3>User: @username</h3>
+
+@foreach (UserClaim c in UserClaims)
+{
+    <div>
+        <span>@c.Value</span>
+    </div>
+}
+
+<AuthorizeView>
+    <Authorized>
+        <p>The user @context.User.FindFirst(ClaimTypes.Name).Value is authorized</p>
+
+        <button class="btn btn-primary" @onclick="Logout">Logout</button>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    protected List<UserClaim> UserClaims = new();
+    protected string username = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        UserClaims = await GetFromApiAsync<List<UserClaim>>($"{ControllerConstants.Users}/claims") ?? new();
+
+        var authState = await asp.GetAuthenticationStateAsync();
+        username = authState.User.Identity.Name;
+    }
+
+    protected async Task Logout()
+    {
+        var response = await PostApiAsync($"{ControllerConstants.Users}/logout");
+
+        if (response.Success)
+        {
+            _navigationManager.NavigateTo("/user/login");
+            asp.NotifyAuthenticationStateChanged();
+        }
+    }
+}

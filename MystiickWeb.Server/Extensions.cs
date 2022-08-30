@@ -12,7 +12,6 @@ public static class Extensions
     /// <param name="services"></param>
     public static void AddInjectables(this IServiceCollection services)
     {
-
         foreach (Type service in AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).Where(x => x.IsDefined(typeof(InjectableAttribute), false)))
         {
             var attr = service.GetCustomAttribute<InjectableAttribute>();
