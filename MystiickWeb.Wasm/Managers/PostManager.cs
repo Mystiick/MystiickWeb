@@ -3,6 +3,7 @@
 using MystiickWeb.Shared;
 using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
+using MystiickWeb.Shared.Models.Posts;
 
 namespace MystiickWeb.Wasm.Managers;
 
@@ -22,6 +23,13 @@ internal class PostManager : BaseManager
     public async Task<Response<T>> GetPostByID<T>(string id)
     {
         var output = await GetFromApiAsync<T>($"{ControllerConstants.Posts}/{id}");
+
+        return output;
+    }
+
+    public async Task<Response<TypelessPost[]>> GetTopPosts(int count)
+    {
+        var output = await GetFromApiAsync<TypelessPost[]>($"{ControllerConstants.Posts}?top={count}");
 
         return output;
     }

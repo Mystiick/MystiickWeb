@@ -1,7 +1,8 @@
 @page "/minecraft"
 @using MystiickWeb.Shared.Constants;
 @using MystiickWeb.Shared.Models;
-@inject HttpClient Http
+
+@inject IMinecraftManager _minecraft;
 
 <PageTitle>Minecraft Server Status</PageTitle>
 
@@ -21,14 +22,22 @@
 {
 
     <div>
-        <h3>Server Online</h3>
+        <h3>Server [@model.ServerName] Online</h3>
         <span>Online: @model.CountOnline / @model.CountMaximum</span>
-
+        <div class="row">
         @foreach (var player in model.OnlinePlayers)
         {
             <MinecraftPlayerCard Player="@player" />
         }
+        </div>
 
+    </div>
+}
+
+@if (!loading && model == null)
+{
+    <div>
+        <h3>Server Offline</h3>
     </div>
 }
 
@@ -44,7 +53,10 @@
 
         try
         {
-            model = await Http.GetFromJsonAsync<MinecraftServerData>(ControllerConstants.Minecraft);
+            Response<MinecraftServerData> response = await _minecraft.GetMinecraftServerData();
+
+            if (response.Success)
+                model = response.Value;
         }
         catch (Exception ex)
         {

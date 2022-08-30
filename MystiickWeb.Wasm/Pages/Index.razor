@@ -5,6 +5,8 @@
 @using MystiickWeb.Shared.Models.Posts;
 @using MystiickWeb.Shared.Constants;
 
+@inject PostManager _postManager;
+
 <PageTitle>Kaisan Studio</PageTitle>
 
 <div class="row">
@@ -47,7 +49,7 @@ Welcome to Kaisan Studio, a portfolio website for my programming and photography
 The [Photography](/photography) page is a collection of posts showcasing some pictures taken by me. I currently have a Nikon D3500, and I use the kit 18-55mm and 70-300mm lenses.
 You can click each picture to view a larger image, which also has some additional information about the composition of the image.
 
-My [Minecraft](/minecraft) server is currently offline, so it returns an error trying to connect to display the information about it.
+My [Minecraft](/minecraft) server is currently offline, so it currently just displays a page with mock data.
 
 ### Who am I?
 I'm Jake, currently working on a handful of programming projects as well as venturing into amateur photography.
@@ -59,6 +61,6 @@ Kaisan is originally just a name that came up when clicking 'Random' while creat
 I like it because it is really close to [Kaizen](https://en.wikipedia.org/wiki/Kaizen), which is Japanese for 'Improvement', and has been adopted as a meaning for continual improvement.
 Kaisan is also a literal translation for 'mountain founder' in Japanese, which is just plain cool.");
 
-        NewPosts = await GetFromApiAsync<TypelessPost[]>($"{ControllerConstants.Posts}?top=5");
+        NewPosts = (await _postManager.GetTopPosts(5)).Value;
     }
 }

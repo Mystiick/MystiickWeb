@@ -3,7 +3,10 @@
 @inherits BasePage
 
 @using MystiickWeb.Shared.Constants;
+@using MystiickWeb.Shared.Models;
 @using MystiickWeb.Shared.Models.Posts;
+
+@inject PostManager _postManager;
 
 <h1 class="inline-block">Programming</h1>
 
@@ -68,11 +71,21 @@
     {
         if (!string.IsNullOrWhiteSpace(ID))
         {
-            Posts = new ProgrammingPost[] { await GetFromApiAsync<ProgrammingPost>($"{ControllerConstants.Posts}/{ID}") };
+            Response<ProgrammingPost> response = await _postManager.GetPostByID<ProgrammingPost>(ID);
+
+            if (response.Success && response.Value != null)
+                Posts = new[] { response.Value };
+            else
+                Posts = Array.Empty<ProgrammingPost>();
         }
         else
         {
-            Posts = await GetFromApiAsync<ProgrammingPost[]>($"{ControllerConstants.Posts}?postType=programming");
+            Response<ProgrammingPost[]> response = await _postManager.GetPostsByType<ProgrammingPost>("programming");
+
+            if (response.Success && response.Value != null)
+                Posts = response.Value;
+            else
+                Posts = Array.Empty<ProgrammingPost>();
         }
     }
 }

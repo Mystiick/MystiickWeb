@@ -4,6 +4,7 @@ using MystiickWeb.Wasm.Shared;
 using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Services;
+using MystiickWeb.Wasm.Managers;
 
 namespace MystiickWeb.Wasm.Pages.Posts
 {
@@ -13,7 +14,7 @@ namespace MystiickWeb.Wasm.Pages.Posts
         private ImageCategory[]? subcategories;
         private ImageResult[]? images;
         private ImageResult? previewImage;
-        private Paginator imagePager = new();
+        private Paginator? imagePager = new();
 
         [Parameter] public string? ImageGuid { get; set; }
         [Parameter] public string? Category { get; set; }
@@ -21,42 +22,41 @@ namespace MystiickWeb.Wasm.Pages.Posts
         [Parameter] public string? Tag { get; set; }
 
         [Inject] private CacheService _cache { get; set; } = new();
+
+        // REASON: NavigationManager and ImageService is injected, so there is no need to set them to a value
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         [Inject] private NavigationManager _navigationManager { get; set; }
+        [Inject] private ImageManager _imageManager { get; set; }
+#pragma warning restore CS8618
 
         protected override async Task OnInitializedAsync()
         {
-            categories = await GetFromApiAsync<ImageCategory[]>($"{ControllerConstants.Images}/categories");
+            categories = (await _imageManager.GetCategories()).Value;
         }
 
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
 
+            images = null;
+
             // Handle URL args
             if (!string.IsNullOrWhiteSpace(ImageGuid))
             {
-                previewImage = await GetFromApiAsync<ImageResult>($"{ControllerConstants.Images}/{ImageGuid}");
+                previewImage = (await _imageManager.GetImageByID(ImageGuid)).Value;
             }
             if (!string.IsNullOrWhiteSpace(Category))
             {
-                SetImages(await GetFromApiAsync<ImageResult[]>($"{ControllerConstants.Images}/categories/{Category}"), true);
+                SetImages((await _imageManager.GetImagesByCategory(Category)).Value ?? Array.Empty<ImageResult>(), true);
             }
             if (!string.IsNullOrWhiteSpace(Subcategory))
             {
-                SetImages(await GetFromApiAsync<ImageResult[]>($"{ControllerConstants.Images}/subcategories/{Subcategory}"), false);
+                SetImages((await _imageManager.GetImagesBySubategory(Subcategory)).Value ?? Array.Empty<ImageResult>(), false);
             }
             if (!string.IsNullOrWhiteSpace(Tag))
             {
-                SetImages(await GetFromApiAsync<ImageResult[]>($"{ControllerConstants.Images}/tags/{Tag}"), true);
+                SetImages((await _imageManager.GetImagesByTag(Tag)).Value ?? Array.Empty<ImageResult>(), true);
             }
-        }
-
-        public override async Task<T> GetFromApiAsync<T>(string path)
-        {
-            // Set to null first to clear out existing list, preventing images from popping in over the old ones, one at a time
-            images = null;
-
-            return await base.GetFromApiAsync<T>(path);
         }
 
         protected void LoadThumbnailsByCategory(string category)
