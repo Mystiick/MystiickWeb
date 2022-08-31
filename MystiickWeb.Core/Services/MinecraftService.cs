@@ -39,10 +39,17 @@ public class MinecraftService : IMinecraftService, IDisposable
         }
     }
 
-    public async Task<MinecraftServerData> GetServerData()
+    public async Task<MinecraftServerData?> GetServerData()
     {
-        await Connect();
-        
+        try
+        {
+            await Connect();
+        }
+        catch
+        {
+            return null;
+        }
+
         var list = await _client.ExecuteCommandAsync("list");
         var day = await _client.ExecuteCommandAsync("time query day");
         var time = await _client.ExecuteCommandAsync("time query daytime");

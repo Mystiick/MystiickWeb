@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
 using MystiickWeb.Wasm.Shared;
-using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Services;
 using MystiickWeb.Wasm.Managers;
@@ -31,7 +30,7 @@ namespace MystiickWeb.Wasm.Pages.Posts
 
         protected override async Task OnInitializedAsync()
         {
-            categories = (await _imageManager.GetCategories()).Value;
+            categories = await CallApi(_imageManager.GetCategories());
         }
 
         protected override async Task OnParametersSetAsync()
@@ -47,15 +46,15 @@ namespace MystiickWeb.Wasm.Pages.Posts
             }
             if (!string.IsNullOrWhiteSpace(Category))
             {
-                SetImages((await _imageManager.GetImagesByCategory(Category)).Value ?? Array.Empty<ImageResult>(), true);
+                SetImages(await CallApi(_imageManager.GetImagesByCategory(Category)), true);
             }
             if (!string.IsNullOrWhiteSpace(Subcategory))
             {
-                SetImages((await _imageManager.GetImagesBySubategory(Subcategory)).Value ?? Array.Empty<ImageResult>(), false);
+                SetImages(await CallApi(_imageManager.GetImagesBySubategory(Subcategory)), false);
             }
             if (!string.IsNullOrWhiteSpace(Tag))
             {
-                SetImages((await _imageManager.GetImagesByTag(Tag)).Value ?? Array.Empty<ImageResult>(), true);
+                SetImages(await CallApi(_imageManager.GetImagesByTag(Tag)), true);
             }
         }
 
@@ -74,11 +73,11 @@ namespace MystiickWeb.Wasm.Pages.Posts
             _navigationManager.NavigateTo($"photogrid/tag/{tag}");
         }
 
-        protected void SetImages(ImageResult[] input, bool populateSub)
+        protected void SetImages(ImageResult[]? input, bool populateSub)
         {
             images = input;
 
-            if (populateSub)
+            if (populateSub && images != null)
             {
                 subcategories = images.GroupBy(x => x.Subcategory)
                                       .Select(x => new ImageCategory() { Name = x.Key, Count = x.Count() })

@@ -9,18 +9,8 @@
 @using MystiickWeb.Shared.Constants;
 
 <PageTitle>Gallery</PageTitle>
-<h1 class="inline-block">Gallery</h1>
 
-@if (Error != string.Empty)
-{
-    <div class="text-danger">@Error</div>
-}
-@if (Message != string.Empty)
-{
-    <div class="text-danger">@Message</div>
-}
-
-<LoadingSpinner IsLoading="IsLoading" />
+<PageHeader @ref="Header" HeaderText="Gallery" IsLoading="IsLoading" Error="@Error" Message="@Message" ValidationMessages="ValidationMessages" />
 
 @if (string.IsNullOrWhiteSpace(ImageGuid))
 {

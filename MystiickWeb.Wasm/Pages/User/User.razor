@@ -29,7 +29,7 @@
 @code {
     protected async Task Logout()
     {
-        var response = await _userManager.Logout();
+        var response = await CallApi(_userManager.Logout());
 
         if (response.Success)
             _navigationManager.NavigateTo("/user/login");

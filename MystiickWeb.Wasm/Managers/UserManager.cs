@@ -23,7 +23,9 @@ internal class UserManager : BaseManager
     public async Task<Response> Login(Credential credential)
     {
         var output = await PostApiAsync($"{ControllerConstants.Users}/login", credential);
-        _authState.NotifyAuthenticationStateChanged();
+
+        if (output.Success)
+            _authState.NotifyAuthenticationStateChanged();
 
         return output;
     }
@@ -31,7 +33,9 @@ internal class UserManager : BaseManager
     public async Task<Response> Logout()
     {
         var output = await PostApiAsync($"{ControllerConstants.Users}/logout");
-        _authState.NotifyAuthenticationStateChanged();
+
+        if (output.Success)
+            _authState.NotifyAuthenticationStateChanged();
 
         return output;
     }

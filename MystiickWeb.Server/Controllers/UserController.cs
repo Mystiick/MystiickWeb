@@ -38,7 +38,7 @@ public class UserController : BaseController
             catch (UnauthorizedAccessException ex)
             {
                 ModelState.AddModelError("", ex.Message);
-                return Unauthorized();
+                return Unauthorized(new[] { "Invalid username or password." });
             }
         }
 

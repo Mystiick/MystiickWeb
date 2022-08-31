@@ -16,21 +16,15 @@ internal class PostManager : BaseManager
 
     public async Task<Response<T[]>> GetPostsByType<T>(string type)
     {
-        var output = await GetFromApiAsync<T[]>($"{ControllerConstants.Posts}?postType={type}");
-
-        return output;
+        return await GetFromApiAsync<T[]>($"{ControllerConstants.Posts}?postType={type}");
     }
     public async Task<Response<T>> GetPostByID<T>(string id)
     {
-        var output = await GetFromApiAsync<T>($"{ControllerConstants.Posts}/{id}");
-
-        return output;
+        return await GetFromApiAsync<T>($"{ControllerConstants.Posts}/{id}");
     }
 
     public async Task<Response<TypelessPost[]>> GetTopPosts(int count)
     {
-        var output = await GetFromApiAsync<TypelessPost[]>($"{ControllerConstants.Posts}?top={count}");
-
-        return output;
+        return await GetFromApiAsync<TypelessPost[]>($"{ControllerConstants.Posts}?top={count}");
     }
 }

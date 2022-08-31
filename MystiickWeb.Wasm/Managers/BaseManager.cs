@@ -33,7 +33,7 @@ internal abstract class BaseManager
             if (response.IsSuccessStatusCode)
             {
                 // Don't try to parse a Response type. This is used to signify a typeless 
-                if (typeof(T) != typeof(Response))
+                if (typeof(T) != typeof(Response) && response.StatusCode != System.Net.HttpStatusCode.NoContent)
                     output.Value = await response.Content.ReadFromJsonAsync<T>();
             }
             else

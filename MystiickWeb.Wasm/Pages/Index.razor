@@ -9,6 +9,8 @@
 
 <PageTitle>Kaisan Studio</PageTitle>
 
+<PageHeader @ref="Header" HeaderText="" Error="@Error" Message="@Message" ValidationMessages="ValidationMessages" />
+
 <div class="row">
 
     <div class="col-xxl-10 col-xl-8">
@@ -61,6 +63,6 @@ Kaisan is originally just a name that came up when clicking 'Random' while creat
 I like it because it is really close to [Kaizen](https://en.wikipedia.org/wiki/Kaizen), which is Japanese for 'Improvement', and has been adopted as a meaning for continual improvement.
 Kaisan is also a literal translation for 'mountain founder' in Japanese, which is just plain cool.");
 
-        NewPosts = (await _postManager.GetTopPosts(5)).Value;
+        NewPosts = (await CallApi(_postManager.GetTopPosts(5)));
     }
 }

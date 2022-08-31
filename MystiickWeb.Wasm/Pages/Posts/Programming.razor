@@ -8,18 +8,7 @@
 
 @inject PostManager _postManager;
 
-<h1 class="inline-block">Programming</h1>
-
-@if (Error != string.Empty)
-{
-    <div class="text-danger">@Error</div>
-}
-@if (Message != string.Empty)
-{
-    <div class="text-danger">@Message</div>
-}
-
-<LoadingSpinner IsLoading="IsLoading" />
+<PageHeader @ref="Header" HeaderText="Programming" IsLoading="IsLoading" Error="@Error" Message="@Message" ValidationMessages="ValidationMessages" />
 
 <div class="border-bottom">
     <ul style="list-style: none;">
@@ -30,7 +19,7 @@
 
 @if (Posts != null)
 {
-    <Paginator @ref="postPager"  Label="Photography post pager" Items="Posts" PageSize="2" Name="ProgrammingPostPager">
+    <Paginator @ref="postPager" Label="Photography post pager" Items="Posts" PageSize="2" Name="ProgrammingPostPager">
         @if (postPager != null)
         {
             @foreach (ProgrammingPost post in postPager.DisplayItems)
@@ -71,21 +60,11 @@
     {
         if (!string.IsNullOrWhiteSpace(ID))
         {
-            Response<ProgrammingPost> response = await _postManager.GetPostByID<ProgrammingPost>(ID);
-
-            if (response.Success && response.Value != null)
-                Posts = new[] { response.Value };
-            else
-                Posts = Array.Empty<ProgrammingPost>();
+            Posts = new[] { await CallApi<ProgrammingPost>(_postManager.GetPostByID<ProgrammingPost>(ID)) ?? new() };
         }
         else
         {
-            Response<ProgrammingPost[]> response = await _postManager.GetPostsByType<ProgrammingPost>("programming");
-
-            if (response.Success && response.Value != null)
-                Posts = response.Value;
-            else
-                Posts = Array.Empty<ProgrammingPost>();
+            Posts = await CallApi(_postManager.GetPostsByType<ProgrammingPost>("programming"));
         }
     }
 }
