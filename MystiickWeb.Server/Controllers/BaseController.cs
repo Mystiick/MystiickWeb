@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace MystiickWeb.Server.Controllers;
 
-public class BaseController : Controller 
+public class BaseController : Controller
 {
     private readonly ILogger _logger;
 

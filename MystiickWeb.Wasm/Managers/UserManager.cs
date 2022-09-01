@@ -15,9 +15,7 @@ internal class UserManager : BaseManager
 
     public UserManager(HttpClient http, IJSRuntime js, MystiickAuthStateProvider masp) : base(http, js)
     {
-
         _authState = masp;
-
     }
 
     public async Task<Response> Login(Credential credential)
@@ -48,5 +46,18 @@ internal class UserManager : BaseManager
             output = await Login(credential);
 
         return output;
+    }
+
+    public async Task<Response> ChangePassword(Credential credential, Credential newPassword)
+    {
+        await Task.CompletedTask;
+        return null;
+    }
+
+    public async Task<Response> ChangeUsername(Credential credential, string newUsername)
+    {
+        Console.WriteLine("CU");
+        await Task.CompletedTask;
+        return null;
     }
 }

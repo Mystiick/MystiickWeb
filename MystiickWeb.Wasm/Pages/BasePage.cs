@@ -40,7 +40,7 @@ public class BasePage : ComponentBase
             };
         }
 
-        if (!output.Success)
+        if (output != null && !output.Success)
         {
             Error = output.Error;
             Message = output.Message;

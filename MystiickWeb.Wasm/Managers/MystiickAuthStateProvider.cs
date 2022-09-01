@@ -29,7 +29,7 @@ public class MystiickAuthStateProvider : AuthenticationStateProvider
 
         // Add Antiforgery token
         _http.DefaultRequestHeaders.Add("X-CSRF-TOKEN", token);
-        string name = await _http.GetStringAsync(ControllerConstants.Users);
+        string name = await _http.GetStringAsync($"{ControllerConstants.Users}/current");
 
         ClaimsIdentity user;
         if (string.IsNullOrWhiteSpace(name))

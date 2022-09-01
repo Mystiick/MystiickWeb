@@ -79,9 +79,27 @@ public class UserController : BaseController
     }
 
     // TODO: This causes an issue when logging in/out [ValidateAntiForgeryToken]
-    [HttpGet]
+    [HttpGet("current")]
     public async Task<string> GetCurrentUser()
     {
         return await Task.FromResult(HttpContext.User.FindFirstValue(ClaimTypes.Name));
+    }
+
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    [HttpPut("current/password")]
+    public async Task<ActionResult> UpdatePassword((Credential currentUser, Credential newPassword) input)
+    {
+        await Task.CompletedTask;
+        return Ok();
+    }
+
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    [HttpPut("current")]
+    public async Task<ActionResult> UpdateUsername(Credential user, [FromQuery] string newUsername)
+    {
+        await Task.CompletedTask;
+        return Ok();
     }
 }
