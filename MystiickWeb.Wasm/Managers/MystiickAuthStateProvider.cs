@@ -1,10 +1,12 @@
-﻿using System.Security.Claims;
-
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 
 using MystiickWeb.Shared.Constants;
+using MystiickWeb.Shared.Models.User;
 
+using Newtonsoft.Json;
+
+using System.Security.Claims;
 
 namespace MystiickWeb.Wasm.Auth;
 
@@ -29,19 +31,15 @@ public class MystiickAuthStateProvider : AuthenticationStateProvider
 
         // Add Antiforgery token
         _http.DefaultRequestHeaders.Add("X-CSRF-TOKEN", token);
-        string name = await _http.GetStringAsync($"{ControllerConstants.Users}/current");
-
-        ClaimsIdentity user;
-        if (string.IsNullOrWhiteSpace(name))
+        User deserializedUser = JsonConvert.DeserializeObject<User>(await _http.GetStringAsync($"{ControllerConstants.Users}/current"));
+        ClaimsIdentity webUser = new();
+        
+        if (deserializedUser.Authenticated)
         {
-            user = new ClaimsIdentity();
-        }
-        else
-        {
-            user = new ClaimsIdentity(new List<Claim> { new Claim(ClaimTypes.Name, name) }, "TestAuth");
+            webUser = new ClaimsIdentity(deserializedUser.Claims.Select(x => new Claim(x.Type, x.Value)), "cookie");
         }
 
-        return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(user)));
+        return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(webUser)));
     }
 
     public void NotifyAuthenticationStateChanged()

@@ -80,9 +80,14 @@ public class UserController : BaseController
 
     // TODO: This causes an issue when logging in/out [ValidateAntiForgeryToken]
     [HttpGet("current")]
-    public async Task<string> GetCurrentUser()
+    public async Task<ActionResult<User>> GetCurrentUser()
     {
-        return await Task.FromResult(HttpContext.User.FindFirstValue(ClaimTypes.Name));
+        var output = await _userService.GetCurrentUser(HttpContext.User);
+
+        if (output != null)
+            return Ok(output);
+        else
+            return NoContent();
     }
 
     [ValidateAntiForgeryToken]

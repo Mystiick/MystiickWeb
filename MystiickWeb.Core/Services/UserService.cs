@@ -96,4 +96,9 @@ public class UserService : IUserService
 
         return errors;
     }
+
+    public Task<User> GetCurrentUser(ClaimsPrincipal user)
+    {
+        return Task.FromResult(new User(user));
+    }
 }

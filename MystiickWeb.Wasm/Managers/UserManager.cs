@@ -56,7 +56,6 @@ internal class UserManager : BaseManager
 
     public async Task<Response> ChangeUsername(Credential credential, string newUsername)
     {
-        Console.WriteLine("CU");
         await Task.CompletedTask;
         return null;
     }

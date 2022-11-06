@@ -10,7 +10,7 @@ using MystiickWeb.Shared.Models.User;
 
 namespace MystiickWeb.Clients.Identity;
 
-public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>
+public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUserRoleStore<User>
 {
 
     private readonly ILogger<MystiickUserStore> _logger;
@@ -21,6 +21,8 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>
         _logger = logger;
         _configs = configs.Value;
     }
+
+    #region | IUserStore<User> |
 
     #region | Create |
 
@@ -80,15 +82,29 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>
 
     public Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
     {
-        // TODO: Update DB
         user.NormalizedUsername = normalizedName;
+
+        // If the user has been authenticated, they have a record in the database
+        // The only reason they might not be authenticated setting the Username is if they are a registering a new user
+        if (user.Authenticated)
+        {
+            // TODO: Update DB
+        }
+
         return Task.CompletedTask;
     }
 
     public Task SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
     {
-        // TODO: Update DB
         user.Username = userName;
+
+        // If the user has been authenticated, they have a record in the database
+        // The only reason they might not be authenticated setting the Username is if they are a registering a new user
+        if (user.Authenticated)
+        {
+            // TODO: Update DB
+        }
+
         return Task.CompletedTask;
     }
 
@@ -116,6 +132,63 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>
     }
     #endregion
 
+    #endregion
+
+    #region | IUserPasswordStore<User> |
+    public Task SetPasswordHashAsync(User user, string passwordHash, CancellationToken cancellationToken)
+    {
+        user.PasswordHash = passwordHash;
+
+        // If the user has been authenticated, they have a record in the database
+        // The only reason they might not be authenticated setting the Password is if they are a registering a new user
+        if (user.Authenticated)
+        {
+            // TODO: Update DB
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task<string> GetPasswordHashAsync(User user, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(user.PasswordHash);
+    }
+
+    public Task<bool> HasPasswordAsync(User user, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(!string.IsNullOrWhiteSpace(user.PasswordHash));
+    }
+    #endregion
+
+    #region | IUserRoleStore<User> |
+
+    public Task AddToRoleAsync(User user, string roleName, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task RemoveFromRoleAsync(User user, string roleName, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IList<string>> GetRolesAsync(User user, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> IsInRoleAsync(User user, string roleName, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IList<User>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
     #region | IDisposable Support |
     private bool disposedValue = false; // To detect redundant calls
 
@@ -139,24 +212,4 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>
         Dispose(true);
     }
     #endregion
-
-    #region | IUserPasswordStore<User> |
-    public Task SetPasswordHashAsync(User user, string passwordHash, CancellationToken cancellationToken)
-    {
-        // TODO: Update DB
-        user.PasswordHash = passwordHash;
-        return Task.CompletedTask;
-    }
-
-    public Task<string> GetPasswordHashAsync(User user, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(user.PasswordHash);
-    }
-
-    public Task<bool> HasPasswordAsync(User user, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(!string.IsNullOrWhiteSpace(user.PasswordHash));
-    }
-    #endregion
-
 }
