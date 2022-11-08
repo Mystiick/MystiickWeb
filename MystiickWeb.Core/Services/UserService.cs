@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared;
+using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.User;
 
 using System.Security.Claims;
@@ -14,11 +16,13 @@ public class UserService : IUserService
 {
     private readonly ILogger<UserService> _logger;
     private readonly UserManager<User> _userManager;
+    private readonly Features _features;
 
-    public UserService(ILogger<UserService> logger, UserManager<User> userManager)
+    public UserService(ILogger<UserService> logger, UserManager<User> userManager, IOptions<Features> features)
     {
         _logger = logger;
         _userManager = userManager;
+        _features = features.Value;
     }
 
     /// <summary>
@@ -45,7 +49,7 @@ public class UserService : IUserService
             ClaimsIdentity output = new("cookies");
             output.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()));
             output.AddClaim(new Claim(ClaimTypes.Name, user.Username));
-            
+
             return output;
         }
         else
@@ -61,16 +65,18 @@ public class UserService : IUserService
     /// <returns>List of errors that occurred while creating the user</returns>
     public async Task<List<string>> RegisterUser(Credential credentials)
     {
+        if (!_features.UserRegistration)
+            throw new MethodAccessException($"Feature {nameof(_features.UserRegistration)} is not enabled. Unable to call {nameof(UserService)}.{nameof(RegisterUser)}");
+
         List<string> errors = new();
 
-
         // First check if the user already exists
-        var user = await _userManager.FindByNameAsync(credentials.Username);
+        User user = await _userManager.FindByNameAsync(credentials.Username);
 
         if (user == null)
         {
             // User does not exist, so create a new one
-            user = new User()
+            user = new()
             {
                 ID = Guid.NewGuid(),
                 Username = credentials.Username
@@ -81,12 +87,7 @@ public class UserService : IUserService
 
             // Validate the creation worked as expected
             if (!result.Succeeded)
-            {
-                foreach (var error in result.Errors)
-                {
-                    errors.Add(error.Description);
-                }
-            }
+                errors.AddRange(result.Errors.Select(x => x.Description));
         }
         else
         {

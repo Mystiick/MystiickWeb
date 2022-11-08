@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-
+using Microsoft.Extensions.Options;
 
 using MystiickWeb.Core.Services;
+using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.User;
 
 using System.Security.Claims;
@@ -19,7 +20,9 @@ namespace MystiickWeb.Core.Tests.Services
             userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User() { Username = TestData.User.Username, ID = TestData.User.ID }));
             userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(true));
 
-            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object);
+            IOptions<Features> features = Options.Create(new Features() { UserRegistration = true });
+
+            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features);
             ClaimsIdentity output;
 
             // Act
@@ -38,7 +41,9 @@ namespace MystiickWeb.Core.Tests.Services
             userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User() { Username = TestData.User.Username, ID = TestData.User.ID }));
             userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(false));
 
-            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object);
+            IOptions<Features> features = Options.Create(new Features() { UserRegistration = true });
+
+            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features);
             UnauthorizedAccessException? expectedException = null;
 
             // Act
@@ -64,7 +69,9 @@ namespace MystiickWeb.Core.Tests.Services
             userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult<User>(null));
             userManager.Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(IdentityResult.Success));
 
-            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object);
+            IOptions<Features> features = Options.Create(new Features() { UserRegistration = true });
+
+            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features);
             List<string> output;
 
             // Act
@@ -81,7 +88,9 @@ namespace MystiickWeb.Core.Tests.Services
             var userManager = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
             userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User() { Username = TestData.User.Username, ID = TestData.User.ID }));
 
-            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object);
+            IOptions<Features> features = Options.Create(new Features() { UserRegistration = true });
+
+            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features);
             List<string> output;
 
             // Act

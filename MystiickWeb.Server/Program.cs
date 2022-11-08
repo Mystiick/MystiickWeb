@@ -15,7 +15,8 @@ MystiickWeb.Core.Startup.Init();
 
 builder.Services
     .AddInjectables()
-    .Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey));
+    .Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey))
+    .Configure<Features>(builder.Configuration.GetSection(Features.FeaturesKey));
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -66,8 +67,8 @@ app.UseAuthentication();
 app.Use((context, next) =>
 {
     IAntiforgery? antiforgery = app.Services.GetRequiredService<IAntiforgery>();
-    var tokens = antiforgery.GetAndStoreTokens(context);
-    context.Response.Cookies.Append(CookieConstants.AntiForgeryToken, tokens.RequestToken, new CookieOptions() { HttpOnly = false, IsEssential = true });
+    AntiforgeryTokenSet tokens = antiforgery.GetAndStoreTokens(context);
+    context.Response.Cookies.Append(CookieConstants.AntiForgeryToken, tokens.RequestToken ?? "", new CookieOptions() { HttpOnly = false, IsEssential = true });
 
     return next(context);
 });

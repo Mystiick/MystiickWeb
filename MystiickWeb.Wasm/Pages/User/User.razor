@@ -5,12 +5,14 @@
 @using Microsoft.AspNetCore.Components.Authorization;
 @using Microsoft.AspNetCore.Authorization;
 
+@using Microsoft.AspNetCore.Http
 @using MystiickWeb.Shared.Constants;
 @using MystiickWeb.Shared.Models.User;
 @using MystiickWeb.Wasm.Auth;
 
 @inject NavigationManager _navigationManager;
 @inject UserManager _userManager;
+@inject AuthenticationStateProvider _asp;
 
 <AuthorizeView>
     <Authorized>
@@ -89,6 +91,13 @@
 @code {
     private readonly Credential currentUser = new();
     private readonly Credential newUser = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        newUser.Username = (await _asp.GetAuthenticationStateAsync()).User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+        await base.OnInitializedAsync();
+    }
+
     protected async Task Logout()
     {
         var response = await CallApi(_userManager.Logout());
