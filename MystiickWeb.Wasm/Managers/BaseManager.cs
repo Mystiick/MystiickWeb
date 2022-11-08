@@ -67,20 +67,7 @@ internal abstract class BaseManager
 
             // POST request to server            
             HttpResponseMessage response = await Http.PostAsJsonAsync(path, request);
-            output.Success = response.IsSuccessStatusCode;
-
-            // If the request was successful, parse the output and return it
-            if (response.IsSuccessStatusCode)
-            {
-                // Don't try to parse a Response type. This is used to signify a typeless 
-                if (typeof(T) != typeof(Response))
-                    output.Value = await response.Content.ReadFromJsonAsync<T>();
-            }
-            else
-            {
-                // Request was not successful, try to read any errors from the output if they exist
-                output.ValidationMessages.AddRange(await response.Content.ReadFromJsonAsync<List<string>>() ?? new());
-            }
+            await HandleResponse(output, response);
         }
         catch (Exception ex)
         {
@@ -96,6 +83,31 @@ internal abstract class BaseManager
 
     }
 
+    protected virtual async Task<Response> PutApiAsync(string path, object? request = null) => new Response(await PutApiAsync<Response>(path, request));
+    protected virtual async Task<Response<T>> PutApiAsync<T>(string path, object? request = null)
+    {
+        Response<T> output = new() { Success = false };
+
+        try
+        {
+            await GetCsrfToken();
+
+            HttpResponseMessage response = await Http.PutAsJsonAsync(path, request);
+            await HandleResponse(output, response);
+        }
+        catch (Exception ex)
+        {
+            output.Error = "An unexpected error has occurred connecting to the server";
+            output.Success = false;
+#if DEBUG
+            Console.WriteLine(ex.Message);
+            output.DebugMessage = ex.Message;
+#endif
+        }
+
+        return output;
+    }
+
     private async Task GetCsrfToken()
     {
         // Get antiforgery token, and add it to the request
@@ -107,5 +119,23 @@ internal abstract class BaseManager
 
         // Add Antiforgery token
         Http.DefaultRequestHeaders.Add("X-CSRF-TOKEN", token);
+    }
+
+    private static async Task HandleResponse<T>(Response<T> output, HttpResponseMessage response)
+    {
+        output.Success = response.IsSuccessStatusCode;
+
+        // If the request was successful, parse the output and return it
+        if (response.IsSuccessStatusCode)
+        {
+            // Don't try to parse a Response type. This is used to signify a typeless 
+            if (typeof(T) != typeof(Response))
+                output.Value = await response.Content.ReadFromJsonAsync<T>();
+        }
+        else
+        {
+            // Request was not successful, try to read any errors from the output if they exist
+            output.ValidationMessages.AddRange(await response.Content.ReadFromJsonAsync<List<string>>() ?? new());
+        }
     }
 }

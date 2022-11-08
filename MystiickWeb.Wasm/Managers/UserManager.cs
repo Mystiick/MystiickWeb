@@ -56,7 +56,11 @@ internal class UserManager : BaseManager
 
     public async Task<Response> ChangeUsername(Credential credential, string newUsername)
     {
-        await Task.CompletedTask;
-        return null;
+        var output = await PutApiAsync($"{ControllerConstants.Users}/current?username={newUsername}", credential);
+
+        if (output.Success)
+            _authState.NotifyAuthenticationStateChanged();
+
+        return output;
     }
 }

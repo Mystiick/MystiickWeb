@@ -98,8 +98,28 @@ public class UserService : IUserService
         return errors;
     }
 
+    /// <summary>
+    /// Converts the ClaimsPrincipal user to a MystiickWeb...User
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
     public Task<User> GetCurrentUser(ClaimsPrincipal user)
     {
         return Task.FromResult(new User(user));
+    }
+
+    public async Task UpdateUsername(Credential credential, string newUsername)
+    {
+        if ((await AuthenticateUser(credential)).IsAuthenticated)
+        {
+            var user = await _userManager.FindByNameAsync(credential.Username);
+            user.Username = newUsername;
+
+            await _userManager.UpdateAsync(user);
+        }
+        else
+        {
+            throw new UnauthorizedAccessException("Invalid username or password");
+        }
     }
 }

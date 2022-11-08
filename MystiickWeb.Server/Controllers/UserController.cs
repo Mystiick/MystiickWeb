@@ -102,9 +102,24 @@ public class UserController : BaseController
     [ValidateAntiForgeryToken]
     [Authorize]
     [HttpPut("current")]
-    public async Task<ActionResult> UpdateUsername(Credential user, [FromQuery] string newUsername)
+    public async Task<ActionResult> UpdateUsername([FromBody] Credential credential, [FromQuery] string username)
     {
-        await Task.CompletedTask;
-        return Ok();
+        try
+        {
+            credential.Username = HttpContext.User.Identity?.Name ?? "";
+            await _userService.UpdateUsername(credential, username);
+
+            // Update username and sign in again
+            credential.Username = username;
+            ClaimsIdentity identity = await _userService.AuthenticateUser(credential);
+
+            await HttpContext.SignInAsync("cookies", new ClaimsPrincipal(identity));
+
+            return Ok();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Unauthorized();
+        }
     }
 }

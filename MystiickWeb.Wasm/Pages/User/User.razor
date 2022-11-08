@@ -17,7 +17,7 @@
 <AuthorizeView>
     <Authorized>
         <h3>Profile</h3>
-        <div class="row">
+        <div class="row mb-3">
             <div class="col-5">
                 <p>Username: @context.User.FindFirst(ClaimTypes.Name)?.Value </p>
             </div>
@@ -26,60 +26,52 @@
             </div>
         </div>
 
-        <div class="card col-xxl-6 col-lg-12 bg-secondary bg-opacity-25 mb-2">
-            <h5>Change Username</h5>
-
-            <div class="card bg-body p-1">
-                <div>
-                    <label class="form-label" for="cu-password">Current Password</label>
-                    <input type="password" class="form-control" id="cu-password" @bind="currentUser.Password" />
-                </div>
-                <hr />
-                <div>
-                    <label class="form-label" for="cu-username">New Username</label>
-                    <input type="text" class="form-control" id="cu-username" @bind="newUser.Username" />
-                </div>
-                <div class="pt-3 text-end p-0">
-                    <button class="btn btn-primary" @onclick="ChangeUsername">Update Username</button>
-                </div>
+        <ExpandableCard Header="Change Username">
+            <div>
+                <label class="form-label" for="cu-password">Current Password</label>
+                <input type="password" class="form-control" id="cu-password" @bind="changeUsernameUser.Password" />
             </div>
-        </div>
-
-        <div class="card col-xxl-6 col-lg-12 bg-secondary bg-opacity-25">
-            <h5>Change Password</h5>
-
-            <div class="card bg-body p-1">
-                <div>
-                    <label class="form-label" for="username">Current Password</label>
-                    <input type="password" class="form-control" id="password" @bind="currentUser.Password" />
-                </div>
-                <hr />
-                <div class="border border-warning rounded pb-0 mb-2 bg-warning bg-opacity-25    ">
-                    <ul class="m-1">
-                        <li>Passwords must be at least 6 characters.</li>
-                        <li>Passwords must have at least one non alphanumeric character.</li>
-                        <li>Passwords must have at least one digit ('0'-'9').</li>
-                        <li>Passwords must have at least one uppercase ('A'-'Z').</li>
-                    </ul>
-                </div>
-                <div>
-                    <label class="form-label" for="username">New Password</label>
-                    <input type="password" class="form-control" id="password" @bind="newUser.Password" />
-                </div>
-                <div>
-                    <label class="form-label" for="username">Confirm New Password</label>
-                    <input type="password" class="form-control" id="password" @bind="newUser.ConfirmPassword" />
-                </div>
-                <div class="pt-3 text-end p-0">
-                    <button class="btn btn-primary" @onclick="ChangePassword">Update Password</button>
-                </div>
+            <hr />
+            <div>
+                <label class="form-label" for="cu-username">New Username</label>
+                <input type="text" class="form-control" id="cu-username" @bind="newUsername" />
             </div>
-        </div>
+            <div class="pt-3 text-end p-0">
+                <button class="btn btn-primary" @onclick="async (x) => await ChangeUsername()">Update Username</button>
+            </div>
+        </ExpandableCard>
 
-        @foreach(var claim in context.User.Claims)
+        <ExpandableCard Header="Change Password">
+            <div>
+                <label class="form-label" for="username">Current Password</label>
+                <input type="password" class="form-control" id="password" @bind="currentUser.Password" />
+            </div>
+            <hr />
+            <div class="border border-warning rounded pb-0 mb-2 bg-warning bg-opacity-25    ">
+                <ul class="m-1">
+                    <li>Must be at least 6 characters.</li>
+                    <li>Must have at least one non alphanumeric character.</li>
+                    <li>Must have at least one digit ('0'-'9').</li>
+                    <li>Must have at least one uppercase ('A'-'Z').</li>
+                </ul>
+            </div>
+            <div>
+                <label class="form-label" for="username">New Password</label>
+                <input type="password" class="form-control" id="password" @bind="newUser.Password" />
+            </div>
+            <div>
+                <label class="form-label" for="username">Confirm New Password</label>
+                <input type="password" class="form-control" id="password" @bind="newUser.ConfirmPassword" />
+            </div>
+            <div class="pt-3 text-end p-0">
+                <button class="btn btn-primary" @onclick="ChangePassword">Update Password</button>
+            </div>
+        </ExpandableCard>
+
+        @*@foreach (var claim in context.User.Claims)
         {
             <p>@claim.Type: @claim.Value</p>
-        }
+        }*@
     </Authorized>
     <NotAuthorized>
         <h3>Not Signed In</h3>
@@ -92,13 +84,16 @@
     private readonly Credential currentUser = new();
     private readonly Credential newUser = new();
 
+    private readonly Credential changeUsernameUser = new();
+    private string newUsername = string.Empty;
+
     protected override async Task OnInitializedAsync()
     {
-        newUser.Username = (await _asp.GetAuthenticationStateAsync()).User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+        newUsername = (await _asp.GetAuthenticationStateAsync()).User.FindFirst(ClaimTypes.Name)?.Value ?? "";
         await base.OnInitializedAsync();
     }
 
-    protected async Task Logout()
+    private async Task Logout()
     {
         var response = await CallApi(_userManager.Logout());
 
@@ -108,8 +103,12 @@
 
     private async Task ChangeUsername()
     {
-        await CallApi(_userManager.ChangeUsername(currentUser, newUser.Username));
+        currentUser.Username = (await _asp.GetAuthenticationStateAsync()).User.Identity?.Name ?? "";
+        await CallApi(_userManager.ChangeUsername(changeUsernameUser, newUsername));
+
+        Console.WriteLine((await _asp.GetAuthenticationStateAsync()).User.Identity.Name);
     }
+
     private async Task ChangePassword()
     {
         await CallApi(_userManager.ChangePassword(currentUser, newUser));

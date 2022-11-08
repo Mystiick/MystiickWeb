@@ -83,3 +83,7 @@ a, .btn-link {
 .hidden-but-not {
     color: rgba(0,0,0,0)
 }
+
+.pointer {
+    cursor: pointer
+}
