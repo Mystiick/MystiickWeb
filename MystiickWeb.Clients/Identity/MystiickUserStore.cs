@@ -80,7 +80,7 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUs
 
     #region | Update |
 
-    public Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
+    public async Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
     {
         user.NormalizedUsername = normalizedName;
 
@@ -88,13 +88,18 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUs
         // The only reason they might not be authenticated setting the Username is if they are a registering a new user
         if (user.Authenticated)
         {
-            // TODO: Update DB
-        }
+            using var connection = new MySqlConnection(_configs.UserDatabase);
+            await connection.OpenAsync(cancellationToken);
 
-        return Task.CompletedTask;
+            var command = new MySqlCommand(@"update User set NormalizedUsername = @NormalizedUsername where ID = @ID", connection);
+            command.Parameters.AddWithValue("@NormalizedUsername", user.NormalizedUsername);
+            command.Parameters.AddWithValue("@ID", user.ID);
+
+            await command.ExecuteNonQueryAsync(cancellationToken);
+        }
     }
 
-    public Task SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
+    public async Task SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
     {
         user.Username = userName;
 
@@ -102,10 +107,15 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUs
         // The only reason they might not be authenticated setting the Username is if they are a registering a new user
         if (user.Authenticated)
         {
-            // TODO: Update DB
-        }
+            using var connection = new MySqlConnection(_configs.UserDatabase);
+            await connection.OpenAsync(cancellationToken);
 
-        return Task.CompletedTask;
+            var command = new MySqlCommand(@"update User set Username = @Username where ID = @ID", connection);
+            command.Parameters.AddWithValue("@Username", user.Username);
+            command.Parameters.AddWithValue("@ID", user.ID);
+
+            await command.ExecuteNonQueryAsync(cancellationToken);
+        }
     }
 
     public async Task<IdentityResult> UpdateAsync(User user, CancellationToken cancellationToken)
