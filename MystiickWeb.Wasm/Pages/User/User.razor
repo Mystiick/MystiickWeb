@@ -27,9 +27,21 @@
         </div>
 
         <ExpandableCard Header="Change Username">
+            @if (UsernameValidationMessages.Any())
+            {
+                <div class="border border-danger rounded p-2 pb-0 mb-2 bg-danger bg-opacity-25">
+                    <ul class="mb-2">
+                        @foreach (var msg in UsernameValidationMessages)
+                        {
+                            <li>@msg</li>
+                        }
+                    </ul>
+                </div>
+            }
+
             <div>
                 <label class="form-label" for="cu-password">Current Password</label>
-                <input type="password" class="form-control" id="cu-password" @bind="changeUsernameUser.Password" />
+                <input type="password" class="form-control" id="cu-password" @bind="changeUsernameCredentials.Password" />
             </div>
             <hr />
             <div>
@@ -42,9 +54,21 @@
         </ExpandableCard>
 
         <ExpandableCard Header="Change Password">
+            @if (PasswordValidationMessages.Any())
+            {
+                <div class="border border-danger rounded p-2 pb-0 mb-2 bg-danger bg-opacity-25">
+                    <ul class="mb-2">
+                        @foreach (var msg in PasswordValidationMessages)
+                        {
+                            <li>@msg</li>
+                        }
+                    </ul>
+                </div>
+            }
+
             <div>
                 <label class="form-label" for="username">Current Password</label>
-                <input type="password" class="form-control" id="password" @bind="currentUser.Password" />
+                <input type="password" class="form-control" id="password" @bind="changePasswordCredentials.Password" />
             </div>
             <hr />
             <div class="border border-warning rounded pb-0 mb-2 bg-warning bg-opacity-25    ">
@@ -57,21 +81,16 @@
             </div>
             <div>
                 <label class="form-label" for="username">New Password</label>
-                <input type="password" class="form-control" id="password" @bind="newUser.Password" />
+                <input type="password" class="form-control" id="password" @bind="newPassword.Password" />
             </div>
             <div>
                 <label class="form-label" for="username">Confirm New Password</label>
-                <input type="password" class="form-control" id="password" @bind="newUser.ConfirmPassword" />
+                <input type="password" class="form-control" id="password" @bind="newPassword.ConfirmPassword" />
             </div>
             <div class="pt-3 text-end p-0">
                 <button class="btn btn-primary" @onclick="ChangePassword">Update Password</button>
             </div>
         </ExpandableCard>
-
-        @*@foreach (var claim in context.User.Claims)
-        {
-            <p>@claim.Type: @claim.Value</p>
-        }*@
     </Authorized>
     <NotAuthorized>
         <h3>Not Signed In</h3>
@@ -81,11 +100,15 @@
 </AuthorizeView>
 
 @code {
-    private readonly Credential currentUser = new();
-    private readonly Credential newUser = new();
+    private readonly Credential changePasswordCredentials = new();
+    private readonly Credential newPassword = new();
 
-    private readonly Credential changeUsernameUser = new();
+    private readonly Credential changeUsernameCredentials = new();
     private string newUsername = string.Empty;
+
+    private List<string> UsernameValidationMessages = new();
+    private List<string> PasswordValidationMessages = new();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -103,14 +126,18 @@
 
     private async Task ChangeUsername()
     {
-        currentUser.Username = (await _asp.GetAuthenticationStateAsync()).User.Identity?.Name ?? "";
-        await CallApi(_userManager.ChangeUsername(changeUsernameUser, newUsername));
+        UsernameValidationMessages.Clear();
 
-        Console.WriteLine((await _asp.GetAuthenticationStateAsync()).User.Identity.Name);
+        var response = await CallApi(_userManager.ChangeUsername(changeUsernameCredentials, newUsername));
+        UsernameValidationMessages.AddRange(response.ValidationMessages);
     }
 
     private async Task ChangePassword()
     {
-        await CallApi(_userManager.ChangePassword(currentUser, newUser));
+        PasswordValidationMessages.Clear();
+
+        var response = await CallApi(_userManager.ChangePassword(changePasswordCredentials, newPassword));
+        PasswordValidationMessages.AddRange(response.ValidationMessages);
+
     }
 }

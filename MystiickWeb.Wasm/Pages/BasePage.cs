@@ -18,11 +18,13 @@ public class BasePage : ComponentBase
 
     public BasePage() { }
 
-    public async Task<Response> CallApi(Task<Response> apiTask)
+    public async Task<Response> CallApi(Task<Response> apiTask, List<string>? messages = null)
     {
+        messages ??= ValidationMessages;
+
         IsLoading = true;
         Response output;
-        ValidationMessages.Clear();
+        messages.Clear();
 
         try
         {
@@ -44,7 +46,7 @@ public class BasePage : ComponentBase
         {
             Error = output.Error;
             Message = output.Message;
-            ValidationMessages.AddRange(output.ValidationMessages);
+            messages.AddRange(output.ValidationMessages);
         }
 
         IsLoading = false;
@@ -52,11 +54,13 @@ public class BasePage : ComponentBase
         return output;
     }
 
-    public async Task<T?> CallApi<T>(Task<Response<T>> apiTask)
+    public async Task<T?> CallApi<T>(Task<Response<T>> apiTask, List<string>? messages = null)
     {
+        messages ??= ValidationMessages;
+
         IsLoading = true;
         Response<T> output;
-        ValidationMessages.Clear();
+        messages.Clear();
 
         try
         {
@@ -78,7 +82,7 @@ public class BasePage : ComponentBase
         {
             Error = output.Error;
             Message = output.Message;
-            ValidationMessages.AddRange(ValidationMessages);
+            messages.AddRange(output.ValidationMessages);
         }
 
         IsLoading = false;

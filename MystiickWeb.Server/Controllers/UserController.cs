@@ -93,16 +93,32 @@ public class UserController : BaseController
     [ValidateAntiForgeryToken]
     [Authorize]
     [HttpPut("current/password")]
-    public async Task<ActionResult> UpdatePassword((Credential currentUser, Credential newPassword) input)
+    public async Task<ActionResult<string[]>> UpdatePassword(Credential[] input)
     {
-        await Task.CompletedTask;
-        return Ok();
+        var oldPassword = input[0];
+        var newPassword = input[1];
+
+        // Done here since we don't trust the client
+        oldPassword.Username = HttpContext.User.Identity?.Name ?? "";
+        newPassword.Username = oldPassword.Username;
+
+        try
+        {
+            await _userService.UpdatePassword(oldPassword, newPassword);
+            await _userService.SignIn(newPassword);
+
+            return Ok();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new[] { ex.Message });
+        }
     }
 
     [ValidateAntiForgeryToken]
     [Authorize]
     [HttpPut("current")]
-    public async Task<ActionResult> UpdateUsername([FromBody] Credential credential, [FromQuery] string username)
+    public async Task<ActionResult<string[]>> UpdateUsername([FromBody] Credential credential, [FromQuery] string username)
     {
         try
         {
@@ -111,15 +127,13 @@ public class UserController : BaseController
 
             // Update username and sign in again
             credential.Username = username;
-            ClaimsIdentity identity = await _userService.AuthenticateUser(credential);
-
-            await HttpContext.SignInAsync("cookies", new ClaimsPrincipal(identity));
+            await _userService.SignIn(credential);
 
             return Ok();
         }
-        catch (UnauthorizedAccessException)
+        catch (UnauthorizedAccessException ex)
         {
-            return Unauthorized();
+            return Unauthorized(new[] { ex.Message });
         }
     }
 }

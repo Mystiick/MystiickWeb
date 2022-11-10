@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
 using MystiickWeb.Core.Services;
@@ -22,7 +23,7 @@ namespace MystiickWeb.Core.Tests.Services
 
             IOptions<Features> features = Options.Create(new Features() { UserRegistration = true });
 
-            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features);
+            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<IHttpContextAccessor>().Object);
             ClaimsIdentity output;
 
             // Act
@@ -43,7 +44,7 @@ namespace MystiickWeb.Core.Tests.Services
 
             IOptions<Features> features = Options.Create(new Features() { UserRegistration = true });
 
-            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features);
+            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<IHttpContextAccessor>().Object);
             UnauthorizedAccessException? expectedException = null;
 
             // Act
@@ -71,7 +72,7 @@ namespace MystiickWeb.Core.Tests.Services
 
             IOptions<Features> features = Options.Create(new Features() { UserRegistration = true });
 
-            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features);
+            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<IHttpContextAccessor>().Object);
             List<string> output;
 
             // Act
@@ -90,7 +91,7 @@ namespace MystiickWeb.Core.Tests.Services
 
             IOptions<Features> features = Options.Create(new Features() { UserRegistration = true });
 
-            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features);
+            var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<IHttpContextAccessor>().Object);
             List<string> output;
 
             // Act

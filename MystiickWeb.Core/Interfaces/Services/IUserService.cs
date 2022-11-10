@@ -7,8 +7,10 @@ namespace MystiickWeb.Core.Interfaces.Services;
 public interface IUserService
 {
     Task<User?> LookupUserByName(string username);
-    Task<ClaimsIdentity> AuthenticateUser(Credential credential);
+    Task<ClaimsIdentity> AuthenticateUser(Credential credentials);
     Task<List<string>> RegisterUser(Credential credentials);
     Task<User> GetCurrentUser(ClaimsPrincipal user);
-    Task UpdateUsername(Credential credential, string newUsername);
+    Task UpdateUsername(Credential credentials, string newUsername);
+    Task UpdatePassword(Credential oldPassword, Credential newPassword);
+    Task SignIn(Credential credentials);
 }

@@ -50,8 +50,12 @@ internal class UserManager : BaseManager
 
     public async Task<Response> ChangePassword(Credential credential, Credential newPassword)
     {
-        await Task.CompletedTask;
-        return null;
+        var output = await PutApiAsync($"{ControllerConstants.Users}/current/password", new[] { credential, newPassword });
+
+        if (output.Success)
+            _authState.NotifyAuthenticationStateChanged();
+
+        return output;
     }
 
     public async Task<Response> ChangeUsername(Credential credential, string newUsername)

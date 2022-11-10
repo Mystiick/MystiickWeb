@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -8,6 +9,8 @@ using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.User;
 
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using System.Net;
 
 namespace MystiickWeb.Core.Services;
 
@@ -17,12 +20,14 @@ public class UserService : IUserService
     private readonly ILogger<UserService> _logger;
     private readonly UserManager<User> _userManager;
     private readonly Features _features;
+    private readonly IHttpContextAccessor _contextAccessor;
 
-    public UserService(ILogger<UserService> logger, UserManager<User> userManager, IOptions<Features> features)
+    public UserService(ILogger<UserService> logger, UserManager<User> userManager, IOptions<Features> features, IHttpContextAccessor contextAccessor)
     {
         _logger = logger;
         _userManager = userManager;
         _features = features.Value;
+        _contextAccessor = contextAccessor;
     }
 
     /// <summary>
@@ -108,11 +113,11 @@ public class UserService : IUserService
         return Task.FromResult(new User(user));
     }
 
-    public async Task UpdateUsername(Credential credential, string newUsername)
+    public async Task UpdateUsername(Credential credentials, string newUsername)
     {
-        if ((await AuthenticateUser(credential)).IsAuthenticated)
+        if ((await AuthenticateUser(credentials)).IsAuthenticated)
         {
-            var user = await _userManager.FindByNameAsync(credential.Username);
+            var user = await _userManager.FindByNameAsync(credentials.Username);
             user.Username = newUsername;
 
             await _userManager.UpdateAsync(user);
@@ -121,5 +126,29 @@ public class UserService : IUserService
         {
             throw new UnauthorizedAccessException("Invalid username or password");
         }
+    }
+
+    public async Task UpdatePassword(Credential oldPassword, Credential newPassword)
+    {
+        if (newPassword.Password != newPassword.ConfirmPassword)
+        {
+            throw new UnauthorizedAccessException("Password and Confirm Password must match.");
+        }
+
+        if ((await AuthenticateUser(oldPassword)).IsAuthenticated)
+        {
+            var user = await _userManager.FindByNameAsync(oldPassword.Username);
+            await _userManager.ChangePasswordAsync(user, oldPassword.Password, newPassword.Password);
+        }
+        else
+        {
+            throw new UnauthorizedAccessException("Invalid username or password");
+        }
+    }
+
+    public async Task SignIn(Credential credentials)
+    {
+        ClaimsIdentity identity = await AuthenticateUser(credentials);
+        await _contextAccessor.HttpContext.SignInAsync("cookies", new ClaimsPrincipal(identity));
     }
 }

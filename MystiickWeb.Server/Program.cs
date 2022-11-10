@@ -26,7 +26,9 @@ builder.Services.AddIdentityCore<User>();
 builder.Services
     .AddScoped<IUserStore<User>, MystiickUserStore>()
     .AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN")
-    .AddAuthentication("cookies").AddCookie("cookies", x => x.LoginPath = "/user/login");
+    .AddHttpContextAccessor()
+    .AddAuthentication("cookies")
+    .AddCookie("cookies", x => x.LoginPath = "/user/login");
 
 // Configs
 builder.Configuration
