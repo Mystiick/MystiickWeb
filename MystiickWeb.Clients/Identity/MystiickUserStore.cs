@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
 using MySql.Data.MySqlClient;
 
 using MystiickWeb.Shared.Configs;
@@ -10,9 +11,8 @@ using MystiickWeb.Shared.Models.User;
 
 namespace MystiickWeb.Clients.Identity;
 
-public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUserRoleStore<User>
+public partial class MystiickUserStore : IUserStore<User>
 {
-
     private readonly ILogger<MystiickUserStore> _logger;
     private readonly ConnectionStrings _configs;
 
@@ -22,11 +22,8 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUs
         _configs = configs.Value;
     }
 
-    #region | IUserStore<User> |
-
     #region | Create |
-
-    public async Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
+    async Task<IdentityResult> IUserStore<User>.CreateAsync(User user, CancellationToken cancellationToken)
     {
         using var connection = new MySqlConnection(_configs.UserDatabase);
         await connection.OpenAsync(cancellationToken);
@@ -42,11 +39,10 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUs
 
         return IdentityResult.Success;
     }
-
     #endregion
 
     #region | Read |
-    public async Task<User> FindByIdAsync(string userID, CancellationToken cancellationToken)
+    async Task<User> IUserStore<User>.FindByIdAsync(string userID, CancellationToken cancellationToken)
     {
         using var connection = new MySqlConnection(_configs.UserDatabase);
         await connection.OpenAsync(cancellationToken);
@@ -54,7 +50,7 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUs
         return await connection.QueryFirstOrDefaultAsync<User>("select * from User where ID = @ID AND Deleted is null", new { ID = userID });
     }
 
-    public async Task<User> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+    async Task<User> IUserStore<User>.FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
     {
         using var connection = new MySqlConnection(_configs.UserDatabase);
         await connection.OpenAsync(cancellationToken);
@@ -62,25 +58,13 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUs
         return await connection.QueryFirstOrDefaultAsync<User>("select * from User where NormalizedUsername = @NormalizedUsername AND Deleted is null", new { NormalizedUsername = normalizedUserName });
     }
 
-    public Task<string> GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(user.NormalizedUsername);
-    }
-
-    public Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(user.ID.ToString());
-    }
-
-    public Task<string> GetUserNameAsync(User user, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(user.Username);
-    }
+    Task<string> IUserStore<User>.GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken) => Task.FromResult(user.NormalizedUsername);
+    Task<string> IUserStore<User>.GetUserIdAsync(User user, CancellationToken cancellationToken) => Task.FromResult(user.ID.ToString());
+    Task<string> IUserStore<User>.GetUserNameAsync(User user, CancellationToken cancellationToken) => Task.FromResult(user.Username);
     #endregion
 
     #region | Update |
-
-    public async Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
+    async Task IUserStore<User>.SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
     {
         user.NormalizedUsername = normalizedName;
 
@@ -99,7 +83,7 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUs
         }
     }
 
-    public async Task SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
+    async Task IUserStore<User>.SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
     {
         user.Username = userName;
 
@@ -118,7 +102,7 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUs
         }
     }
 
-    public async Task<IdentityResult> UpdateAsync(User user, CancellationToken cancellationToken)
+    async Task<IdentityResult> IUserStore<User>.UpdateAsync(User user, CancellationToken cancellationToken)
     {
         using var connection = new MySqlConnection(_configs.UserDatabase);
         await connection.OpenAsync(cancellationToken);
@@ -134,72 +118,17 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUs
         return IdentityResult.Success;
     }
     #endregion
-    
+
     #region | Delete |
-    public Task<IdentityResult> DeleteAsync(User user, CancellationToken cancellationToken)
+    Task<IdentityResult> IUserStore<User>.DeleteAsync(User user, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
     #endregion
 
-    #endregion
-
-    #region | IUserPasswordStore<User> |
-    public Task SetPasswordHashAsync(User user, string passwordHash, CancellationToken cancellationToken)
-    {
-        user.PasswordHash = passwordHash;
-
-        // If the user has been authenticated, they have a record in the database
-        // The only reason they might not be authenticated setting the Password is if they are a registering a new user
-        if (user.Authenticated)
-        {
-            // TODO: Update DB
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public Task<string> GetPasswordHashAsync(User user, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(user.PasswordHash);
-    }
-
-    public Task<bool> HasPasswordAsync(User user, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(!string.IsNullOrWhiteSpace(user.PasswordHash));
-    }
-    #endregion
-
-    #region | IUserRoleStore<User> |
-
-    public Task AddToRoleAsync(User user, string roleName, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task RemoveFromRoleAsync(User user, string roleName, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IList<string>> GetRolesAsync(User user, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> IsInRoleAsync(User user, string roleName, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IList<User>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    #endregion
 
     #region | IDisposable Support |
+
     private bool disposedValue = false; // To detect redundant calls
 
     protected virtual void Dispose(bool disposing)
@@ -221,5 +150,6 @@ public class MystiickUserStore : IUserStore<User>, IUserPasswordStore<User>, IUs
         // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
         Dispose(true);
     }
+
     #endregion
 }
