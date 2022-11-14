@@ -14,28 +14,33 @@ namespace MystiickWeb.Clients.Identity;
 public partial class MystiickUserStore : IUserStore<User>
 {
     private readonly ILogger<MystiickUserStore> _logger;
-    private readonly ConnectionStrings _configs;
+    private readonly ConnectionStrings _connections;
+    private readonly IdentityConfig _identity;
 
-    public MystiickUserStore(ILogger<MystiickUserStore> logger, IOptions<ConnectionStrings> configs)
+    public MystiickUserStore(ILogger<MystiickUserStore> logger, IOptions<ConnectionStrings> configs, IOptions<IdentityConfig> identity)
     {
         _logger = logger;
-        _configs = configs.Value;
+        _connections = configs.Value;
+        _identity = identity.Value;
     }
 
     #region | Create |
     async Task<IdentityResult> IUserStore<User>.CreateAsync(User user, CancellationToken cancellationToken)
     {
-        using var connection = new MySqlConnection(_configs.UserDatabase);
+        using var connection = new MySqlConnection(_connections.UserDatabase);
         await connection.OpenAsync(cancellationToken);
 
-        var command = new MySqlCommand(@"insert into User (ID, Username, NormalizedUsername, PasswordHash, Created, Updated) values (@ID, @Username, @NormalizedUsername, @PasswordHash, @Created, @Created)", connection);
-        command.Parameters.AddWithValue("@ID", user.ID);
-        command.Parameters.AddWithValue("@Username", user.Username);
-        command.Parameters.AddWithValue("@NormalizedUsername", user.NormalizedUsername);
-        command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
-        command.Parameters.AddWithValue("@Created", DateTime.Now);
-
-        await command.ExecuteNonQueryAsync(cancellationToken);
+        await connection.ExecuteAsync(
+            "insert into User (ID, Username, NormalizedUsername, PasswordHash, Created, Updated) values (@ID, @Username, @NormalizedUsername, @PasswordHash, @Created, @Created)",
+            new
+            {
+                user.ID,
+                user.Username,
+                user.NormalizedUsername,
+                user.PasswordHash,
+                Created = DateTime.Now
+            }
+        );
 
         return IdentityResult.Success;
     }
@@ -44,7 +49,7 @@ public partial class MystiickUserStore : IUserStore<User>
     #region | Read |
     async Task<User> IUserStore<User>.FindByIdAsync(string userID, CancellationToken cancellationToken)
     {
-        using var connection = new MySqlConnection(_configs.UserDatabase);
+        using var connection = new MySqlConnection(_connections.UserDatabase);
         await connection.OpenAsync(cancellationToken);
 
         return await connection.QueryFirstOrDefaultAsync<User>("select * from User where ID = @ID AND Deleted is null", new { ID = userID });
@@ -52,7 +57,7 @@ public partial class MystiickUserStore : IUserStore<User>
 
     async Task<User> IUserStore<User>.FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
     {
-        using var connection = new MySqlConnection(_configs.UserDatabase);
+        using var connection = new MySqlConnection(_connections.UserDatabase);
         await connection.OpenAsync(cancellationToken);
 
         return await connection.QueryFirstOrDefaultAsync<User>("select * from User where NormalizedUsername = @NormalizedUsername AND Deleted is null", new { NormalizedUsername = normalizedUserName });
@@ -72,14 +77,10 @@ public partial class MystiickUserStore : IUserStore<User>
         // The only reason they might not be authenticated setting the Username is if they are a registering a new user
         if (user.Authenticated)
         {
-            using var connection = new MySqlConnection(_configs.UserDatabase);
+            using var connection = new MySqlConnection(_connections.UserDatabase);
             await connection.OpenAsync(cancellationToken);
 
-            var command = new MySqlCommand(@"update User set NormalizedUsername = @NormalizedUsername where ID = @ID", connection);
-            command.Parameters.AddWithValue("@NormalizedUsername", user.NormalizedUsername);
-            command.Parameters.AddWithValue("@ID", user.ID);
-
-            await command.ExecuteNonQueryAsync(cancellationToken);
+            await connection.ExecuteAsync("update User set NormalizedUsername = @NormalizedUsername, Updated = @Updated where ID = @ID", new { user.NormalizedUsername, Updated = DateTime.Now, user.ID });
         }
     }
 
@@ -91,38 +92,43 @@ public partial class MystiickUserStore : IUserStore<User>
         // The only reason they might not be authenticated setting the Username is if they are a registering a new user
         if (user.Authenticated)
         {
-            using var connection = new MySqlConnection(_configs.UserDatabase);
+            using var connection = new MySqlConnection(_connections.UserDatabase);
             await connection.OpenAsync(cancellationToken);
 
-            var command = new MySqlCommand(@"update User set Username = @Username where ID = @ID", connection);
-            command.Parameters.AddWithValue("@Username", user.Username);
-            command.Parameters.AddWithValue("@ID", user.ID);
-
-            await command.ExecuteNonQueryAsync(cancellationToken);
+            await connection.ExecuteAsync("update User set Username = @Username, Updated = @Updated where ID = @ID", new { user.Username, Updated = DateTime.Now, user.ID } );
         }
     }
 
     async Task<IdentityResult> IUserStore<User>.UpdateAsync(User user, CancellationToken cancellationToken)
     {
-        using var connection = new MySqlConnection(_configs.UserDatabase);
+        using var connection = new MySqlConnection(_connections.UserDatabase);
         await connection.OpenAsync(cancellationToken);
 
-        var command = new MySqlCommand(@"update User set Username = @Username, NormalizedUsername = @NormalizedUsername, PasswordHash = @PasswordHash where ID = @ID", connection);
-        command.Parameters.AddWithValue("@Username", user.Username);
-        command.Parameters.AddWithValue("@NormalizedUsername", user.NormalizedUsername);
-        command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
-        command.Parameters.AddWithValue("@ID", user.ID);
-
-        await command.ExecuteNonQueryAsync(cancellationToken);
+        connection.Execute(
+            "update User set Username = @Username, NormalizedUsername = @NormalizedUsername, PasswordHash = @PasswordHash, Updated = @Updated where ID = @ID",
+            new
+            {
+                user.Username,
+                user.NormalizedUsername,
+                user.PasswordHash,
+                Updated = DateTime.Now,
+                user.ID
+            }
+        );
 
         return IdentityResult.Success;
     }
     #endregion
 
     #region | Delete |
-    Task<IdentityResult> IUserStore<User>.DeleteAsync(User user, CancellationToken cancellationToken)
+    async Task<IdentityResult> IUserStore<User>.DeleteAsync(User user, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        using var connection = new MySqlConnection(_connections.UserDatabase);
+        await connection.OpenAsync(cancellationToken);
+
+        await connection.ExecuteAsync("update User set Deleted = @Deleted where ID = @ID", new { Deleted = DateTime.Now, user.ID });
+
+        return IdentityResult.Success;
     }
     #endregion
 

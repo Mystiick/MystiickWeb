@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Security.Claims;
+
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,10 +10,6 @@ using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.User;
-
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using System.Net;
 
 namespace MystiickWeb.Core.Services;
 
@@ -35,10 +34,7 @@ public class UserService : IUserService
     /// </summary>
     /// <param name="username"></param>
     /// <returns></returns>
-    public async Task<User?> LookupUserByName(string username)
-    {
-        return await _userManager.FindByNameAsync(username);
-    }
+    public async Task<User?> LookupUserByName(string username) => await _userManager.FindByNameAsync(username);
 
     /// <summary>
     /// 
@@ -49,18 +45,28 @@ public class UserService : IUserService
     {
         User? user = await LookupUserByName(credentials.Username);
 
-        if (user != null && await _userManager.CheckPasswordAsync(user, credentials.Password))
+        if (user == null)
+            throw new UnauthorizedAccessException("Invalid username or password");
+
+        if (user.AccountLocked)
+            throw new UnauthorizedAccessException("User account has been locked");
+
+        if (!await _userManager.CheckPasswordAsync(user, credentials.Password))
+        {
+            await _userManager.AccessFailedAsync(user);
+            throw new UnauthorizedAccessException("Invalid username or password");
+        }
+        else
         {
             ClaimsIdentity output = new("cookies");
             output.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()));
             output.AddClaim(new Claim(ClaimTypes.Name, user.Username));
 
+            await _userManager.ResetAccessFailedCountAsync(user);
+
             return output;
         }
-        else
-        {
-            throw new UnauthorizedAccessException("Invalid username or password");
-        }
+
     }
 
     /// <summary>
@@ -108,10 +114,7 @@ public class UserService : IUserService
     /// </summary>
     /// <param name="user"></param>
     /// <returns></returns>
-    public Task<User> GetCurrentUser(ClaimsPrincipal user)
-    {
-        return Task.FromResult(new User(user));
-    }
+    public Task<User> GetCurrentUser(ClaimsPrincipal user) =>  Task.FromResult(new User(user));
 
     public async Task UpdateUsername(Credential credentials, string newUsername)
     {
@@ -131,9 +134,7 @@ public class UserService : IUserService
     public async Task UpdatePassword(Credential oldPassword, Credential newPassword)
     {
         if (newPassword.Password != newPassword.ConfirmPassword)
-        {
             throw new UnauthorizedAccessException("Password and Confirm Password must match.");
-        }
 
         if ((await AuthenticateUser(oldPassword)).IsAuthenticated)
         {

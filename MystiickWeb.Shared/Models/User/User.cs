@@ -11,6 +11,10 @@ public class User
     public List<UserClaim> Claims { get; private set; }
     public bool Authenticated { get; init; }
 
+    public bool AccountLocked { get => LockoutEndDate > DateTime.UtcNow; }
+    public int FailedAttempts { get; set; }
+    public DateTimeOffset LockoutEndDate { get; set; }
+
     public User()
     {
         Claims = new List<UserClaim>();
@@ -29,7 +33,6 @@ public class User
         {
             Authenticated = true;
             ID = Guid.Parse(id);
-            Username = user.FindFirst(ClaimTypes.Name)?.Value ?? "";
             Username = user.FindFirst(ClaimTypes.Name)?.Value ?? "";
             Claims = user.Claims.Select(x => new UserClaim(x)).ToList();
         }

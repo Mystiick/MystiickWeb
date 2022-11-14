@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Claims;
+
+using Microsoft.AspNetCore.Identity;
 
 using MystiickWeb.Shared.Models.User;
-
-using System.Security.Claims;
 
 namespace MystiickWeb.Clients.Identity
 {

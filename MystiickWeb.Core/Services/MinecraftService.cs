@@ -1,16 +1,12 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
+using MystiickWeb.Core.Interfaces.Services;
+using MystiickWeb.Shared;
+using MystiickWeb.Shared.Constants;
+using MystiickWeb.Shared.Models;
 // TODO: Move most of this to a Client, and remove RconSharp dependency
 using RconSharp;
-
-using MystiickWeb.Shared;
-using MystiickWeb.Shared.Models;
-using MystiickWeb.Shared.Constants;
-using MystiickWeb.Core.Interfaces.Services;
-using MystiickWeb.Core.Interfaces;
 
 namespace MystiickWeb.Core.Services;
 

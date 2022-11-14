@@ -35,9 +35,8 @@ public class UserController : BaseController
                 await HttpContext.SignInAsync("cookies", new ClaimsPrincipal(identity));
                 return Ok();
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
-                ModelState.AddModelError("", ex.Message);
                 return Unauthorized(new[] { "Invalid username or password." });
             }
         }

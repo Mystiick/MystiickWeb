@@ -16,6 +16,7 @@ MystiickWeb.Core.Startup.Init();
 builder.Services
     .AddInjectables()
     .Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey))
+    .Configure<IdentityConfig>(builder.Configuration.GetSection(IdentityConfig.IdentityConfigsKey))
     .Configure<Features>(builder.Configuration.GetSection(Features.FeaturesKey));
 
 builder.Services.AddControllersWithViews();
