@@ -30,10 +30,10 @@ public class UserService : IUserService
     }
 
     /// <summary>
-    /// 
+    /// Gets the User object by username
     /// </summary>
-    /// <param name="username"></param>
-    /// <returns></returns>
+    /// <param name="username">Username to lookup</param>
+    /// <returns>User object, or null if one does not exist with that name</returns>
     public async Task<User?> LookupUserByName(string username) => await _userManager.FindByNameAsync(username);
 
     /// <summary>
@@ -87,11 +87,7 @@ public class UserService : IUserService
         if (user == null)
         {
             // User does not exist, so create a new one
-            user = new()
-            {
-                ID = Guid.NewGuid(),
-                Username = credentials.Username
-            };
+            user = new() { ID = Guid.NewGuid(), Username = credentials.Username };
 
             // Save to DB
             IdentityResult result = await _userManager.CreateAsync(user, credentials.Password);
@@ -110,12 +106,16 @@ public class UserService : IUserService
     }
 
     /// <summary>
-    /// Converts the ClaimsPrincipal user to a MystiickWeb...User
+    /// Gets the currently signed in user from the HttpContext
     /// </summary>
-    /// <param name="user"></param>
-    /// <returns></returns>
-    public Task<User> GetCurrentUser(ClaimsPrincipal user) =>  Task.FromResult(new User(user));
+    public User GetCurrentUser() => new(_contextAccessor.HttpContext.User);
 
+    /// <summary>
+    /// Validates user credentials, and updates the username if the credentials are valid
+    /// </summary>
+    /// <param name="credentials">Credentials to validate</param>
+    /// <param name="newUsername">Username to update to</param>
+    /// <exception cref="UnauthorizedAccessException">If the user fails to authenticate, an UnauthorizedAccessException is thrown</exception>
     public async Task UpdateUsername(Credential credentials, string newUsername)
     {
         if ((await AuthenticateUser(credentials)).IsAuthenticated)
@@ -131,6 +131,12 @@ public class UserService : IUserService
         }
     }
 
+    /// <summary>
+    /// Validates user credentials, and updates the password if the credentials are valid
+    /// </summary>
+    /// <param name="credentials">Credentials to validate</param>
+    /// <param name="newPassword">New password to update to</param>
+    /// <exception cref="UnauthorizedAccessException">If the user fails to authenticate, an UnauthorizedAccessException is thrown</exception>
     public async Task UpdatePassword(Credential oldPassword, Credential newPassword)
     {
         if (newPassword.Password != newPassword.ConfirmPassword)
@@ -147,6 +153,11 @@ public class UserService : IUserService
         }
     }
 
+    /// <summary>
+    /// Sign in the user with the given credentials
+    /// </summary>
+    /// <param name="credentials"></param>
+    /// <exception cref="UnauthorizedAccessException">If the user fails to authenticate, an UnauthorizedAccessException is thrown</exception>
     public async Task SignIn(Credential credentials)
     {
         ClaimsIdentity identity = await AuthenticateUser(credentials);

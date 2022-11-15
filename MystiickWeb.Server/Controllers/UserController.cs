@@ -72,16 +72,16 @@ public class UserController : BaseController
     [ValidateAntiForgeryToken]
     [Authorize]
     [HttpGet("claims")]
-    public async Task<List<UserClaim>> GetUserClaims()
+    public ActionResult<List<UserClaim>> GetUserClaims()
     {
-        return await Task.FromResult(HttpContext.User.Identities.SelectMany(x => x.Claims).Select(x => new UserClaim(x)).ToList());
+        return Ok(HttpContext.User.Identities.SelectMany(x => x.Claims).Select(x => new UserClaim(x)).ToList());
     }
 
     // TODO: This causes an issue when logging in/out [ValidateAntiForgeryToken]
     [HttpGet("current")]
-    public async Task<ActionResult<User>> GetCurrentUser()
+    public ActionResult<User> GetCurrentUser()
     {
-        var output = await _userService.GetCurrentUser(HttpContext.User);
+        var output = _userService.GetCurrentUser();
 
         if (output != null)
             return Ok(output);

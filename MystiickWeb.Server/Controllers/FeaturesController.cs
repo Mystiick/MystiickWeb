@@ -20,15 +20,15 @@ namespace MystiickWeb.Server.Controllers
 
         [HttpGet]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-        public Task<Features> GetAllFeatures()
+        public Features GetAllFeatures()
         {
-            return Task.FromResult(_features);
+            return _features;
         }
 
         [HttpGet("{feature}")]
-        public Task<bool> IsFeatureEnabled(string feature)
+        public bool IsFeatureEnabled(string feature)
         {
-            return Task.FromResult(_features.IsFeatureEnabled(feature));
+            return _features.IsFeatureEnabled(feature);
         }
     }
 }

@@ -86,7 +86,7 @@ public class MinecraftService : IMinecraftService, IDisposable
         }
         else 
         {
-            output.OnlinePlayerNames = new string[0];
+            output.OnlinePlayerNames = Array.Empty<string>();
         }
 
         output.Day = int.Parse(day.Substring("The time is ".Length));

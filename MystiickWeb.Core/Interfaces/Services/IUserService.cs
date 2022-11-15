@@ -9,7 +9,7 @@ public interface IUserService
     Task<User?> LookupUserByName(string username);
     Task<ClaimsIdentity> AuthenticateUser(Credential credentials);
     Task<List<string>> RegisterUser(Credential credentials);
-    Task<User> GetCurrentUser(ClaimsPrincipal user);
+    User GetCurrentUser();
     Task UpdateUsername(Credential credentials, string newUsername);
     Task UpdatePassword(Credential oldPassword, Credential newPassword);
     Task SignIn(Credential credentials);
