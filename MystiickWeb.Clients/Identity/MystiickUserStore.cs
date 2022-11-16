@@ -132,7 +132,6 @@ public partial class MystiickUserStore : IUserStore<User>
     }
     #endregion
 
-
     #region | IDisposable Support |
 
     private bool disposedValue = false; // To detect redundant calls
