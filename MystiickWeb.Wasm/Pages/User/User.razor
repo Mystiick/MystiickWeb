@@ -9,6 +9,7 @@
 @using MystiickWeb.Shared.Constants;
 @using MystiickWeb.Shared.Models.User;
 @using MystiickWeb.Wasm.Auth;
+@using MystiickWeb.Wasm.Shared.Cards;
 
 @inject NavigationManager _navigationManager;
 @inject UserManager _userManager;
@@ -71,7 +72,7 @@
                 <input type="password" class="form-control" id="password" @bind="changePasswordCredentials.Password" />
             </div>
             <hr />
-            <div class="border border-warning rounded pb-0 mb-2 bg-warning bg-opacity-25    ">
+            <div class="border border-warning rounded pb-0 mb-2 bg-warning bg-opacity-25">
                 <ul class="m-1">
                     <li>Must be at least 6 characters.</li>
                     <li>Must have at least one non alphanumeric character.</li>
@@ -138,6 +139,5 @@
 
         var response = await CallApi(_userManager.ChangePassword(changePasswordCredentials, newPassword));
         PasswordValidationMessages.AddRange(response.ValidationMessages);
-
     }
 }

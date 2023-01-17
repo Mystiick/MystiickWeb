@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-
 using MystiickWeb.Shared.Models.User;
 
 namespace MystiickWeb.Core.Interfaces.Services;
@@ -13,4 +12,5 @@ public interface IUserService
     Task UpdateUsername(Credential credentials, string newUsername);
     Task UpdatePassword(Credential oldPassword, Credential newPassword);
     Task SignIn(Credential credentials);
+    Task AddRoleToUser(string userID, string role);
 }

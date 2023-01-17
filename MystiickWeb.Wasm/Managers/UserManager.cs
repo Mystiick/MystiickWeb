@@ -18,9 +18,9 @@ internal class UserManager : BaseManager
         _authState = masp;
     }
 
-    public async Task<Response> Login(Credential credential)
+    protected async override Task<Response> PostApiAsync(string path, object? request = null)
     {
-        var output = await PostApiAsync($"{ControllerConstants.Users}/login", credential);
+        var output = await base.PostApiAsync(path, request);
 
         if (output.Success)
             _authState.NotifyAuthenticationStateChanged();
@@ -28,43 +28,11 @@ internal class UserManager : BaseManager
         return output;
     }
 
-    public async Task<Response> Logout()
-    {
-        var output = await PostApiAsync($"{ControllerConstants.Users}/logout");
+    public async Task<Response> Login(Credential credential) => await PostApiAsync($"{ControllerConstants.Users}/login", credential);
+    public async Task<Response> Logout() => await PostApiAsync($"{ControllerConstants.Users}/logout");
+    public async Task<Response> RegisterUser(Credential credential) => await PostApiAsync($"{ControllerConstants.Users}/register", credential);
+    public async Task<Response> ChangePassword(Credential credential, Credential newPassword) => await PutApiAsync($"{ControllerConstants.Users}/current/password", new[] { credential, newPassword });
+    public async Task<Response> ChangeUsername(Credential credential, string newUsername) => await PutApiAsync($"{ControllerConstants.Users}/current?username={newUsername}", credential);
+    public async Task<Response> AddRoleToUser(string userID, string role) => await PostApiAsync($"{ControllerConstants.Users}/{userID}", role);
 
-        if (output.Success)
-            _authState.NotifyAuthenticationStateChanged();
-
-        return output;
-    }
-
-    public async Task<Response> RegisterUser(Credential credential)
-    {
-        var output = await PostApiAsync($"{ControllerConstants.Users}/register", credential);
-
-        if (output.Success)
-            output = await Login(credential);
-
-        return output;
-    }
-
-    public async Task<Response> ChangePassword(Credential credential, Credential newPassword)
-    {
-        var output = await PutApiAsync($"{ControllerConstants.Users}/current/password", new[] { credential, newPassword });
-
-        if (output.Success)
-            _authState.NotifyAuthenticationStateChanged();
-
-        return output;
-    }
-
-    public async Task<Response> ChangeUsername(Credential credential, string newUsername)
-    {
-        var output = await PutApiAsync($"{ControllerConstants.Users}/current?username={newUsername}", credential);
-
-        if (output.Success)
-            _authState.NotifyAuthenticationStateChanged();
-
-        return output;
-    }
 }

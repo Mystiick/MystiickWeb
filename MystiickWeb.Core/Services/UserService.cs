@@ -1,11 +1,9 @@
 ﻿using System.Security.Claims;
-
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
 using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared;
 using MystiickWeb.Shared.Configs;
@@ -163,4 +161,15 @@ public class UserService : IUserService
         ClaimsIdentity identity = await AuthenticateUser(credentials);
         await _contextAccessor.HttpContext.SignInAsync("cookies", new ClaimsPrincipal(identity));
     }
+
+    public async Task AddRoleToUser(string userID, string role)
+    {
+        var currentUser = GetCurrentUser();
+        if (currentUser.Authenticated && await _userManager.IsInRoleAsync(currentUser, "Administrator"))
+        {
+            User targetUser = await _userManager.FindByIdAsync(userID);
+            await _userManager.AddToRoleAsync(targetUser, role);
+        }
+    }
+
 }

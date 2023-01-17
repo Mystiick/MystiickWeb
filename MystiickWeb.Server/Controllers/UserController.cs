@@ -135,4 +135,12 @@ public class UserController : BaseController
             return Unauthorized(new[] { ex.Message });
         }
     }
+
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = $"{Core.UserRoles.Administrator}")]
+    [HttpPost("{userID}")]
+    public async Task AddRoleToUser(string userID, [FromBody] string role)
+    {
+        await _userService.AddRoleToUser(userID, role);
+    }
 }
