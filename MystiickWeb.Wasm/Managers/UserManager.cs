@@ -34,5 +34,6 @@ internal class UserManager : BaseManager
     public async Task<Response> ChangePassword(Credential credential, Credential newPassword) => await PutApiAsync($"{ControllerConstants.Users}/current/password", new[] { credential, newPassword });
     public async Task<Response> ChangeUsername(Credential credential, string newUsername) => await PutApiAsync($"{ControllerConstants.Users}/current?username={newUsername}", credential);
     public async Task<Response> AddRoleToUser(string userID, string role) => await PostApiAsync($"{ControllerConstants.Users}/{userID}", role);
+    public async Task<Response<User>> LookupUser(string username) => await GetFromApiAsync<User>($"{ControllerConstants.Users}?username={username}");
 
 }

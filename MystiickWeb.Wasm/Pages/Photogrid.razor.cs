@@ -5,7 +5,7 @@ using MystiickWeb.Shared.Services;
 using MystiickWeb.Wasm.Managers;
 using MystiickWeb.Wasm.Shared;
 
-namespace MystiickWeb.Wasm.Pages.Posts
+namespace MystiickWeb.Wasm.Pages
 {
     public partial class Photogrid
     {

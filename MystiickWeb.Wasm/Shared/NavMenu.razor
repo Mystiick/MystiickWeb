@@ -15,12 +15,12 @@
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="programming">
+            <NavLink class="nav-link" href="/posts/programming">
                 <i class="oi oi-terminal"></i> Programming
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="photography">
+            <NavLink class="nav-link" href="/posts/photography">
                 <i class="oi oi-camera-slr"></i> Photography
             </NavLink>
         </div>
@@ -44,6 +44,15 @@
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="user">
                         <i class="oi oi-person"></i> User
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="@UserRoles.Administrator">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="users">
+                        <i class="oi oi-people"></i> Manage Users
                     </NavLink>
                 </div>
             </Authorized>

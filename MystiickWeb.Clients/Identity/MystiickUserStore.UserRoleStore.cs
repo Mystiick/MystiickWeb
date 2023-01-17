@@ -1,4 +1,6 @@
-﻿using System.Security.Authentication;
+﻿using System.Data;
+using System.Security.Authentication;
+using System.Security.Claims;
 using Dapper;
 using Microsoft.AspNetCore.Identity;
 using MySql.Data.MySqlClient;
@@ -26,17 +28,7 @@ public partial class MystiickUserStore : IUserRoleStore<User>
         );
 
         // Create Claim/role association
-        await connection.ExecuteAsync(
-            "insert into UserClaim (ID, UserID, ClaimType, ClaimValue, Created, Updated) values (@ID, @UserID, @ClaimType, @ClaimValue, @Created)",
-            new
-            {
-                ID = Guid.NewGuid(),
-                UserID = user.ID,
-                ClaimType = roleName,
-                ClaimValue = Guid.NewGuid(),
-                Created = DateTime.Now
-            }
-        );
+        await AddClaimsAsync(user, new[] { new Claim(ClaimTypes.Role, roleName) }, cancellationToken);
     }
 
     public async Task RemoveFromRoleAsync(User user, string roleName, CancellationToken cancellationToken)
@@ -65,7 +57,7 @@ public partial class MystiickUserStore : IUserRoleStore<User>
             new { UserID = user.ID }
         );
 
-        return output.ToList();
+        return output.Select(x => x.ToUpper()).ToList();
     }
 
     public async Task<bool> IsInRoleAsync(User user, string roleName, CancellationToken cancellationToken)
@@ -73,18 +65,24 @@ public partial class MystiickUserStore : IUserRoleStore<User>
         // Validate Claim ID
         if ((await GetRolesAsync(user, cancellationToken)).Contains(roleName))
         {
-            // Get claim from User
-            var userClaim = user.Claims.Find(x => x.Type == roleName);
+            // Get claim from the passed in User
+            var userClaim = user.Claims.Find(x => x.Type == ClaimTypes.Role && x.Value == roleName);
             if (userClaim?.Value == null)
                 throw new AuthenticationException();
 
-            // Check claim against database claim
+            // Check claim against database claim.
+            // Every user role has an associated UserClaim, compare the passed in user's claim with the one in the database to validate authenticity
             using var connection = new MySqlConnection(_connections.UserDatabase);
             await connection.OpenAsync(cancellationToken);
 
             return await connection.QueryFirstAsync<bool>(
-                "select 1 output from UserClaim where UserID = @UserID AND ClaimID = @ClaimID",
-                new { UserID = user.ID, ClaimID = userClaim.Value }
+                "select 1 output from UserClaim where UserID = @UserID AND ClaimType = @ClaimType AND ID = @ClaimID",
+                new
+                {
+                    UserID = user.ID,
+                    ClaimType = ClaimTypes.Role,
+                    ClaimID = userClaim.Properties["ClaimID"],
+                }
             );
         }
         else

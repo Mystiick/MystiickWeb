@@ -8,7 +8,7 @@ public class User
     public string Username { get; set; } = string.Empty;
     public string NormalizedUsername { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
-    public List<UserClaim> Claims { get; private set; }
+    public List<UserClaim> Claims { get; init; }
     public bool Authenticated { get; init; }
 
     public bool AccountLocked { get => LockoutEndDate > DateTime.UtcNow; }

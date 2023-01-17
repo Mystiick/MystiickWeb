@@ -11,12 +11,17 @@ public class UserClaim
     public string Value { get; set; } = string.Empty;
     public string ValueType { get; set; } = string.Empty;
 
-    public UserClaim(){}
+    public UserClaim() { }
+    public UserClaim(string type, string value)
+    {
+        Type = type;
+        Value = value;
+    }
     public UserClaim(Claim claim)
     {
         Issuer = claim.Issuer;
         Properties = claim.Properties;
-        @Type = claim.Type;
+        Type = claim.Type;
         Value = claim.Value;
         ValueType = claim.ValueType;
     }

@@ -137,10 +137,25 @@ public class UserController : BaseController
     }
 
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = $"{Core.UserRoles.Administrator}")]
+    [Authorize(Roles = $"{Shared.UserRoles.Administrator}")]
     [HttpPost("{userID}")]
-    public async Task AddRoleToUser(string userID, [FromBody] string role)
+    public async Task<ActionResult> AddRoleToUser(string userID, [FromBody] string role)
     {
         await _userService.AddRoleToUser(userID, role);
+        
+        return Ok();
+    }
+
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = $"{Shared.UserRoles.Administrator}")]
+    [HttpGet]
+    public async Task<ActionResult<User>> LookupUser(string username)
+    {
+        User? output = await _userService.LookupUserByName(username);
+
+        if (output == null)
+            return NotFound();
+        else
+            return Ok(output);
     }
 }

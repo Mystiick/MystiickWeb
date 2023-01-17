@@ -1,11 +1,10 @@
-﻿using Dapper;
-
+﻿using System.Security.Claims;
+using System.Threading;
+using Dapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
 using MySql.Data.MySqlClient;
-
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.User;
 
@@ -49,18 +48,12 @@ public partial class MystiickUserStore : IUserStore<User>
     #region | Read |
     async Task<User> IUserStore<User>.FindByIdAsync(string userID, CancellationToken cancellationToken)
     {
-        using var connection = new MySqlConnection(_connections.UserDatabase);
-        await connection.OpenAsync(cancellationToken);
-
-        return await connection.QueryFirstOrDefaultAsync<User>("select * from User where ID = @ID AND Deleted is null", new { ID = userID });
+        return await GetUser("select * from User where ID = @ID AND Deleted is null", new { ID = userID }, cancellationToken);
     }
 
     async Task<User> IUserStore<User>.FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
     {
-        using var connection = new MySqlConnection(_connections.UserDatabase);
-        await connection.OpenAsync(cancellationToken);
-
-        return await connection.QueryFirstOrDefaultAsync<User>("select * from User where NormalizedUsername = @NormalizedUsername AND Deleted is null", new { NormalizedUsername = normalizedUserName });
+        return await GetUser("select * from User where NormalizedUsername = @NormalizedUsername AND Deleted is null", new { NormalizedUsername = normalizedUserName }, cancellationToken);
     }
 
     Task<string> IUserStore<User>.GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken) => Task.FromResult(user.NormalizedUsername);
@@ -95,7 +88,7 @@ public partial class MystiickUserStore : IUserStore<User>
             using var connection = new MySqlConnection(_connections.UserDatabase);
             await connection.OpenAsync(cancellationToken);
 
-            await connection.ExecuteAsync("update User set Username = @Username, Updated = @Updated where ID = @ID", new { user.Username, Updated = DateTime.Now, user.ID } );
+            await connection.ExecuteAsync("update User set Username = @Username, Updated = @Updated where ID = @ID", new { user.Username, Updated = DateTime.Now, user.ID });
         }
     }
 
@@ -117,6 +110,24 @@ public partial class MystiickUserStore : IUserStore<User>
         );
 
         return IdentityResult.Success;
+    }
+
+    private async Task<User?> GetUser(string query, object args, CancellationToken cancellationToken)
+    {
+        using var connection = new MySqlConnection(_connections.UserDatabase);
+        await connection.OpenAsync(cancellationToken);
+
+        var user = await connection.QueryFirstOrDefaultAsync<User>(query, args);
+
+        if (user == null)
+            return null;
+
+        user.Claims.AddRange((await GetClaimsAsync(user, cancellationToken)).Select(x => new UserClaim(x)));
+
+        user.Claims.Add(new UserClaim(ClaimTypes.NameIdentifier, user.ID.ToString()));
+        user.Claims.Add(new UserClaim(ClaimTypes.Name, user.Username));
+
+        return user;
     }
     #endregion
 

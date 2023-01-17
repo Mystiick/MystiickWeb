@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Transactions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -28,11 +29,17 @@ public class UserService : IUserService
     }
 
     /// <summary>
-    /// Gets the User object by username
+    /// Gets the User object by username, omitting the password.
     /// </summary>
     /// <param name="username">Username to lookup</param>
     /// <returns>User object, or null if one does not exist with that name</returns>
-    public async Task<User?> LookupUserByName(string username) => await _userManager.FindByNameAsync(username);
+    public async Task<User?> LookupUserByName(string username)
+    {
+        var user = await LookupUserByNameInternal(username);
+        user.PasswordHash = "";
+
+        return user;
+    }
 
     /// <summary>
     /// 
@@ -41,10 +48,7 @@ public class UserService : IUserService
     /// <returns></returns>
     public async Task<ClaimsIdentity> AuthenticateUser(Credential credentials)
     {
-        User? user = await LookupUserByName(credentials.Username);
-
-        if (user == null)
-            throw new UnauthorizedAccessException("Invalid username or password");
+        User? user = await LookupUserByNameInternal(credentials.Username);
 
         if (user.AccountLocked)
             throw new UnauthorizedAccessException("User account has been locked");
@@ -56,15 +60,11 @@ public class UserService : IUserService
         }
         else
         {
-            ClaimsIdentity output = new("cookies");
-            output.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()));
-            output.AddClaim(new Claim(ClaimTypes.Name, user.Username));
-
+            ClaimsIdentity output = await BuildNewUser(user);
             await _userManager.ResetAccessFailedCountAsync(user);
 
             return output;
         }
-
     }
 
     /// <summary>
@@ -162,14 +162,40 @@ public class UserService : IUserService
         await _contextAccessor.HttpContext.SignInAsync("cookies", new ClaimsPrincipal(identity));
     }
 
-    public async Task AddRoleToUser(string userID, string role)
+    public async Task AddRoleToUser(string userName, string role)
     {
+        using var scope = new TransactionScope();
+
         var currentUser = GetCurrentUser();
-        if (currentUser.Authenticated && await _userManager.IsInRoleAsync(currentUser, "Administrator"))
+        if (currentUser.Authenticated && await _userManager.IsInRoleAsync(currentUser, UserRoles.Administrator))
         {
-            User targetUser = await _userManager.FindByIdAsync(userID);
+            User targetUser = await _userManager.FindByNameAsync(userName);
             await _userManager.AddToRoleAsync(targetUser, role);
         }
+
+        scope.Complete();
     }
 
+    private async Task<User> LookupUserByNameInternal(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+
+        if (user == null)
+            throw new UnauthorizedAccessException("Invalid username or password");
+
+        return user;
+    }
+
+    private async Task<ClaimsIdentity> BuildNewUser(User user)
+    {
+        ClaimsIdentity output = new("cookies");
+
+        output.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()));
+        output.AddClaim(new Claim(ClaimTypes.Name, user.Username));
+
+        foreach (Claim claim in await _userManager.GetClaimsAsync(user))
+            output.AddClaim(claim);
+
+        return output;
+    }
 }

@@ -1,9 +1,6 @@
 ﻿using Dapper;
-
 using Microsoft.AspNetCore.Identity;
-
 using MySql.Data.MySqlClient;
-
 using MystiickWeb.Shared.Models.User;
 
 namespace MystiickWeb.Clients.Identity
@@ -47,7 +44,7 @@ namespace MystiickWeb.Clients.Identity
             await connection.OpenAsync(cancellationToken);
 
             if (enabled)
-                await connection.ExecuteAsync($"update User set LockoutEndDate = @Lockout where ID = @ID", new { user.ID, Lockout = DateTime.UtcNow.AddMinutes(30)});
+                await connection.ExecuteAsync($"update User set LockoutEndDate = @Lockout where ID = @ID", new { user.ID, Lockout = DateTime.UtcNow.AddMinutes(30) });
             else
                 await connection.ExecuteAsync($"update User set LockoutEndDate = NULL where ID = @ID", new { user.ID });
         }
