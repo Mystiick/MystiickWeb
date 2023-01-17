@@ -112,15 +112,15 @@ public partial class MystiickUserStore : IUserStore<User>
         return IdentityResult.Success;
     }
 
-    private async Task<User?> GetUser(string query, object args, CancellationToken cancellationToken)
+    private async Task<User> GetUser(string query, object args, CancellationToken cancellationToken)
     {
         using var connection = new MySqlConnection(_connections.UserDatabase);
         await connection.OpenAsync(cancellationToken);
 
-        var user = await connection.QueryFirstOrDefaultAsync<User>(query, args);
+        User? user = await connection.QueryFirstOrDefaultAsync<User>(query, args);
 
         if (user == null)
-            return null;
+            throw new Exception("User not found");
 
         user.Claims.AddRange((await GetClaimsAsync(user, cancellationToken)).Select(x => new UserClaim(x)));
 
