@@ -19,11 +19,8 @@ namespace MystiickWeb.Core.Tests.Services
         public async Task UserService_AuthenticateUser_Pass()
         {
             // Arrange
-            var userManager = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
-            userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User() { Username = TestData.User.Username, ID = TestData.User.ID }));
-            userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(true));
-
-            IOptions<Features> features = Options.Create(new Features());
+            var userManager = PrebuiltMocks.GetUserManager();
+            IOptions <Features> features = Options.Create(new Features());
 
             var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<IHttpContextAccessor>().Object);
             ClaimsIdentity output;
@@ -41,8 +38,7 @@ namespace MystiickWeb.Core.Tests.Services
         public async Task UserService_AuthenticateUser_Unauthenticated_ThrowsException()
         {
             // Arrange
-            var userManager = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
-            userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User() { Username = TestData.User.Username, ID = TestData.User.ID }));
+            var userManager = PrebuiltMocks.GetUserManager();
             userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(false));
 
             IOptions<Features> features = Options.Create(new Features());
@@ -139,10 +135,7 @@ namespace MystiickWeb.Core.Tests.Services
         public async Task UserService_UpdateUsername_Pass()
         {
             // Arrange
-            var userManager = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
-            userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User()));
-            userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(true));
-
+            var userManager = PrebuiltMocks.GetUserManager();
             var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
 
             // Act
@@ -157,8 +150,7 @@ namespace MystiickWeb.Core.Tests.Services
         public async Task UserService_UpdateUsername_InvalidCredentials_ThrowsException()
         {
             // Arrange
-            var userManager = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
-            userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User()));
+            var userManager = PrebuiltMocks.GetUserManager();
             userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(false));
 
             var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
@@ -183,7 +175,7 @@ namespace MystiickWeb.Core.Tests.Services
         public async Task UserService_UpdateUsername_LockedAccount_ThrowsException()
         {
             // Arrange
-            var userManager = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
+            var userManager = PrebuiltMocks.GetUserManager();
             userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User() { LockoutEndDate = DateTimeOffset.UtcNow.AddDays(1) }));
 
             var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
@@ -210,9 +202,7 @@ namespace MystiickWeb.Core.Tests.Services
         public async Task UserService_UpdatePassword_Pass()
         {
             // Arrange
-            var userManager = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
-            userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User()));
-            userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(true));
+            var userManager = PrebuiltMocks.GetUserManager();
 
             var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
 
@@ -228,8 +218,7 @@ namespace MystiickWeb.Core.Tests.Services
         public async Task UserService_UpdatePassword_InvalidCredentials_ThrowsException()
         {
             // Arrange
-            var userManager = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
-            userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User()));
+            var userManager = PrebuiltMocks.GetUserManager();
             userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(false));
 
             var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
@@ -255,9 +244,7 @@ namespace MystiickWeb.Core.Tests.Services
         public async Task UserService_UpdatePassword_PasswordDoesntMatch_ThrowsException()
         {
             // Arrange
-            var userManager = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
-            userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User()));
-            userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(true));
+            var userManager = PrebuiltMocks.GetUserManager();
 
             var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
             UnauthorizedAccessException? expectedException = null;
@@ -282,7 +269,7 @@ namespace MystiickWeb.Core.Tests.Services
         public async Task UserService_UpdatePassword_LockedAccount_ThrowsException()
         {
             // Arrange
-            var userManager = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
+            var userManager = PrebuiltMocks.GetUserManager();
             userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User() { LockoutEndDate = DateTimeOffset.UtcNow.AddDays(1) }));
 
             var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
