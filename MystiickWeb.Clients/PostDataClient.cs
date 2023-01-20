@@ -1,23 +1,20 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Data.Common;
+using Dapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
 using MySql.Data.MySqlClient;
-
-using Constants = MystiickWeb.Shared.Constants;
+using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Shared;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.Posts;
-
-using System.Data.Common;
-using MystiickWeb.Core.Interfaces.Clients;
-using MystiickWeb.Core;
+using Constants = MystiickWeb.Shared.Constants;
+using MystiickWeb.Shared.Models;
 
 namespace MystiickWeb.Clients;
 
 [Injectable(typeof(IPostDataClient))]
 public class PostDataClient : IPostDataClient
 {
-
     private readonly ILogger<PostDataClient> _logger;
     private readonly ConnectionStrings _configs;
 
@@ -27,13 +24,10 @@ public class PostDataClient : IPostDataClient
         _configs = configs.Value;
     }
 
-    private const string SelectPosts = @"select p.PostID, p.PostTitle, p.PostText, p.Created, GROUP_CONCAT(pa.ObjectID) as AttachmentIDs, p.PostType
-                                         from Post p
-                                         left join PostAttachment pa on p.PostID = pa.PostID";
-
+    private const string SelectPosts = "select * from Post p";
     private const string WherePostType = " where PostType = @PostType ";
-    private const string WherePostID = " where p.PostID = @ID ";
-    private const string GroupAndOrderPosts = " group by p.PostID order by Created desc " ;
+    private const string WherePostID = " where PostID = @ID ";
+    private const string GroupAndOrderPosts = " group by PostID order by Created desc " ;
 
     public async Task<IBasePost[]> GetAllPosts()
     {
@@ -105,6 +99,15 @@ public class PostDataClient : IPostDataClient
         };
     }
 
+    public async Task<List<PostAttachment>> GetPostAttachments(uint postID)
+    {
+        using var connection = new MySqlConnection(_configs.ImageDatabase);
+        await connection.OpenAsync();
+        var results = await connection.QueryAsync<PostAttachment>("select * from PostAttachment where PostID = @PostID", new { PostID = postID });
+
+        return results.ToList();
+    }
+
     private static IBasePost DetermineAndPopulatePost(DbDataRecord rec)
     {
         return ((string)rec["PostType"]).ToLower() switch
@@ -122,8 +125,9 @@ public class PostDataClient : IPostDataClient
             ID = (uint)rec["PostID"],
             Title = (string)rec["PostTitle"],
             Text = (string)rec["PostText"],
-            CreatedDate = (DateTime)rec["Created"],
-            AttachmentIDs = (rec["AttachmentIDs"].ToString() ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).Select(x => uint.Parse(x)).ToArray()
+            CreatedDate = (DateTime)rec["Created"]
         };
     }
+
+    //async public Task<IAttachment> GetAttachmentByID(uint id) => (IAttachment)(await GetLinkByID(id));
 }

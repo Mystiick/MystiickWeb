@@ -1,4 +1,5 @@
 ﻿using MystiickWeb.Shared.Models;
+using MystiickWeb.Shared.Models.Posts;
 
 namespace MystiickWeb.Core.Interfaces.Clients;
 
@@ -11,5 +12,4 @@ public interface IImageDataClient
     Task<ImageResult[]> GetImagesBySubcategory(string subcategory);
     Task<ImageResult[]> GetImagesByTag(string tag);
     Task<string> GetImagePathByGuid(string guid, bool thumbnail);
-    //Task<ImageResult[]> GetImageData(string query, MySqlParameter param);
 }

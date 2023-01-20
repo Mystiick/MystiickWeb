@@ -1,4 +1,5 @@
-﻿using MystiickWeb.Shared.Models.Posts;
+﻿using MystiickWeb.Shared.Models;
+using MystiickWeb.Shared.Models.Posts;
 
 namespace MystiickWeb.Core.Interfaces.Clients;
 
@@ -8,5 +9,6 @@ public interface IPostDataClient
     Task<IBasePost[]> GetAllPostsOfType(string postType);
     Task<IBasePost> GetPost(uint id);
     Task<Link> GetLinkByID(uint id);
+    Task<List<PostAttachment>> GetPostAttachments(uint postID);
 }
 

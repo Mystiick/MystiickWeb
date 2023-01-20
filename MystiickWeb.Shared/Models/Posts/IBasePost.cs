@@ -7,5 +7,5 @@ public interface IBasePost
     public string Title { get; set; }
     public string Text { get; set; }
     public DateTime CreatedDate { get; set; }
-    public uint[] AttachmentIDs { get; set; }
+    public List<PostAttachment> Attachments { get; set; }
 }

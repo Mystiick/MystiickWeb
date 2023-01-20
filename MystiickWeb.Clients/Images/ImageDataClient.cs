@@ -8,7 +8,7 @@ using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Shared;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models;
-
+using MystiickWeb.Shared.Models.Posts;
 using System.Data.Common;
 using System.Linq;
 
@@ -161,4 +161,5 @@ public class ImageDataClient : IImageDataClient
 
         return (string)reader.Cast<DbDataRecord>().First()[thumbnail ? "ThumbnailPath" : "PreviewPath"];
     }
+
 }

@@ -10,5 +10,5 @@ public class TypelessPost : IBasePost
     public string Title { get; set; } = string.Empty;
     public string Text { get; set; } = string.Empty;
     public DateTime CreatedDate { get; set; }
-    public uint[] AttachmentIDs { get; set; } = Array.Empty<uint>();
+    public List<PostAttachment> Attachments { get; set; } = new();
 }

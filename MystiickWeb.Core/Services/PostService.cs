@@ -13,12 +13,19 @@ public class PostService : IPostService
     private readonly ILogger<PostService> _logger;
     private readonly IPostDataClient _postDataClient;
     private readonly IImageDataClient _imageDataClient;
+    //private readonly Dictionary<AttachmentType, Func<uint, Task<IAttachment>>> _attachmentLookup;
 
     public PostService(ILogger<PostService> logger, IPostDataClient postDataClient, IImageDataClient imageDataClient)
     {
         _logger = logger;
         _postDataClient = postDataClient;
         _imageDataClient = imageDataClient;
+
+        //_attachmentLookup = new Dictionary<AttachmentType, Func<uint, Task<IAttachment>>>
+        //{
+        //    { AttachmentType.Link, _postDataClient.GetAttachmentByID },
+        //    { AttachmentType.Image, _imageDataClient.GetAttachmentByID }
+        //};
     }
 
     public async Task<IBasePost[]> GetAllPosts()
@@ -51,44 +58,36 @@ public class PostService : IPostService
         return post;
     }
 
+    //public async Task CreatePost<T>(T post) where T : IBasePost
+    //{
+
+    //}
+
+
     private async Task ProcessAttachments(IBasePost post)
     {
-        if (post.GetType() == typeof(ImagePost) && post.AttachmentIDs.Any())
+        var postAttachments = await _postDataClient.GetPostAttachments(post.ID);
+        post.Attachments = new();
+
+        foreach (PostAttachment attachment in postAttachments)
         {
-            ((ImagePost)post).Attachments = await GetImageAttachments((ImagePost)post);
-        }
-        else if (post.GetType() == typeof(ProgrammingPost) && post.AttachmentIDs.Any())
-        {
-            ((ProgrammingPost)post).Attachments = await GetLinkAttachments((ProgrammingPost)post);
+            switch (attachment.AttachmentType)
+            {
+                case AttachmentType.Link:
+                    var link = new PostAttachment<Link>(attachment);
+                    link.Content = await _postDataClient.GetLinkByID(link.ObjectID);
+                    post.Attachments.Add(link);
+                    break;
+
+                case AttachmentType.Image:
+                    var image = new PostAttachment<ImageResult>(attachment);
+                    image.Content = await _imageDataClient.GetImageByID(image.ObjectID);
+                    post.Attachments.Add(image);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
-
-    private async Task<ImageResult[]> GetImageAttachments(ImagePost post)
-    {
-        var attachments = new List<ImageResult>();
-
-        foreach (var id in post.AttachmentIDs)
-        {
-            attachments.Add(await _imageDataClient.GetImageByID(id));
-        }
-
-        post.Attachments = attachments.ToArray();
-
-        return attachments.ToArray();
-    }
-
-    private async Task<Link[]> GetLinkAttachments(ProgrammingPost post)
-    {
-        var attachments = new List<Link>();
-
-        foreach (var id in post.AttachmentIDs)
-        {
-            attachments.Add(await _postDataClient.GetLinkByID(id));
-        }
-
-        post.Attachments = attachments.ToArray();
-
-        return attachments.ToArray();
-    }
-
 }

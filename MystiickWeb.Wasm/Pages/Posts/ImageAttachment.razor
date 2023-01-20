@@ -1,0 +1,9 @@
+﻿@using MystiickWeb.Shared.Models;
+
+<div class="col-xxl-2 col-lg-4 col-md-6">
+    <ImageCard Image="Image" />
+</div>
+
+@code {
+    [Parameter] public ImageResult Image { get; set; } = new();
+}
