@@ -20,7 +20,7 @@ namespace MystiickWeb.Core.Tests.Services
         {
             // Arrange
             var userManager = PrebuiltMocks.GetUserManager();
-            IOptions <Features> features = Options.Create(new Features());
+            IOptions<Features> features = Options.Create(new Features());
 
             var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<IHttpContextAccessor>().Object);
             ClaimsIdentity output;

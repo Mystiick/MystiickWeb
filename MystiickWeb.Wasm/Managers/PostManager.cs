@@ -13,7 +13,7 @@ internal class PostManager : BaseManager
     public PostManager(HttpClient http, IJSRuntime js) : base(http, js)
     {
     }
-     
+
     public async Task<Response<T[]>> GetPostsByType<T>(string type) where T : IBasePost
     {
         var output = await GetFromApiAsync<T[]>($"{ControllerConstants.Posts}?postType={type}");
@@ -51,10 +51,10 @@ internal class PostManager : BaseManager
             case AttachmentType.Link:
                 return JsonConvert.DeserializeObject<Link>(attachment.Content.ToString());
 
-            case AttachmentType.Image: 
+            case AttachmentType.Image:
                 return JsonConvert.DeserializeObject<ImageResult>(attachment.Content.ToString());
 
-            default: 
+            default:
                 throw new NotImplementedException(attachment.AttachmentType.ToString());
         }
     }

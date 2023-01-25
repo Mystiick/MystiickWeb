@@ -33,7 +33,7 @@ public class MystiickAuthStateProvider : AuthenticationStateProvider
         _http.DefaultRequestHeaders.Add("X-CSRF-TOKEN", token);
         User deserializedUser = JsonConvert.DeserializeObject<User>(await _http.GetStringAsync($"{ControllerConstants.Users}/current"));
         ClaimsIdentity webUser = new();
-        
+
         if (deserializedUser.Authenticated)
         {
             webUser = new ClaimsIdentity(deserializedUser.Claims.Select(x => new Claim(x.Type, x.Value)), "cookie");

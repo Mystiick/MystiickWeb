@@ -27,7 +27,7 @@ public class PostDataClient : IPostDataClient
     private const string SelectPosts = "select * from Post p";
     private const string WherePostType = " where PostType = @PostType ";
     private const string WherePostID = " where PostID = @ID ";
-    private const string GroupAndOrderPosts = " group by PostID order by Created desc " ;
+    private const string GroupAndOrderPosts = " group by PostID order by Created desc ";
 
     public async Task<IBasePost[]> GetAllPosts()
     {
@@ -85,7 +85,7 @@ public class PostDataClient : IPostDataClient
         await connection.OpenAsync();
 
         var command = new MySqlCommand("select * from Link where LinkID = @ID", connection);
-        command.Parameters.AddWithValue ("@ID", id);
+        command.Parameters.AddWithValue("@ID", id);
 
         DbDataReader reader = await command.ExecuteReaderAsync();
         DbDataRecord rec = reader.Cast<DbDataRecord>().First();
@@ -118,7 +118,7 @@ public class PostDataClient : IPostDataClient
         };
     }
 
-    private static T PopulatePost<T>(DbDataRecord rec) where T: IBasePost, new()
+    private static T PopulatePost<T>(DbDataRecord rec) where T : IBasePost, new()
     {
         return new T()
         {

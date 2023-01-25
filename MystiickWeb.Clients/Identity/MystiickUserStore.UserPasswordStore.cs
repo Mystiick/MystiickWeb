@@ -24,7 +24,7 @@ namespace MystiickWeb.Clients.Identity
             }
         }
 
-        Task<string> IUserPasswordStore<User>.GetPasswordHashAsync(User user, CancellationToken cancellationToken)=> Task.FromResult(user.PasswordHash);
+        Task<string> IUserPasswordStore<User>.GetPasswordHashAsync(User user, CancellationToken cancellationToken) => Task.FromResult(user.PasswordHash);
         Task<bool> IUserPasswordStore<User>.HasPasswordAsync(User user, CancellationToken cancellationToken) => Task.FromResult(!string.IsNullOrWhiteSpace(user.PasswordHash));
     }
 }

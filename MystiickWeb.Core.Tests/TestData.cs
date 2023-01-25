@@ -22,7 +22,7 @@ namespace MystiickWeb.Core.Tests
             userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User() { Username = TestData.User.Username, ID = TestData.User.ID }));
             userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             userManager.Setup(x => x.GetClaimsAsync(It.IsAny<User>())).Returns(Task.FromResult<IList<Claim>>(new List<Claim>()));
-                
+
             return userManager;
         }
     }

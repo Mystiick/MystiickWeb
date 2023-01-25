@@ -142,7 +142,7 @@ public class UserController : BaseController
     public async Task<ActionResult> AddRoleToUser(string userID, [FromBody] string role)
     {
         await _userService.AddRoleToUser(userID, role);
-        
+
         return Ok();
     }
 

@@ -43,15 +43,15 @@ namespace MystiickWeb.Core.Tests.Services
             Mock<IPostDataClient> mockPostClient = new();
             mockPostClient.Setup(x => x.GetPost(It.IsAny<uint>())).Returns(Task.FromResult((IBasePost)new ImagePost()));
             mockPostClient.Setup(x => x.GetPostAttachments(It.IsAny<uint>())).Returns(Task.FromResult(
-                new List<PostAttachment>() 
-                { 
+                new List<PostAttachment>()
+                {
                     new PostAttachment() { AttachmentType = AttachmentType.Image },
                     new PostAttachment() { AttachmentType = AttachmentType.Link },
                 }
             ));
             mockPostClient.Setup(x => x.GetLinkByID(It.IsAny<uint>())).Returns(Task.FromResult(new Link()));
 
-            Mock <IImageDataClient> mockImageClient = new();
+            Mock<IImageDataClient> mockImageClient = new();
             mockImageClient.Setup(x => x.GetImageByID(It.IsAny<uint>())).Returns(Task.FromResult(new ImageResult()));
 
             var postService = new PostService(new Mock<ILogger<PostService>>().Object, mockPostClient.Object, mockImageClient.Object);

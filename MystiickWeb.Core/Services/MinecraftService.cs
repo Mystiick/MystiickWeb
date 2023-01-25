@@ -61,7 +61,7 @@ public class MinecraftService : IMinecraftService, IDisposable
         var hunger = await _client.ExecuteCommandAsync($"data get entity {name} foodLevel");
         var health = (await _client.ExecuteCommandAsync($"data get entity {name} Health")).Replace("f", "");
 
-        if (new[] {level, hunger, health}.Any(x => x == "No entity was found"))
+        if (new[] { level, hunger, health }.Any(x => x == "No entity was found"))
         {
             throw new KeyNotFoundException(name);
         }
@@ -83,7 +83,7 @@ public class MinecraftService : IMinecraftService, IDisposable
         {
             output.OnlinePlayerNames = words.Skip(10).Select(x => x.Replace(",", "")).ToArray();
         }
-        else 
+        else
         {
             output.OnlinePlayerNames = Array.Empty<string>();
         }
@@ -98,7 +98,7 @@ public class MinecraftService : IMinecraftService, IDisposable
     private MinecraftPlayer ParsePlayerData(string name, string level, string hunger, string health)
     {
         var output = new MinecraftPlayer();
-        
+
         output.Name = name;
         output.Level = int.Parse(level.Substring(level.IndexOf("data: ") + 6));
         output.Hunger = int.Parse(hunger.Substring(hunger.IndexOf("data: ") + 6)) / 2f;
@@ -107,7 +107,7 @@ public class MinecraftService : IMinecraftService, IDisposable
         return output;
     }
 
-#region | IDisposable Implementation |
+    #region | IDisposable Implementation |
     private bool isDisposed;
 
     public void Dispose()
@@ -118,7 +118,7 @@ public class MinecraftService : IMinecraftService, IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (isDisposed) 
+        if (isDisposed)
         {
             // Don't dispose multiple times
             return;
@@ -132,6 +132,6 @@ public class MinecraftService : IMinecraftService, IDisposable
 
         isDisposed = true;
     }
-#endregion
+    #endregion
 
 }
