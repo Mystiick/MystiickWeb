@@ -46,16 +46,11 @@ internal class PostManager : BaseManager
         if (attachment.Content == null)
             return new();
 
-        switch (attachment.AttachmentType)
+        return attachment.AttachmentType switch
         {
-            case AttachmentType.Link:
-                return JsonConvert.DeserializeObject<Link>(attachment.Content.ToString());
-
-            case AttachmentType.Image:
-                return JsonConvert.DeserializeObject<ImageResult>(attachment.Content.ToString());
-
-            default:
-                throw new NotImplementedException(attachment.AttachmentType.ToString());
-        }
+            AttachmentType.Link => JsonConvert.DeserializeObject<Link>(attachment.Content.ToString()),
+            AttachmentType.Image => JsonConvert.DeserializeObject<ImageResult>(attachment.Content.ToString()),
+            _ => throw new NotImplementedException(attachment.AttachmentType.ToString()),
+        };
     }
 }

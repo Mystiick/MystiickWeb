@@ -25,17 +25,12 @@ public class PostsController : BaseController
     {
         if (!string.IsNullOrWhiteSpace(postType))
         {
-            switch (postType.ToLower())
+            return postType.ToLower() switch
             {
-                case Constants.Post.PostType_Photography:
-                    return await GetPostsOfType<ImagePost>(postType);
-
-                case Constants.Post.PostType_Programming:
-                    return await GetPostsOfType<ProgrammingPost>(postType);
-
-                default:
-                    throw new ArgumentException("todo");
-            }
+                Constants.Post.PostType_Photography => await GetPostsOfType<ImagePost>(postType),
+                Constants.Post.PostType_Programming => await GetPostsOfType<ProgrammingPost>(postType),
+                _ => throw new ArgumentException("todo"),
+            };
         }
         else if (int.TryParse(top, out int count) && count > 0)
         {
