@@ -112,8 +112,8 @@ public class PostDataClient : IPostDataClient
     {
         return ((string)rec["PostType"]).ToLower() switch
         {
-            Constants.Post.PostType_Photography => PopulatePost<ImagePost>(rec),
-            Constants.Post.PostType_Programming => PopulatePost<ProgrammingPost>(rec),
+            Constants.PostType.Photography => PopulatePost<ImagePost>(rec),
+            Constants.PostType.Programming => PopulatePost<ProgrammingPost>(rec),
             _ => throw new NotImplementedException(),
         };
     }

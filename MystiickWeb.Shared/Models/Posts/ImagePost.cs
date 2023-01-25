@@ -3,7 +3,7 @@
 public class ImagePost : IBasePost
 {
     public uint ID { get; set; }
-    public string PostType { get; init; } = Constants.Post.PostType_Photography;
+    public string PostType { get; init; } = Constants.PostType.Photography;
     public string Title { get; set; } = string.Empty;
     public string Text { get; set; } = string.Empty;
     public DateTime CreatedDate { get; set; }

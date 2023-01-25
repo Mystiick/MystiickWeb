@@ -3,7 +3,7 @@
 public interface IBasePost
 {
     public uint ID { get; set; }
-    public string PostType { get; init; }
+    public string PostType { get; }
     public string Title { get; set; }
     public string Text { get; set; }
     public DateTime CreatedDate { get; set; }

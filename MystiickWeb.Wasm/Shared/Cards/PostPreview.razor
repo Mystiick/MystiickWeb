@@ -25,8 +25,8 @@
     {
         return Post?.PostType.ToLower() switch
         {
-            Constants.Post.PostType_Photography => $"/posts/photography/{Post.ID}",
-            Constants.Post.PostType_Programming => $"/posts/programming/{Post.ID}",
+            Constants.PostType.Photography => $"/posts/photography/{Post.ID}",
+            Constants.PostType.Programming => $"/posts/programming/{Post.ID}",
             _ => "/404"
         };
     }

@@ -27,8 +27,8 @@ public class PostsController : BaseController
         {
             return postType.ToLower() switch
             {
-                Constants.Post.PostType_Photography => await GetPostsOfType<ImagePost>(postType),
-                Constants.Post.PostType_Programming => await GetPostsOfType<ProgrammingPost>(postType),
+                Constants.PostType.Photography => await GetPostsOfType<ImagePost>(postType),
+                Constants.PostType.Programming => await GetPostsOfType<ProgrammingPost>(postType),
                 _ => throw new ArgumentException("todo"),
             };
         }
