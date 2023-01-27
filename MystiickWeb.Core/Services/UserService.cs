@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared;
 using MystiickWeb.Shared.Configs;
+using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models.User;
 
 namespace MystiickWeb.Core.Services;
@@ -35,7 +36,7 @@ public class UserService : IUserService
     /// <returns>User object, or null if one does not exist with that name</returns>
     public async Task<User?> LookupUserByName(string username)
     {
-        var user = await LookupUserByNameInternal(username);
+        User user = await LookupUserByNameInternal(username);
         user.PasswordHash = "";
 
         return user;
@@ -118,7 +119,7 @@ public class UserService : IUserService
     {
         if ((await AuthenticateUser(credentials)).IsAuthenticated)
         {
-            var user = await _userManager.FindByNameAsync(credentials.Username);
+            User user = await _userManager.FindByNameAsync(credentials.Username);
             user.Username = newUsername;
 
             await _userManager.UpdateAsync(user);
@@ -142,7 +143,7 @@ public class UserService : IUserService
 
         if ((await AuthenticateUser(oldPassword)).IsAuthenticated)
         {
-            var user = await _userManager.FindByNameAsync(oldPassword.Username);
+            User user = await _userManager.FindByNameAsync(oldPassword.Username);
             await _userManager.ChangePasswordAsync(user, oldPassword.Password, newPassword.Password);
         }
         else
@@ -159,14 +160,14 @@ public class UserService : IUserService
     public async Task SignIn(Credential credentials)
     {
         ClaimsIdentity identity = await AuthenticateUser(credentials);
-        await _contextAccessor.HttpContext.SignInAsync("cookies", new ClaimsPrincipal(identity));
+        await _contextAccessor.HttpContext.SignInAsync(Identity.Cookies, new ClaimsPrincipal(identity));
     }
 
     public async Task AddRoleToUser(string userName, string role)
     {
-        using var scope = new TransactionScope();
+        using TransactionScope scope = new();
 
-        var currentUser = GetCurrentUser();
+        User currentUser = GetCurrentUser();
         if (currentUser.Authenticated && await _userManager.IsInRoleAsync(currentUser, UserRoles.Administrator))
         {
             User targetUser = await _userManager.FindByNameAsync(userName);
@@ -178,7 +179,7 @@ public class UserService : IUserService
 
     private async Task<User> LookupUserByNameInternal(string username)
     {
-        var user = await _userManager.FindByNameAsync(username);
+        User user = await _userManager.FindByNameAsync(username);
 
         if (user == null)
             throw new UnauthorizedAccessException("Invalid username or password");
@@ -188,7 +189,7 @@ public class UserService : IUserService
 
     private async Task<ClaimsIdentity> BuildNewUser(User user)
     {
-        ClaimsIdentity output = new("cookies");
+        ClaimsIdentity output = new(Identity.Cookies);
 
         output.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()));
         output.AddClaim(new Claim(ClaimTypes.Name, user.Username));

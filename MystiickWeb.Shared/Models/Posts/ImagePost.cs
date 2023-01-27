@@ -1,12 +1,6 @@
 ﻿namespace MystiickWeb.Shared.Models.Posts;
 
-public class ImagePost : IBasePost
+public class ImagePost : BasePost
 {
-    public uint ID { get; set; }
-    public string PostType { get; init; } = Constants.PostType.Photography;
-    public string Title { get; set; } = string.Empty;
-    public string Text { get; set; } = string.Empty;
-    public DateTime CreatedDate { get; set; }
-    public uint[] AttachmentIDs { get; set; } = Array.Empty<uint>();
-    public List<PostAttachment> Attachments { get; set; } = new();
+    public override string PostType { get; set; } = Constants.PostType.Photography;
 }

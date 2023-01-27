@@ -14,7 +14,7 @@ internal class PostManager : BaseManager
     {
     }
 
-    public async Task<Response<T[]>> GetPostsByType<T>(string type) where T : IBasePost
+    public async Task<Response<T[]>> GetPostsByType<T>(string type) where T : BasePost
     {
         var output = await GetFromApiAsync<T[]>($"{ControllerConstants.Posts}?postType={type}");
 
@@ -25,7 +25,7 @@ internal class PostManager : BaseManager
         return output;
     }
 
-    public async Task<Response<T>> GetPostByID<T>(string id) where T : IBasePost
+    public async Task<Response<T>> GetPostByID<T>(string id) where T : BasePost
     {
         var output = await GetFromApiAsync<T>($"{ControllerConstants.Posts}/{id}");
 
@@ -36,9 +36,14 @@ internal class PostManager : BaseManager
         return output;
     }
 
-    public async Task<Response<TypelessPost[]>> GetTopPosts(int count)
+    public async Task<Response<BasePost[]>> GetTopPosts(int count)
     {
-        return await GetFromApiAsync<TypelessPost[]>($"{ControllerConstants.Posts}?top={count}");
+        return await GetFromApiAsync<BasePost[]>($"{ControllerConstants.Posts}?top={count}");
+    }
+
+    public async Task<Response<BasePost>> CreatePost(BasePost post)
+    {
+        return await PostApiAsync<BasePost>(ControllerConstants.Posts, post);
     }
 
     private object MapAttachment(PostAttachment attachment)

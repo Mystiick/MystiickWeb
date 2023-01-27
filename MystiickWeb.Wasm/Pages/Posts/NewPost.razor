@@ -4,14 +4,19 @@
 @using MystiickWeb.Shared.Constants;
 @using MystiickWeb.Shared.Models.Posts;
 
-@attribute [Authorize(Roles = MystiickWeb.Shared.UserRoles.Administrator)]
+@attribute [Authorize(Roles = $"{UserRoles.Administrator},${UserRoles.Author}")]
+
+@inject PostManager _postManager;
+@inject NavigationManager _navigationManager
+
+<PageHeader @ref="Header" HeaderText="Login" IsLoading="IsLoading" Error="@Error" Message="@Message" ValidationMessages="ValidationMessages" />
 
 <div class="card">
     <div class="row">
-        <div class="col-xxl-6 col-xl-12">
+        <div class="col-xxl-6 col-xl-12 border-end">
             <h2 class="ms-3 me-3 border-bottom">New Post</h2>
 
-            <EditForm Model="@post" Context="editContext" OnValidSubmit="@HandleSubmit">
+            <EditForm Model="@post" OnValidSubmit="@HandleSubmit">
 
                 <div class="card-body">
                     <DataAnnotationsValidator />
@@ -23,8 +28,8 @@
                     </div>
 
                     <div class="row input-group">
-                        <label for="contents" class="col-form-label col-xxl-2 col-xl-3 input-group-text">Post Type</label>
-                        <InputSelect class="form-select col-xxl-10 col-xl-9" @bind-Value="post.PostType">
+                        <label for="post-type" class="col-form-label col-xxl-2 col-xl-3 input-group-text">Post Type</label>
+                        <InputSelect class="form-select col-xxl-10 col-xl-9" id="post-type" @bind-Value="post.PostType">
                             <option value="@PostType.Programming">@PostType.Programming</option>
                             <option value="@PostType.Photography">@PostType.Photography</option>
                         </InputSelect>
@@ -55,15 +60,16 @@
             </div>
         </div>
     </div>
-
 </div>
 
 @code {
-    private TypelessPost post = new() { CreatedDate = DateTime.Now };
+    private BasePost post = new() { CreatedDate = DateTime.Now };
 
     private async Task HandleSubmit()
     {
+        BasePost? output = await CallApi<BasePost>(_postManager.CreatePost(post));
 
-        Console.WriteLine("Submitted 3 electric boogare");
+        if (output != null && output.ID > 0)
+            _navigationManager.NavigateTo($"posts/{output.PostType}/{output.ID}");
     }
 }

@@ -1,7 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Transactions;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Shared;
+using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Models.Posts;
 
@@ -13,24 +16,19 @@ public class PostService : IPostService
     private readonly ILogger<PostService> _logger;
     private readonly IPostDataClient _postDataClient;
     private readonly IImageDataClient _imageDataClient;
-    //private readonly Dictionary<AttachmentType, Func<uint, Task<IAttachment>>> _attachmentLookup;
+    private readonly IUserService _userService;
 
-    public PostService(ILogger<PostService> logger, IPostDataClient postDataClient, IImageDataClient imageDataClient)
+    public PostService(ILogger<PostService> logger, IPostDataClient postDataClient, IImageDataClient imageDataClient, IUserService userService)
     {
         _logger = logger;
         _postDataClient = postDataClient;
         _imageDataClient = imageDataClient;
-
-        //_attachmentLookup = new Dictionary<AttachmentType, Func<uint, Task<IAttachment>>>
-        //{
-        //    { AttachmentType.Link, _postDataClient.GetAttachmentByID },
-        //    { AttachmentType.Image, _imageDataClient.GetAttachmentByID }
-        //};
+        _userService = userService;
     }
 
-    public async Task<IBasePost[]> GetAllPosts()
+    public async Task<BasePost[]> GetAllPosts()
     {
-        IBasePost[] output = await _postDataClient.GetAllPosts();
+        BasePost[] output = await _postDataClient.GetAllPosts();
         foreach (var post in output)
         {
             await ProcessAttachments(post);
@@ -39,10 +37,10 @@ public class PostService : IPostService
         return output;
     }
 
-    public async Task<IBasePost[]> GetAllPosts(string postType)
+    public async Task<BasePost[]> GetAllPosts(string postType)
     {
-        IBasePost[] output = await _postDataClient.GetAllPostsOfType(postType);
-        foreach (IBasePost post in output)
+        BasePost[] output = await _postDataClient.GetAllPostsOfType(postType);
+        foreach (BasePost post in output)
         {
             await ProcessAttachments(post);
         }
@@ -50,21 +48,25 @@ public class PostService : IPostService
         return output;
     }
 
-    public async Task<IBasePost> GetPost(uint id)
+    public async Task<BasePost> GetPost(uint id)
     {
-        IBasePost post = await _postDataClient.GetPost(id);
+        BasePost post = await _postDataClient.GetPost(id);
         await ProcessAttachments(post);
 
         return post;
     }
 
-    //public async Task CreatePost<T>(T post) where T : IBasePost
-    //{
+    public async Task<BasePost> CreatePost(BasePost post)
+    {
+        using TransactionScope scope = new();
+        BasePost output = await _postDataClient.CreatePost(post);
+        scope.Complete();
 
-    //}
 
+        return output;
+    }
 
-    private async Task ProcessAttachments(IBasePost post)
+    private async Task ProcessAttachments(BasePost post)
     {
         var postAttachments = await _postDataClient.GetPostAttachments(post.ID);
         post.Attachments = new();

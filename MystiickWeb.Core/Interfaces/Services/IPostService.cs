@@ -1,12 +1,11 @@
-﻿using MystiickWeb.Shared.Models;
-using MystiickWeb.Shared.Models.Posts;
+﻿using MystiickWeb.Shared.Models.Posts;
 
 namespace MystiickWeb.Core.Interfaces.Services;
 
 public interface IPostService
 {
-    Task<IBasePost[]> GetAllPosts();
-    Task<IBasePost[]> GetAllPosts(string postType);
-    Task<IBasePost> GetPost(uint id);
-    //Task CreatePost<T>(T post) where T : IBasePost;
+    Task<BasePost[]> GetAllPosts();
+    Task<BasePost[]> GetAllPosts(string postType);
+    Task<BasePost> GetPost(uint id);
+    Task<BasePost> CreatePost(BasePost post);
 }

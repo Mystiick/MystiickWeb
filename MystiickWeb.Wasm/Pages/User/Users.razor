@@ -1,8 +1,9 @@
 ﻿@page "/users"
 @inherits BasePage
 @using Microsoft.AspNetCore.Authorization
+@using MystiickWeb.Shared.Constants
 
-@attribute [Authorize(Roles = MystiickWeb.Shared.UserRoles.Administrator)]
+@attribute [Authorize(Roles = UserRoles.Administrator)]
 
 @inject UserManager _userManager;
 

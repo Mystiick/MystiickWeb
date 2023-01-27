@@ -26,7 +26,7 @@
 
             @if (NewPosts != null)
             {
-                @foreach (IBasePost post in NewPosts)
+                @foreach (BasePost post in NewPosts)
                 {
                     <PostPreview Post="post" />
                 }
@@ -36,7 +36,7 @@
 </div>
 
 @code {
-    private IBasePost[]? NewPosts;
+    private BasePost[]? NewPosts;
 
     private MarkupString greeting;
 

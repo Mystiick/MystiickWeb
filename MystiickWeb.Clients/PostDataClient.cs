@@ -6,9 +6,9 @@ using MySql.Data.MySqlClient;
 using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Shared;
 using MystiickWeb.Shared.Configs;
+using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Models.Posts;
 using Constants = MystiickWeb.Shared.Constants;
-using MystiickWeb.Shared.Models;
 
 namespace MystiickWeb.Clients;
 
@@ -29,9 +29,9 @@ public class PostDataClient : IPostDataClient
     private const string WherePostID = " where PostID = @ID ";
     private const string GroupAndOrderPosts = " group by PostID order by Created desc ";
 
-    public async Task<IBasePost[]> GetAllPosts()
+    public async Task<BasePost[]> GetAllPosts()
     {
-        var output = new List<IBasePost>();
+        var output = new List<BasePost>();
 
         using var connection = new MySqlConnection(_configs.ImageDatabase);
         await connection.OpenAsync();
@@ -47,9 +47,9 @@ public class PostDataClient : IPostDataClient
         return output.ToArray();
     }
 
-    public async Task<IBasePost[]> GetAllPostsOfType(string postType)
+    public async Task<BasePost[]> GetAllPostsOfType(string postType)
     {
-        var output = new List<IBasePost>();
+        var output = new List<BasePost>();
 
         using var connection = new MySqlConnection(_configs.ImageDatabase);
         await connection.OpenAsync();
@@ -66,7 +66,7 @@ public class PostDataClient : IPostDataClient
         return output.ToArray();
     }
 
-    public async Task<IBasePost> GetPost(uint id)
+    public async Task<BasePost> GetPost(uint id)
     {
         using var connection = new MySqlConnection(_configs.ImageDatabase);
         await connection.OpenAsync();
@@ -108,7 +108,29 @@ public class PostDataClient : IPostDataClient
         return results.ToList();
     }
 
-    private static IBasePost DetermineAndPopulatePost(DbDataRecord rec)
+    public async Task<BasePost> CreatePost(BasePost post)
+    {
+        using var connection = new MySqlConnection(_configs.ImageDatabase);
+        await connection.OpenAsync();
+
+        uint newID = await connection.ExecuteScalarAsync<uint>(
+            "insert into Post (PostType, PostTitle, PostText, Created, Updated) values (@PostType, @PostTitle, @PostText, @Created, @Created); select LAST_INSERT_ID();",
+            new
+            {
+                post.PostType,
+                PostTitle = post.Title,
+                PostText = post.Text,
+                Created = DateTime.Now
+            }
+        );
+
+        if (post.Attachments.Any())
+            throw new NotImplementedException();
+
+        return await GetPost(newID);
+    }
+
+    private static BasePost DetermineAndPopulatePost(DbDataRecord rec)
     {
         return ((string)rec["PostType"]).ToLower() switch
         {
@@ -118,7 +140,7 @@ public class PostDataClient : IPostDataClient
         };
     }
 
-    private static T PopulatePost<T>(DbDataRecord rec) where T : IBasePost, new()
+    private static T PopulatePost<T>(DbDataRecord rec) where T : BasePost, new()
     {
         return new T()
         {
@@ -128,6 +150,4 @@ public class PostDataClient : IPostDataClient
             CreatedDate = (DateTime)rec["Created"]
         };
     }
-
-    //async public Task<IAttachment> GetAttachmentByID(uint id) => (IAttachment)(await GetLinkByID(id));
 }

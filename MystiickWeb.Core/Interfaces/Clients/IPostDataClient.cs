@@ -5,10 +5,11 @@ namespace MystiickWeb.Core.Interfaces.Clients;
 
 public interface IPostDataClient
 {
-    Task<IBasePost[]> GetAllPosts();
-    Task<IBasePost[]> GetAllPostsOfType(string postType);
-    Task<IBasePost> GetPost(uint id);
+    Task<BasePost[]> GetAllPosts();
+    Task<BasePost[]> GetAllPostsOfType(string postType);
+    Task<BasePost> GetPost(uint id);
     Task<Link> GetLinkByID(uint id);
     Task<List<PostAttachment>> GetPostAttachments(uint postID);
+    Task<BasePost> CreatePost(BasePost post);
 }
 

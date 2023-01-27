@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MystiickWeb.Core.Interfaces.Services;
+using MystiickWeb.Core.Services;
+using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models.Posts;
-using Constants = MystiickWeb.Shared.Constants;
 
 namespace MystiickWeb.Server.Controllers;
 
@@ -20,15 +21,15 @@ public class PostsController : BaseController
         _postService = postService;
     }
 
-    [HttpGet("")]
-    public async Task<IBasePost[]> GetPosts(string? postType, string? top)
+    [HttpGet]
+    public async Task<BasePost[]> GetPosts(string? postType, string? top)
     {
         if (!string.IsNullOrWhiteSpace(postType))
         {
             return postType.ToLower() switch
             {
-                Constants.PostType.Photography => await GetPostsOfType<ImagePost>(postType),
-                Constants.PostType.Programming => await GetPostsOfType<ProgrammingPost>(postType),
+                PostType.Photography => await GetPostsOfType<ImagePost>(postType),
+                PostType.Programming => await GetPostsOfType<ProgrammingPost>(postType),
                 _ => throw new ArgumentException("todo"),
             };
         }
@@ -41,12 +42,23 @@ public class PostsController : BaseController
     }
 
     [HttpGet("{id}")]
-    public async Task<IBasePost> GetPostByID(uint id)
+    public async Task<BasePost> GetPostByID(uint id)
     {
         return await _postService.GetPost(id);
     }
 
-    private async Task<IBasePost[]> GetTopPosts(int count)
+
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = $"{UserRoles.Author},{UserRoles.Administrator}")]
+    [HttpPost]
+    public async Task<ActionResult<BasePost>> CreatePost(BasePost post)
+    {
+        BasePost output = await _postService.CreatePost(post);
+
+        return Ok(output);
+    }
+
+    private async Task<BasePost[]> GetTopPosts(int count)
     {
         if (count > 10) throw new ArgumentException("Cannot get more than 10 posts at once");
 
@@ -54,7 +66,7 @@ public class PostsController : BaseController
         return output;
     }
 
-    private async Task<T[]> GetPostsOfType<T>(string postType) where T : IBasePost, new()
+    private async Task<T[]> GetPostsOfType<T>(string postType) where T : BasePost, new()
     {
         T[] posts = (await _postService.GetAllPosts(postType)).Cast<T>().ToArray();
 

@@ -1,5 +1,4 @@
 ﻿using MystiickWeb.Shared.Models;
-using MystiickWeb.Shared.Models.Posts;
 
 namespace MystiickWeb.Core.Interfaces.Clients;
 
