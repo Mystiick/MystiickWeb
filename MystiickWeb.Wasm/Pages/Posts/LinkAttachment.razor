@@ -1,0 +1,10 @@
+﻿@using MystiickWeb.Shared.Models.Posts;
+
+<li class="list-group-item">
+    <div class="oi oi-@(string.IsNullOrWhiteSpace(Link.Icon) ? "external-link" : Link.Icon)"></div>
+    <a href="@Link.Url" target="_blank">@Link.Text</a>
+</li>
+
+@code {
+    [Parameter] public Link Link { get; set; } = new();
+}

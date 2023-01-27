@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-using MystiickWeb.Server.Services;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MystiickWeb.Core.Interfaces.Services;
+using MystiickWeb.Core.Services;
+using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models.Posts;
-using Constants = MystiickWeb.Shared.Constants;
 
 namespace MystiickWeb.Server.Controllers;
 
@@ -12,30 +13,25 @@ public class PostsController : BaseController
 {
 
     private readonly ILogger<PostsController> _logger;
-    private readonly PostService _postService;
+    private readonly IPostService _postService;
 
-    public PostsController(ILogger<PostsController> logger, PostService postService) : base(logger)
+    public PostsController(ILogger<PostsController> logger, IPostService postService) : base(logger)
     {
         _logger = logger;
         _postService = postService;
     }
 
-    [HttpGet("")]
-    public async Task<IBasePost[]> GetPosts(string? postType, string? top)
+    [HttpGet]
+    public async Task<BasePost[]> GetPosts(string? postType, string? top)
     {
         if (!string.IsNullOrWhiteSpace(postType))
         {
-            switch (postType.ToLower())
+            return postType.ToLower() switch
             {
-                case Constants.Post.PostType_Photography:
-                    return await GetPostsOfType<ImagePost>(postType);
-
-                case Constants.Post.PostType_Programming:
-                    return await GetPostsOfType<ProgrammingPost>(postType);
-
-                default:
-                    throw new ArgumentException("todo");
-            }
+                PostType.Photography => await GetPostsOfType<ImagePost>(postType),
+                PostType.Programming => await GetPostsOfType<ProgrammingPost>(postType),
+                _ => throw new ArgumentException("todo"),
+            };
         }
         else if (int.TryParse(top, out int count) && count > 0)
         {
@@ -46,12 +42,23 @@ public class PostsController : BaseController
     }
 
     [HttpGet("{id}")]
-    public async Task<IBasePost> GetPostByID(uint id)
+    public async Task<BasePost> GetPostByID(uint id)
     {
         return await _postService.GetPost(id);
     }
 
-    private async Task<IBasePost[]> GetTopPosts(int count)
+
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = $"{UserRoles.Author},{UserRoles.Administrator}")]
+    [HttpPost]
+    public async Task<ActionResult<BasePost>> CreatePost(BasePost post)
+    {
+        BasePost output = await _postService.CreatePost(post);
+
+        return Ok(output);
+    }
+
+    private async Task<BasePost[]> GetTopPosts(int count)
     {
         if (count > 10) throw new ArgumentException("Cannot get more than 10 posts at once");
 
@@ -59,7 +66,7 @@ public class PostsController : BaseController
         return output;
     }
 
-    private async Task<T[]> GetPostsOfType<T>(string postType) where T : IBasePost, new()
+    private async Task<T[]> GetPostsOfType<T>(string postType) where T : BasePost, new()
     {
         T[] posts = (await _postService.GetAllPosts(postType)).Cast<T>().ToArray();
 

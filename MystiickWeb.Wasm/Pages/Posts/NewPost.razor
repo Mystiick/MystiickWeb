@@ -1,0 +1,75 @@
+﻿@page "/posts/new"
+@inherits BasePage
+@using Microsoft.AspNetCore.Authorization
+@using MystiickWeb.Shared.Constants;
+@using MystiickWeb.Shared.Models.Posts;
+
+@attribute [Authorize(Roles = $"{UserRoles.Administrator},${UserRoles.Author}")]
+
+@inject PostManager _postManager;
+@inject NavigationManager _navigationManager
+
+<PageHeader @ref="Header" HeaderText="Login" IsLoading="IsLoading" Error="@Error" Message="@Message" ValidationMessages="ValidationMessages" />
+
+<div class="card">
+    <div class="row">
+        <div class="col-xxl-6 col-xl-12 border-end">
+            <h2 class="ms-3 me-3 border-bottom">New Post</h2>
+
+            <EditForm Model="@post" OnValidSubmit="@HandleSubmit">
+
+                <div class="card-body">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="row input-group">
+                        <label for="title" class="col-form-label col-xxl-2 col-xl-3 input-group-text">Post Title</label>
+                        <InputText class="form-control col-xxl-10 col-xl-9" id="title" @bind-Value="post.Title" />
+                    </div>
+
+                    <div class="row input-group">
+                        <label for="post-type" class="col-form-label col-xxl-2 col-xl-3 input-group-text">Post Type</label>
+                        <InputSelect class="form-select col-xxl-10 col-xl-9" id="post-type" @bind-Value="post.PostType">
+                            <option value="@PostType.Programming">@PostType.Programming</option>
+                            <option value="@PostType.Photography">@PostType.Photography</option>
+                        </InputSelect>
+                    </div>
+
+                    <div class="row mb-3 input-group">
+                        <label for="contents" class="col-form-label col-xxl-2 col-xl-3 input-group-text">Post Contents</label>
+                        <InputTextArea class="form-control col-xxl-10 col-xl-9" id="contents" @bind-Value="@post.Text" />
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+        <div class="col-xxl-6 col-xl-12">
+            <h2 class="ms-3 me-3 border-bottom">Preview</h2>
+
+            <div class="card-body">
+                <h3>@post.Title</h3>
+                @if (!string.IsNullOrEmpty(post.Title) || !string.IsNullOrEmpty(post.Text))
+                {
+                    <h5>@post.CreatedDate.ToShortDateString()</h5>
+                }
+
+                @((MarkupString)Markdig.Markdown.ToHtml(post.Text))
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private BasePost post = new() { CreatedDate = DateTime.Now };
+
+    private async Task HandleSubmit()
+    {
+        BasePost? output = await CallApi<BasePost>(_postManager.CreatePost(post));
+
+        if (output != null && output.ID > 0)
+            _navigationManager.NavigateTo($"posts/{output.PostType}/{output.ID}");
+    }
+}

@@ -1,7 +1,7 @@
 ﻿namespace MystiickWeb.Shared.Constants;
 
-public static class Post
+public static class PostType
 {
-    public const string PostType_Photography = "photography";
-    public const string PostType_Programming = "programming";
+    public const string Photography = "photography";
+    public const string Programming = "programming";
 }

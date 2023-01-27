@@ -1,0 +1,137 @@
+﻿@page "/user/register"
+@inherits BasePage
+@using MystiickWeb.Shared.Constants;
+@using MystiickWeb.Shared.Models;
+@using MystiickWeb.Shared.Models.User;
+
+@inject UserManager _userManager;
+@inject NavigationManager _navigation;
+@inject FeaturesManager _features;
+
+<PageHeader @ref="Header" HeaderText="Register" IsLoading="IsLoading" Error="@Error" Message="@Message" ValidationMessages="ValidationMessages" />
+
+
+<AuthorizeView>
+    <Authorized>
+        <div>Already signed in!</div>
+        <div><a href="/user">User</a></div>
+    </Authorized>
+    <NotAuthorized>
+        @if (registrationEnabled) {
+            <div class="col-xxl-6 p-3 col-12">
+                <div class="mb-3">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control @(validationErrors.ContainsKey(nameof(username)) ? "is-invalid" : "")" id="username" @bind="username" placeholder="" />
+
+                    @if (validationErrors.ContainsKey(nameof(username)))
+                    {
+                        <div class="invalid-feedback">
+                            @foreach (var msg in validationErrors[nameof(username)])
+                            {
+                                <div>@msg</div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control @(validationErrors.ContainsKey(nameof(password)) ? "is-invalid" : "")" id="password" @bind=password placeholder="" />
+
+                    @if (validationErrors.ContainsKey(nameof(password)))
+                    {
+                        <div class="invalid-feedback">
+                            @foreach (var msg in validationErrors[nameof(password)])
+                            {
+                                <div>@msg</div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirm">Confirm Password</label>
+                    <input type="password" class="form-control @(validationErrors.ContainsKey(nameof(confirm)) ? "is-invalid" : "")" id="confirm" @bind=confirm placeholder="" />
+
+                    @if (validationErrors.ContainsKey(nameof(confirm)))
+                    {
+                        <div class="invalid-feedback">
+                            @foreach (var msg in validationErrors[nameof(confirm)])
+                            {
+                                <div>@msg</div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <div class="form-floating">
+                    <button class="btn btn-primary" @onclick="RegisterUser">Submit</button>
+                </div>
+            </div>
+        }
+        else 
+        {
+            <h4>User registration is currently closed</h4>
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    private string username = string.Empty;
+    private string password = string.Empty;
+    private string confirm = string.Empty;
+    private Dictionary<string, List<string>> validationErrors = new();
+    private bool registrationEnabled = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        registrationEnabled = (await _features.GetFeatures()).Value?.UserRegistration ?? false;
+    }
+
+    private async Task RegisterUser()
+    {
+        Response resp = new() { Success = false };
+        validationErrors.Clear();
+
+        if (IsFormValid())
+            resp = await CallApi(_userManager.RegisterUser(new Credential { Username = username, Password = password, ConfirmPassword = confirm }));
+
+        if (resp.Success)
+        {
+            // Registration successful, navigate to the user 
+            _navigation.NavigateTo("/user");
+        }
+        else
+        {
+            // Reset password fields
+            password = string.Empty;
+            confirm = string.Empty;
+        }
+    }
+
+    private bool IsFormValid()
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            AddValidationError(nameof(username), "Field is required.");
+
+        if (string.IsNullOrWhiteSpace(password))
+            AddValidationError(nameof(password), "Field is required.");
+
+        if (string.IsNullOrWhiteSpace(confirm))
+            AddValidationError(nameof(confirm), "Field is required.");
+
+        if (password != confirm)
+            AddValidationError(nameof(confirm), "Password and Confirm Password must be the same.");
+
+        return !validationErrors.Any();
+    }
+
+    private void AddValidationError(string field, string message)
+    {
+        if (validationErrors.ContainsKey(field))
+            validationErrors[field].Add(message);
+        else
+            validationErrors.Add(field, new List<string> { message });
+    }
+}

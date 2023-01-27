@@ -1,0 +1,44 @@
+﻿@page "/user/login"
+@inherits BasePage
+
+@using MystiickWeb.Wasm.Auth;
+@using MystiickWeb.Shared.Constants;
+@using MystiickWeb.Shared.Models.User;
+@using MystiickWeb.Shared.Models;
+
+@inject NavigationManager _navigationManager;
+@inject UserManager _userManager;
+
+
+<div class="col-6">
+    <PageHeader @ref="Header" HeaderText="Login" IsLoading="IsLoading" Error="@Error" Message="@Message" ValidationMessages="ValidationMessages" />
+    <div class="m-3">
+        <label class="form-label" for="username">Username</label>
+        <input type="text" class="form-control" id="username" @bind="username" />
+    </div>
+    <div class="m-3">
+        <label class="form-label" for="username">Password</label>
+        <input type="password" class="form-control" id="password" @bind=password />
+    </div>
+    <div class="m-3">
+        <button class="btn btn-primary" @onclick="OnClick">Submit</button>
+    </div>
+</div>
+
+@code {
+    private string username = string.Empty;
+    private string password = string.Empty;
+
+    private async Task OnClick()
+    {
+        var response = await CallApi(_userManager.Login(new Credential { Username = username, Password = password }));
+        password = string.Empty;
+
+        if (response.Success)
+        {
+            _navigationManager.NavigateTo("/user");
+        }
+
+        await Task.CompletedTask;
+    }
+}

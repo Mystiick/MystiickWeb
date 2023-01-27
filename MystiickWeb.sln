@@ -1,14 +1,14 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.1.32210.238
+VisualStudioVersion = 17.3.32804.467
 MinimumVisualStudioVersion = 16.0.0.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MystiickWeb.Server", "MystiickWeb.Server\MystiickWeb.Server.csproj", "{D3DCBC8F-0B97-498E-BF05-742F5E9FC08E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MystiickWeb.Client", "MystiickWeb.Client\MystiickWeb.Client.csproj", "{3E8310E3-CFEE-4E47-8661-387792CA01AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MystiickWeb.Wasm", "MystiickWeb.Wasm\MystiickWeb.Wasm.csproj", "{3E8310E3-CFEE-4E47-8661-387792CA01AC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MystiickWeb.Shared", "MystiickWeb.Shared\MystiickWeb.Shared.csproj", "{95D90B32-5969-45E8-B53F-274F4BF3D109}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MystiickWeb.Server.Clients", "MystiickWeb.Server.Clients\MystiickWeb.Server.Clients.csproj", "{888833D1-634B-44BB-BF8E-38C4D2662FFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MystiickWeb.Clients", "MystiickWeb.Clients\MystiickWeb.Clients.csproj", "{888833D1-634B-44BB-BF8E-38C4D2662FFB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "quickstart", "quickstart", "{7F90958F-53C0-4FA5-A80A-73177A4759C3}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,6 +19,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "quickstart", "quickstart", 
 		quickstart\quickstart-dev.sh = quickstart\quickstart-dev.sh
 		quickstart\quickstop.sh = quickstart\quickstop.sh
 		quickstart\README.md = quickstart\README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MystiickWeb.Core", "MystiickWeb.Core\MystiickWeb.Core.csproj", "{5B07F270-2E6D-47D5-8882-FC561CCDC83C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MystiickWeb.Core.Tests", "MystiickWeb.Core.Tests\MystiickWeb.Core.Tests.csproj", "{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{018C7CBC-5F0E-4B5C-9158-C86E8E209522}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{65E20D0F-B547-4EB5-89C2-AF18BD953A8A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FEEE51A1-B6E3-49F8-ABD4-D88C13E88EE6}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
 Global
@@ -79,9 +92,38 @@ Global
 		{888833D1-634B-44BB-BF8E-38C4D2662FFB}.Release|x64.Build.0 = Release|Any CPU
 		{888833D1-634B-44BB-BF8E-38C4D2662FFB}.Release|x86.ActiveCfg = Release|Any CPU
 		{888833D1-634B-44BB-BF8E-38C4D2662FFB}.Release|x86.Build.0 = Release|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Debug|x64.Build.0 = Debug|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Debug|x86.Build.0 = Debug|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Release|x64.ActiveCfg = Release|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Release|x64.Build.0 = Release|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Release|x86.ActiveCfg = Release|Any CPU
+		{5B07F270-2E6D-47D5-8882-FC561CCDC83C}.Release|x86.Build.0 = Release|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Debug|x64.Build.0 = Debug|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Debug|x86.Build.0 = Debug|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Release|x64.ActiveCfg = Release|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Release|x64.Build.0 = Release|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Release|x86.ActiveCfg = Release|Any CPU
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D3DCBC8F-0B97-498E-BF05-742F5E9FC08E} = {65E20D0F-B547-4EB5-89C2-AF18BD953A8A}
+		{3E8310E3-CFEE-4E47-8661-387792CA01AC} = {65E20D0F-B547-4EB5-89C2-AF18BD953A8A}
+		{C75E8C07-DA08-42FA-88B3-1BC76AC6BF7A} = {018C7CBC-5F0E-4B5C-9158-C86E8E209522}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {15B71052-E0C4-4F68-BC65-681C00E95018}

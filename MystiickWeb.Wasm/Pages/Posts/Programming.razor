@@ -1,0 +1,60 @@
+﻿@page "/posts/programming/"
+@page "/posts/programming/{ID}"
+@inherits BasePage
+
+@using MystiickWeb.Shared.Constants;
+@using MystiickWeb.Shared.Models;
+@using MystiickWeb.Shared.Models.Posts;
+
+@inject PostManager _postManager;
+
+<PageHeader @ref="Header" HeaderText="Programming" IsLoading="IsLoading" Error="@Error" Message="@Message" ValidationMessages="ValidationMessages" />
+
+<div class="border-bottom">
+    <ul style="list-style: none;">
+        <li><a href="https://github.com/Mystiick">Github</a></li>
+        <li><a href="https://hub.docker.com/u/mystiick">Docker Hub</a></li>
+    </ul>
+</div>
+
+@if (Posts != null)
+{
+    <Paginator @ref="postPager" Label="Photography post pager" Items="Posts" PageSize="2" Name="ProgrammingPostPager">
+        @if (postPager != null)
+        {
+            @foreach (ProgrammingPost post in postPager.DisplayItems)
+            {
+                <article class="p-2 border-bottom">
+                    <h3>@post.Title</h3>
+                    <h5>@post.CreatedDate.ToShortDateString()</h5>
+
+                    @((MarkupString)Markdig.Markdown.ToHtml(post.Text))
+
+                    @if (post.Attachments.Any())
+                    {
+                        <AttachmentList Attachments="post.Attachments"></AttachmentList>
+                    }
+                </article>
+            }
+        }
+    </Paginator>
+}
+
+@code {
+    private ProgrammingPost[]? Posts;
+    private Paginator? postPager;
+
+    [Parameter] public string ID { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(ID))
+        {
+            Posts = new[] { await CallApi<ProgrammingPost>(_postManager.GetPostByID<ProgrammingPost>(ID)) ?? new() };
+        }
+        else
+        {
+            Posts = await CallApi(_postManager.GetPostsByType<ProgrammingPost>("programming"));
+        }
+    }
+}

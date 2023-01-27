@@ -1,34 +1,41 @@
-using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 
-using MystiickWeb.Server.Services;
-using MystiickWeb.Server.Clients;
-using MystiickWeb.Server.Clients.Images;
+using MystiickWeb.Clients.Identity;
 using MystiickWeb.Shared.Configs;
-
+using MystiickWeb.Shared.Constants;
+using MystiickWeb.Shared.Extensions;
+using MystiickWeb.Shared.Models.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
+MystiickWeb.Core.Startup.Init();
+
+builder.Services
+    .AddInjectables()
+    .Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey))
+    .Configure<IdentityConfig>(builder.Configuration.GetSection(IdentityConfig.IdentityConfigsKey))
+    .Configure<Features>(builder.Configuration.GetSection(Features.FeaturesKey));
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-// Services
-builder.Services.AddSingleton<MinecraftService>();
-builder.Services.AddSingleton<ImageService>();
-builder.Services.AddSingleton<PostService>();
-
-// Clients
-builder.Services.AddSingleton<ImageDataClient>();
-builder.Services.AddSingleton<ImageFileClient>();
-builder.Services.AddSingleton<PostDataClient>();
+// Identity and services
+builder.Services.AddIdentityCore<User>();
+builder.Services
+    .AddScoped<IUserStore<User>, MystiickUserStore>()
+    .AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN")
+    .AddHttpContextAccessor()
+    .AddAuthentication(Identity.Cookies)
+    .AddCookie(Identity.Cookies, x => x.LoginPath = "/user/login");
 
 // Configs
-builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(ConnectionStrings.ConnectionStringsKey));
-builder.Configuration.AddJsonFile("appsettings.json", false);
-builder.Configuration.AddJsonFile("appsettings.development.json", true);
-builder.Configuration.AddEnvironmentVariables();
+builder.Configuration
+    .AddJsonFile("appsettings.json", false)
+    .AddJsonFile("appsettings.development.json", true)
+    .AddEnvironmentVariables();
 
 builder.Logging.AddConfiguration(builder.Configuration);
 builder.Services.AddLogging(x =>
@@ -40,7 +47,7 @@ builder.Services.AddLogging(x =>
 builder.Logging.AddSimpleConsole(config => config.SingleLine = true);
 #endif
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -57,15 +64,27 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+app.UseAuthentication();
 
+// Setup CSRF Token
+app.Use((context, next) =>
+{
+    IAntiforgery? antiforgery = app.Services.GetRequiredService<IAntiforgery>();
+    AntiforgeryTokenSet tokens = antiforgery.GetAndStoreTokens(context);
+    context.Response.Cookies.Append(CookieConstants.AntiForgeryToken, tokens.RequestToken ?? "", new CookieOptions() { HttpOnly = false, IsEssential = true });
+
+    return next(context);
+});
+
+app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 
 
 FileExtensionContentTypeProvider content = new();
 content.Mappings[".pck"] = "application/octet-stream";
 
-app.UseStaticFiles(new StaticFileOptions() { 
+app.UseStaticFiles(new StaticFileOptions()
+{
     ContentTypeProvider = content,
     OnPrepareResponse = ctx =>
     {
@@ -74,6 +93,7 @@ app.UseStaticFiles(new StaticFileOptions() {
 });
 
 app.UseRouting();
+app.UseAuthorization();
 
 
 app.MapRazorPages();
