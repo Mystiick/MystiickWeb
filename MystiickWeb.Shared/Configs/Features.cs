@@ -1,20 +1,19 @@
 ﻿using System.Reflection;
 
-namespace MystiickWeb.Shared.Configs
+namespace MystiickWeb.Shared.Configs;
+
+public class Features
 {
-    public class Features
+    public static string FeaturesKey = "Features";
+    public bool UserRegistration { get; set; }
+
+    public bool IsFeatureEnabled(string feature)
     {
-        public static string FeaturesKey = "Features";
-        public bool UserRegistration { get; set; }
+        PropertyInfo? prop = typeof(Features).GetProperty(feature);
 
-        public bool IsFeatureEnabled(string feature)
-        {
-            PropertyInfo? prop = typeof(Features).GetProperty(feature);
+        if (prop != null)
+            return (bool)(prop.GetValue(this) ?? false);
 
-            if (prop != null)
-                return (bool)(prop.GetValue(this) ?? false);
-
-            return false;
-        }
+        return false;
     }
 }

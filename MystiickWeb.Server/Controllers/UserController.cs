@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
 using MystiickWeb.Core.Interfaces.Services;
+using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models.User;
-
-using System.Security.Claims;
 
 namespace MystiickWeb.Server.Controllers;
 
@@ -32,7 +30,7 @@ public class UserController : BaseController
             {
                 ClaimsIdentity identity = await _userService.AuthenticateUser(credentials);
 
-                await HttpContext.SignInAsync("cookies", new ClaimsPrincipal(identity));
+                await HttpContext.SignInAsync(Identity.Cookies, new ClaimsPrincipal(identity));
                 return Ok();
             }
             catch (UnauthorizedAccessException)
@@ -48,7 +46,7 @@ public class UserController : BaseController
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        await HttpContext.SignOutAsync("cookies");
+        await HttpContext.SignOutAsync(Identity.Cookies);
         return Ok();
     }
 
@@ -137,7 +135,7 @@ public class UserController : BaseController
     }
 
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = $"{Shared.UserRoles.Administrator}")]
+    [Authorize(Roles = $"{UserRoles.Administrator}")]
     [HttpPost("{userID}")]
     public async Task<ActionResult> AddRoleToUser(string userID, [FromBody] string role)
     {
@@ -147,7 +145,7 @@ public class UserController : BaseController
     }
 
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = $"{Shared.UserRoles.Administrator}")]
+    [Authorize(Roles = $"{UserRoles.Administrator}")]
     [HttpGet]
     public async Task<ActionResult<User>> LookupUser(string username)
     {
