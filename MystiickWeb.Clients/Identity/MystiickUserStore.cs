@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using System.Threading;
 using Dapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -30,14 +29,15 @@ public partial class MystiickUserStore : IUserStore<User>
         await connection.OpenAsync(cancellationToken);
 
         await connection.ExecuteAsync(
-            "insert into User (ID, Username, NormalizedUsername, PasswordHash, Created, Updated) values (@ID, @Username, @NormalizedUsername, @PasswordHash, @Created, @Created)",
+            "insert into User (ID, Username, NormalizedUsername, PasswordHash, Created, Updated, FailedAttempts) values (@ID, @Username, @NormalizedUsername, @PasswordHash, @Created, @Created, @FailedAttempts)",
             new
             {
                 user.ID,
                 user.Username,
                 user.NormalizedUsername,
                 user.PasswordHash,
-                Created = DateTime.Now
+                Created = DateTime.Now,
+                FailedAttempts = 0
             }
         );
 
@@ -119,8 +119,12 @@ public partial class MystiickUserStore : IUserStore<User>
 
         User? user = await connection.QueryFirstOrDefaultAsync<User>(query, args);
 
+#pragma warning disable CS8603 // Possible null reference return.
+        // AspNetCore.Identity expects the return to be null, but doesn't expect the implementation to be `IUserStore<User?>`
+        // This causes the Possible null reference return warning, so we just ignore it
         if (user == null)
-            throw new Exception("User not found");
+            return null;
+#pragma warning restore CS8603 // Possible null reference return.
 
         user.Claims.AddRange((await GetClaimsAsync(user, cancellationToken)).Select(x => new UserClaim(x)));
 
