@@ -59,7 +59,8 @@ CREATE TABLE `Post` (
   `PostType` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `PostTitle` text NOT NULL,
   `PostText` text NOT NULL,
-  `Created` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `Created` datetime NOT NULL,
+  `Updated` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`PostID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -72,4 +73,40 @@ CREATE TABLE `PostAttachment` (
   PRIMARY KEY (`PostAttachmentID`),
   KEY `PostID` (`PostID`),
   CONSTRAINT `PostAttachment_ibfk_1` FOREIGN KEY (`PostID`) REFERENCES `Post` (`PostID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `User` (
+  `ID` char(36) NOT NULL,
+  `Username` varchar(50) NOT NULL,
+  `NormalizedUsername` varchar(50) NOT NULL,
+  `PasswordHash` text NOT NULL,
+  `Created` datetime NOT NULL,
+  `Updated` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `FailedAttempts` int unsigned NOT NULL,
+  `LockoutEndDate` datetime DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `UserClaim` (
+  `ID` char(36) NOT NULL,
+  `UserID` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `ClaimType` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `ClaimValue` varchar(100) NOT NULL,
+  `Created` datetime NOT NULL,
+  `Updated` datetime NOT NULL,
+  KEY `UserID` (`UserID`),
+  CONSTRAINT `UserClaim_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `UserRole` (
+  `ID` char(36) NOT NULL,
+  `UserID` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `Role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `Created` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `Updated` datetime NOT NULL,
+  KEY `UserID` (`UserID`),
+  CONSTRAINT `UserRole_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

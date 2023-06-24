@@ -27,7 +27,7 @@ public class ImagesController : BaseController
     [HttpGet("{guid}/img")]
     public async Task<FileContentResult> GetImageFile(string guid, bool thumbnail = true)
     {
-        ImageResult output = await _service.GetImageFileByGuid(guid, thumbnail);
+        ImageResult output = await _service. GetImageFileByGuid(guid, thumbnail);
 
         return base.File(output.Data, output.ContentType);
     }

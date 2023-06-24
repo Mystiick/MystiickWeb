@@ -1,9 +1,7 @@
 ﻿using System.Security.Claims;
-using Dapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+using MystiickWeb.Core.Interfaces.Clients.UserStore;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models.User;
 
@@ -11,70 +9,55 @@ namespace MystiickWeb.Clients.Identity;
 
 public partial class MystiickUserStore : IUserStore<User>
 {
-    private readonly ILogger<MystiickUserStore> _logger;
-    private readonly ConnectionStrings _connections;
     private readonly IdentityConfig _identity;
+    private readonly IUserDataClient _userDataClient;
+    private readonly IUserClaimDataClient _userClaimDataClient;
+    private readonly IUserLockoutDataClient _userLockoutDataClient;
+    private readonly IUserRoleDataClient _userRoleDataClient;
 
-    public MystiickUserStore(ILogger<MystiickUserStore> logger, IOptions<ConnectionStrings> configs, IOptions<IdentityConfig> identity)
+    public MystiickUserStore(
+        IOptions<IdentityConfig> identity,
+        IUserDataClient userDataClient,
+        IUserClaimDataClient userClaimDataClient,
+        IUserLockoutDataClient userLockoutDataClient,
+        IUserRoleDataClient userRoleDataClient
+    )
     {
-        _logger = logger;
-        _connections = configs.Value;
         _identity = identity.Value;
+        _userDataClient = userDataClient;
+        _userClaimDataClient = userClaimDataClient;
+        _userLockoutDataClient = userLockoutDataClient;
+        _userRoleDataClient = userRoleDataClient;
     }
 
-    #region | Create |
-    async Task<IdentityResult> IUserStore<User>.CreateAsync(User user, CancellationToken cancellationToken)
-    {
-        using var connection = new MySqlConnection(_connections.UserDatabase);
-        await connection.OpenAsync(cancellationToken);
+    Task<IdentityResult> IUserStore<User>.CreateAsync(User user, CancellationToken cancellationToken) => _userDataClient.CreateUser(user, cancellationToken);
 
-        await connection.ExecuteAsync(
-            "insert into User (ID, Username, NormalizedUsername, PasswordHash, Created, Updated, FailedAttempts) values (@ID, @Username, @NormalizedUsername, @PasswordHash, @Created, @Created, @FailedAttempts)",
-            new
-            {
-                user.ID,
-                user.Username,
-                user.NormalizedUsername,
-                user.PasswordHash,
-                Created = DateTime.Now,
-                FailedAttempts = 0
-            }
-        );
 
-        return IdentityResult.Success;
-    }
-    #endregion
-
-    #region | Read |
     async Task<User> IUserStore<User>.FindByIdAsync(string userID, CancellationToken cancellationToken)
     {
-        return await GetUser("select * from User where ID = @ID AND Deleted is null", new { ID = userID }, cancellationToken);
+        User? user = await _userDataClient.GetUserByID(userID, cancellationToken);
+        return await PopulateUser(user, cancellationToken);
     }
 
     async Task<User> IUserStore<User>.FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
     {
-        return await GetUser("select * from User where NormalizedUsername = @NormalizedUsername AND Deleted is null", new { NormalizedUsername = normalizedUserName }, cancellationToken);
+        User? user = await _userDataClient.GetUserByName(normalizedUserName, cancellationToken);
+        return await PopulateUser(user, cancellationToken);
     }
 
     Task<string> IUserStore<User>.GetNormalizedUserNameAsync(User user, CancellationToken cancellationToken) => Task.FromResult(user.NormalizedUsername);
     Task<string> IUserStore<User>.GetUserIdAsync(User user, CancellationToken cancellationToken) => Task.FromResult(user.ID.ToString());
     Task<string> IUserStore<User>.GetUserNameAsync(User user, CancellationToken cancellationToken) => Task.FromResult(user.Username);
-    #endregion
 
-    #region | Update |
+
     async Task IUserStore<User>.SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
     {
         user.NormalizedUsername = normalizedName;
 
         // If the user has been authenticated, they have a record in the database
-        // The only reason they might not be authenticated setting the Username is if they are a registering a new user
+        // The only reason they might not be authenticated setting the Username is if they are a registering a new user. In that case, we don't want to update
         if (user.Authenticated)
-        {
-            using var connection = new MySqlConnection(_connections.UserDatabase);
-            await connection.OpenAsync(cancellationToken);
-
-            await connection.ExecuteAsync("update User set NormalizedUsername = @NormalizedUsername, Updated = @Updated where ID = @ID", new { user.NormalizedUsername, Updated = DateTime.Now, user.ID });
-        }
+            await _userDataClient.UpdateNormalizedUserName(user, cancellationToken);
     }
 
     async Task IUserStore<User>.SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
@@ -84,47 +67,35 @@ public partial class MystiickUserStore : IUserStore<User>
         // If the user has been authenticated, they have a record in the database
         // The only reason they might not be authenticated setting the Username is if they are a registering a new user
         if (user.Authenticated)
-        {
-            using var connection = new MySqlConnection(_connections.UserDatabase);
-            await connection.OpenAsync(cancellationToken);
-
-            await connection.ExecuteAsync("update User set Username = @Username, Updated = @Updated where ID = @ID", new { user.Username, Updated = DateTime.Now, user.ID });
-        }
+            await _userDataClient.UpdateUserName(user, cancellationToken);
     }
 
     async Task<IdentityResult> IUserStore<User>.UpdateAsync(User user, CancellationToken cancellationToken)
     {
-        using var connection = new MySqlConnection(_connections.UserDatabase);
-        await connection.OpenAsync(cancellationToken);
+        await _userDataClient.UpdateUser(user, cancellationToken);
+        return IdentityResult.Success;
+    }
 
-        connection.Execute(
-            "update User set Username = @Username, NormalizedUsername = @NormalizedUsername, PasswordHash = @PasswordHash, Updated = @Updated where ID = @ID",
-            new
-            {
-                user.Username,
-                user.NormalizedUsername,
-                user.PasswordHash,
-                Updated = DateTime.Now,
-                user.ID
-            }
-        );
+    async Task<IdentityResult> IUserStore<User>.DeleteAsync(User user, CancellationToken cancellationToken)
+    {
+        // Delete all information related to the user
+        //TODO: Delete all user claims
+
+        // Delete the user record itself
+        await _userDataClient.DeleteUser(user, cancellationToken);
 
         return IdentityResult.Success;
     }
 
-    private async Task<User> GetUser(string query, object args, CancellationToken cancellationToken)
+
+    private async Task<User> PopulateUser(User? user, CancellationToken cancellationToken)
     {
-        using var connection = new MySqlConnection(_connections.UserDatabase);
-        await connection.OpenAsync(cancellationToken);
-
-        User? user = await connection.QueryFirstOrDefaultAsync<User>(query, args);
-
-#pragma warning disable CS8603 // Possible null reference return.
+        #pragma warning disable CS8603 // Possible null reference return.
         // AspNetCore.Identity expects the return to be null, but doesn't expect the implementation to be `IUserStore<User?>`
         // This causes the Possible null reference return warning, so we just ignore it
         if (user == null)
             return null;
-#pragma warning restore CS8603 // Possible null reference return.
+        #pragma warning restore CS8603 // Possible null reference return.
 
         user.Claims.AddRange((await GetClaimsAsync(user, cancellationToken)).Select(x => new UserClaim(x)));
 
@@ -133,22 +104,8 @@ public partial class MystiickUserStore : IUserStore<User>
 
         return user;
     }
-    #endregion
-
-    #region | Delete |
-    async Task<IdentityResult> IUserStore<User>.DeleteAsync(User user, CancellationToken cancellationToken)
-    {
-        using var connection = new MySqlConnection(_connections.UserDatabase);
-        await connection.OpenAsync(cancellationToken);
-
-        await connection.ExecuteAsync("update User set Deleted = @Deleted where ID = @ID", new { Deleted = DateTime.Now, user.ID });
-
-        return IdentityResult.Success;
-    }
-    #endregion
 
     #region | IDisposable Support |
-
     private bool disposedValue = false; // To detect redundant calls
 
     protected virtual void Dispose(bool disposing)
@@ -169,7 +126,7 @@ public partial class MystiickUserStore : IUserStore<User>
     {
         // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
         Dispose(true);
+        GC.SuppressFinalize(this);
     }
-
     #endregion
 }

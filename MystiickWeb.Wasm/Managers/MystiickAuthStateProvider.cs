@@ -36,7 +36,7 @@ public class MystiickAuthStateProvider : AuthenticationStateProvider
 
         if (deserializedUser.Authenticated)
         {
-            webUser = new ClaimsIdentity(deserializedUser.Claims.Select(x => new Claim(x.Type, x.Value)), "cookie");
+            webUser = new ClaimsIdentity(deserializedUser.Claims.Select(x => new Claim(x.ClaimType, x.ClaimValue)), "cookie");
         }
 
         return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(webUser)));

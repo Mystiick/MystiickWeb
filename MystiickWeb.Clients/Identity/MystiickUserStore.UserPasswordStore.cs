@@ -1,6 +1,4 @@
-﻿using Dapper;
-using Microsoft.AspNetCore.Identity;
-using MySql.Data.MySqlClient;
+﻿using Microsoft.AspNetCore.Identity;
 using MystiickWeb.Shared.Models.User;
 
 
@@ -16,12 +14,7 @@ public partial class MystiickUserStore : IUserPasswordStore<User>
         // If the user has been authenticated, they have a record in the database
         // The only reason they might not be authenticated setting the Password is if they are a registering a new user
         if (user.Authenticated)
-        {
-            using var connection = new MySqlConnection(_connections.UserDatabase);
-            await connection.OpenAsync(cancellationToken);
-
-            await connection.ExecuteAsync("update User set PasswordHash = @PasswordHash where ID = @ID", new { PasswordHash = passwordHash, user.ID });
-        }
+            await _userDataClient.UpdatePassword(user, cancellationToken);
     }
 
     Task<string> IUserPasswordStore<User>.GetPasswordHashAsync(User user, CancellationToken cancellationToken) => Task.FromResult(user.PasswordHash);

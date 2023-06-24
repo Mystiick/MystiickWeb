@@ -8,7 +8,7 @@ using MystiickWeb.Shared;
 using MystiickWeb.Shared.Configs;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Models.Posts;
-using Constants = MystiickWeb.Shared.Constants;
+using MystiickWeb.Shared.Constants;
 
 namespace MystiickWeb.Clients;
 
@@ -134,8 +134,8 @@ public class PostDataClient : IPostDataClient
     {
         return ((string)rec["PostType"]).ToLower() switch
         {
-            Constants.PostType.Photography => PopulatePost<ImagePost>(rec),
-            Constants.PostType.Programming => PopulatePost<ProgrammingPost>(rec),
+            PostType.Photography => PopulatePost<ImagePost>(rec),
+            PostType.Programming => PopulatePost<ProgrammingPost>(rec),
             _ => throw new NotImplementedException(),
         };
     }
