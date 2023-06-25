@@ -36,13 +36,13 @@ public class MystiickUserDataClient : BaseUserDataClient, IUserDataClient
     async Task<User?> IUserDataClient.GetUserByID(string userID, CancellationToken cancellationToken)
     {
         using MySqlConnection connection = await GetConnection(cancellationToken);
-        return await connection.QueryFirstOrDefaultAsync<User>("select * from User where ID = @ID AND Deleted is null", new { ID = userID });
+        return await connection.QueryFirstOrDefaultAsync<User>("select * from User where ID = @ID", new { ID = userID });
     }
 
     async Task<User?> IUserDataClient.GetUserByName(string normalizedUserName, CancellationToken cancellationToken)
     {
         using MySqlConnection connection = await GetConnection(cancellationToken);
-        return await connection.QueryFirstOrDefaultAsync<User>("select * from User where NormalizedUsername = @NormalizedUsername AND Deleted is null", new { NormalizedUsername = normalizedUserName });
+        return await connection.QueryFirstOrDefaultAsync<User>("select * from User where NormalizedUsername = @NormalizedUsername", new { NormalizedUsername = normalizedUserName });
     }
 
     async Task IUserDataClient.UpdateNormalizedUserName(User user, CancellationToken cancellationToken)

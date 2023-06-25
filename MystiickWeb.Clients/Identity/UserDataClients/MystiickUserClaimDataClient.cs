@@ -36,10 +36,21 @@ public class MystiickUserClaimDataClient : BaseUserDataClient, IUserClaimDataCli
     {
         using MySqlConnection connection = await GetConnection(cancellationToken);
 
-        return (await connection.QueryAsync<UserClaim>(
+        List<UserClaim> output = new();
+        var userClaims = await connection.QueryAsync(
             "select ID, ClaimType, ClaimValue from UserClaim where UserID = @UserID",
             new { UserID = user.ID }
-        )).ToList();
+        );
+
+        foreach (var claim in userClaims)
+        {
+            UserClaim temp = new(claim.ClaimType, claim.ClaimValue);
+            temp.Properties.Add(ClaimConstants.ClaimID, claim.ID.ToString());
+
+            output.Add(temp);
+        }
+
+        return output;
     }
 
     async Task IUserClaimDataClient.RemoveClaim(User user, Claim claim, CancellationToken cancellationToken)

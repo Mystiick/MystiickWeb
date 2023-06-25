@@ -17,8 +17,8 @@ public partial class MystiickUserStore : IUserClaimStore<User>
         foreach (UserClaim claim in userClaims)
         {
             Claim temp = new(claim.ClaimType, claim.ClaimValue);
-            temp.Properties.Add(ClaimConstants.ClaimID, claim.ID.ToString());
-
+            temp.Properties.Add(ClaimConstants.ClaimID, claim.Properties[ClaimConstants.ClaimID].ToString());
+            
             output.Add(temp);
         }
 
