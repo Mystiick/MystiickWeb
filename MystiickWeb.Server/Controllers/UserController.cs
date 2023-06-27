@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Net;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,8 @@ public class UserController : BaseController
                 ClaimsIdentity identity = await _userService.AuthenticateUser(credentials);
 
                 await HttpContext.SignInAsync(Identity.Cookies, new ClaimsPrincipal(identity));
+                _logger.LogInformation("{log}", BuildLog(HttpContext, $"User Logged In: {credentials.Username}"));
+
                 return Ok();
             }
             catch (UnauthorizedAccessException)
@@ -46,6 +49,8 @@ public class UserController : BaseController
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
+        _logger.LogInformation("{log}", BuildLog(HttpContext, $"User Logged Out: {HttpContext.User?.Identity?.Name}"));
+        
         await HttpContext.SignOutAsync(Identity.Cookies);
         return Ok();
     }
@@ -64,7 +69,10 @@ public class UserController : BaseController
         if (errors.Any())
             return BadRequest(errors);
         else
+        {
+            _logger.LogInformation("{log}", BuildLog(HttpContext, $"User Registered: {credentials.Username}"));
             return Ok();
+        }
     }
 
     [ValidateAntiForgeryToken]
