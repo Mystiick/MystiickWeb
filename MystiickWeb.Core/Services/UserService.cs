@@ -165,7 +165,6 @@ public class UserService : IUserService
 
     public async Task AddRoleToUser(string userName, string role)
     {
-        // TODO: Add TransactionScopeAsyncFlowOption.Enabled everywhere
         using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
         User currentUser = GetCurrentUser();
