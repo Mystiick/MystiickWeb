@@ -6,9 +6,9 @@ using MySql.Data.MySqlClient;
 using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Shared;
 using MystiickWeb.Shared.Configs;
+using MystiickWeb.Shared.Constants;
 using MystiickWeb.Shared.Models;
 using MystiickWeb.Shared.Models.Posts;
-using Constants = MystiickWeb.Shared.Constants;
 
 namespace MystiickWeb.Clients;
 
@@ -110,8 +110,10 @@ public class PostDataClient : IPostDataClient
 
     public async Task<BasePost> CreatePost(BasePost post)
     {
-        using var connection = new MySqlConnection(_configs.ImageDatabase);
+        using MySqlConnection connection = new(_configs.ImageDatabase);
         await connection.OpenAsync();
+
+        using MySqlTransaction transaction = await connection.BeginTransactionAsync();
 
         uint newID = await connection.ExecuteScalarAsync<uint>(
             "insert into Post (PostType, PostTitle, PostText, Created, Updated) values (@PostType, @PostTitle, @PostText, @Created, @Created); select LAST_INSERT_ID();",
@@ -127,6 +129,8 @@ public class PostDataClient : IPostDataClient
         if (post.Attachments.Any())
             throw new NotImplementedException();
 
+        await transaction.CommitAsync();
+
         return await GetPost(newID);
     }
 
@@ -134,8 +138,8 @@ public class PostDataClient : IPostDataClient
     {
         return ((string)rec["PostType"]).ToLower() switch
         {
-            Constants.PostType.Photography => PopulatePost<ImagePost>(rec),
-            Constants.PostType.Programming => PopulatePost<ProgrammingPost>(rec),
+            PostType.Photography => PopulatePost<ImagePost>(rec),
+            PostType.Programming => PopulatePost<ProgrammingPost>(rec),
             _ => throw new NotImplementedException(),
         };
     }

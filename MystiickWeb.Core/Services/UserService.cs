@@ -165,7 +165,7 @@ public class UserService : IUserService
 
     public async Task AddRoleToUser(string userName, string role)
     {
-        using TransactionScope scope = new();
+        using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
         User currentUser = GetCurrentUser();
         if (currentUser.Authenticated && await _userManager.IsInRoleAsync(currentUser, UserRoles.Administrator))

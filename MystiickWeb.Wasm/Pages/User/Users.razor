@@ -32,10 +32,10 @@
                     @foreach(var claim in lookedUpUser.Claims)
                     {
                         <dt class="col-sm-1">Value</dt>
-                        <dd class="col-sm-5">@claim.Value</dd>
+                        <dd class="col-sm-5">@claim.ClaimValue</dd>
 
                         <dt class="col-sm-1">Type</dt>
-                        <dd class="col-sm-5">@claim.Type</dd>
+                        <dd class="col-sm-5">@claim.ClaimType</dd>
                     }
                 </dl>
 

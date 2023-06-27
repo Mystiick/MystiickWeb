@@ -26,7 +26,7 @@ public class PostServiceTests
         Mock<IImageDataClient> mockImageClient = new();
         mockImageClient.Setup(x => x.GetImageByID(It.IsAny<uint>())).Returns(Task.FromResult(new ImageResult()));
 
-        var postService = new PostService(new Mock<ILogger<PostService>>().Object, mockPostClient.Object, mockImageClient.Object, new Mock<IUserService>().Object);
+        IPostService postService = new PostService(mockPostClient.Object, mockImageClient.Object);
 
         // Act
         var unit = await postService.GetPost(123);
@@ -55,7 +55,7 @@ public class PostServiceTests
         Mock<IImageDataClient> mockImageClient = new();
         mockImageClient.Setup(x => x.GetImageByID(It.IsAny<uint>())).Returns(Task.FromResult(new ImageResult()));
 
-        var postService = new PostService(new Mock<ILogger<PostService>>().Object, mockPostClient.Object, mockImageClient.Object, new Mock<IUserService>().Object);
+        IPostService postService = new PostService(mockPostClient.Object, mockImageClient.Object);
 
         // Act
         var unit = await postService.GetPost(123);
