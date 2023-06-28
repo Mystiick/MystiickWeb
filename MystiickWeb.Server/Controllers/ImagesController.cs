@@ -9,12 +9,10 @@ namespace MystiickWeb.Server.Controllers;
 [Route(Shared.Constants.ControllerConstants.Images)]
 public class ImagesController : BaseController
 {
-    private readonly ILogger<ImagesController> _logger;
     private readonly IImageService _service;
 
     public ImagesController(ILogger<ImagesController> logger, IImageService service) : base(logger)
     {
-        _logger = logger;
         _service = service;
     }
 

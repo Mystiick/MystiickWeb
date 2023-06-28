@@ -22,7 +22,7 @@ public class UserServiceTests
         var userManager = PrebuiltMocks.GetUserManager();
         IOptions<Features> features = Options.Create(new Features());
 
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, null);
         ClaimsIdentity output;
 
         // Act
@@ -43,7 +43,7 @@ public class UserServiceTests
 
         IOptions<Features> features = Options.Create(new Features());
 
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<SignInManager<User>>().Object);
         UnauthorizedAccessException? expectedException = null;
 
         // Act
@@ -70,7 +70,7 @@ public class UserServiceTests
 
         IOptions<Features> features = Options.Create(new Features());
 
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<SignInManager<User>>().Object);
         UnauthorizedAccessException? expectedException = null;
 
         // Act
@@ -100,7 +100,7 @@ public class UserServiceTests
 
         IOptions<Features> features = Options.Create(new Features() { UserRegistration = true });
 
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<SignInManager<User>>().Object);
         List<string> output;
 
         // Act
@@ -119,7 +119,7 @@ public class UserServiceTests
 
         IOptions<Features> features = Options.Create(new Features() { UserRegistration = true });
 
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, features, new Mock<SignInManager<User>>().Object);
         List<string> output;
 
         // Act
@@ -136,7 +136,7 @@ public class UserServiceTests
     {
         // Arrange
         var userManager = PrebuiltMocks.GetUserManager();
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<SignInManager<User>>().Object);
 
         // Act
         await unit.UpdateUsername(new Credential(), "TEST");
@@ -153,7 +153,7 @@ public class UserServiceTests
         var userManager = PrebuiltMocks.GetUserManager();
         userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(false));
 
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<SignInManager<User>>().Object);
         UnauthorizedAccessException? expectedException = null;
 
         // Act
@@ -178,7 +178,7 @@ public class UserServiceTests
         var userManager = PrebuiltMocks.GetUserManager();
         userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User() { LockoutEndDate = DateTimeOffset.UtcNow.AddDays(1) }));
 
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<SignInManager<User>>().Object);
         UnauthorizedAccessException? expectedException = null;
 
         // Act
@@ -204,7 +204,7 @@ public class UserServiceTests
         // Arrange
         var userManager = PrebuiltMocks.GetUserManager();
 
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<SignInManager<User>>().Object);
 
         // Act
         await unit.UpdatePassword(new Credential(), new Credential() { Password = "TEST", ConfirmPassword = "TEST" });
@@ -221,7 +221,7 @@ public class UserServiceTests
         var userManager = PrebuiltMocks.GetUserManager();
         userManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(false));
 
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<SignInManager<User>>().Object);
         UnauthorizedAccessException? expectedException = null;
 
         // Act
@@ -246,7 +246,7 @@ public class UserServiceTests
         // Arrange
         var userManager = PrebuiltMocks.GetUserManager();
 
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<SignInManager<User>>().Object);
         UnauthorizedAccessException? expectedException = null;
 
         // Act
@@ -272,7 +272,7 @@ public class UserServiceTests
         var userManager = PrebuiltMocks.GetUserManager();
         userManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(new User() { LockoutEndDate = DateTimeOffset.UtcNow.AddDays(1) }));
 
-        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<IHttpContextAccessor>().Object);
+        var unit = new UserService(new Mock<ILogger<UserService>>().Object, userManager.Object, Options.Create(new Features()), new Mock<SignInManager<User>>().Object);
         UnauthorizedAccessException? expectedException = null;
 
         // Act

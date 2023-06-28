@@ -23,7 +23,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 // Identity and services
-builder.Services.AddIdentityCore<User>();
+builder.Services.AddIdentityCore<User>().AddSignInManager();
 builder.Services
     .AddScoped<IUserStore<User>, MystiickUserStore>()
     .AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN")

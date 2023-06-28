@@ -1,7 +1,5 @@
 ﻿using System.Security.Claims;
 using System.Transactions;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -19,14 +17,14 @@ public class UserService : IUserService
     private readonly ILogger<UserService> _logger;
     private readonly UserManager<User> _userManager;
     private readonly Features _features;
-    private readonly IHttpContextAccessor _contextAccessor;
+    private readonly SignInManager<User> _signInManager;
 
-    public UserService(ILogger<UserService> logger, UserManager<User> userManager, IOptions<Features> features, IHttpContextAccessor contextAccessor)
+    public UserService(ILogger<UserService> logger, UserManager<User> userManager, IOptions<Features> features, SignInManager<User> signInManager)
     {
         _logger = logger;
         _userManager = userManager;
         _features = features.Value;
-        _contextAccessor = contextAccessor;
+        _signInManager = signInManager;
     }
 
     /// <summary>
@@ -107,7 +105,7 @@ public class UserService : IUserService
     /// <summary>
     /// Gets the currently signed in user from the HttpContext
     /// </summary>
-    public User GetCurrentUser() => new(_contextAccessor.HttpContext.User);
+    public User GetCurrentUser() => new(_signInManager.Context.User);
 
     /// <summary>
     /// Validates user credentials, and updates the username if the credentials are valid
@@ -160,7 +158,10 @@ public class UserService : IUserService
     public async Task SignIn(Credential credentials)
     {
         ClaimsIdentity identity = await AuthenticateUser(credentials);
-        await _contextAccessor.HttpContext.SignInAsync(Identity.Cookies, new ClaimsPrincipal(identity));
+        User user = await LookupUserByNameInternal(credentials.Username);
+
+        await _signInManager.PasswordSignInAsync(credentials.Username, credentials.Password, false, true);
+        //await _contextAccessor.HttpContext.Authentication.SignInAsync(Identity.Cookies, new ClaimsPrincipal(identity));
     }
 
     public async Task AddRoleToUser(string userName, string role)
