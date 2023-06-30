@@ -1,5 +1,9 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
 using MystiickWeb.Shared.Models.User;
 
 namespace MystiickWeb.Core.Tests;
@@ -24,5 +28,18 @@ internal static class PrebuiltMocks
         userManager.Setup(x => x.GetClaimsAsync(It.IsAny<User>())).Returns(Task.FromResult<IList<Claim>>(new List<Claim>()));
 
         return userManager;
+    }
+
+    public static SignInManager<User> GetSignInManager()
+    {
+        return new SignInManager<User>(
+            GetUserManager().Object,
+            new Mock<IHttpContextAccessor>().Object,
+            new Mock<IUserClaimsPrincipalFactory<User>>().Object,
+            new Mock<IOptions<IdentityOptions>>().Object,
+            new Mock<ILogger<SignInManager<User>>>().Object,
+            new Mock<IAuthenticationSchemeProvider>().Object,
+            new Mock<IUserConfirmation<User>>().Object
+        );
     }
 }
