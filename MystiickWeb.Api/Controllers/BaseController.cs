@@ -16,7 +16,7 @@ public abstract class BaseController : Controller
 
     public override void OnActionExecuting(ActionExecutingContext filterContext)
     {
-        //_logger.LogInformation("{log}", BuildLog(filterContext.HttpContext));
+        _logger.LogInformation("{log}", BuildLog(filterContext.HttpContext));
     }
 
     protected virtual string BuildLog(HttpContext context, string message = "")

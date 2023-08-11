@@ -43,8 +43,5 @@ public class MinecraftController : BaseController
     }
 
     [HttpGet("{name}")]
-    public async Task<MinecraftPlayer> GetPlayerData(string name)
-    {
-        return await _service.GetPlayerData(name);
-    }
+    public Task<MinecraftPlayer> GetPlayerData(string name) => _service.GetPlayerData(name);
 }

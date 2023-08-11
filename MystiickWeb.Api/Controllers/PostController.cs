@@ -37,10 +37,7 @@ public class PostsController : BaseController
     }
 
     [HttpGet("{id}")]
-    public async Task<BasePost> GetPostByID(uint id)
-    {
-        return await _postService.GetPost(id);
-    }
+    public Task<BasePost> GetPostByID(uint id) => _postService.GetPost(id);
 
     private async Task<BasePost[]> GetTopPosts(int count)
     {

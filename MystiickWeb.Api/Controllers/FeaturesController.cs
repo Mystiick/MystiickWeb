@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using MystiickWeb.Shared.Configs;
@@ -11,7 +10,7 @@ namespace MystiickWeb.Api.Controllers;
 [Route(Shared.Constants.ControllerConstants.Features)]
 public class FeaturesController : BaseController
 {
-    private Features _features;
+    private readonly Features _features;
 
     public FeaturesController(ILogger<FeaturesController> logger, IOptions<Features> features) : base(logger)
     {
@@ -20,14 +19,8 @@ public class FeaturesController : BaseController
 
     [HttpGet]
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-    public Features GetAllFeatures()
-    {
-        return _features;
-    }
+    public Features GetAllFeatures() => _features;
 
     [HttpGet("{feature}")]
-    public bool IsFeatureEnabled(string feature)
-    {
-        return _features.IsFeatureEnabled(feature);
-    }
+    public bool IsFeatureEnabled(string feature) => _features.IsFeatureEnabled(feature);
 }
