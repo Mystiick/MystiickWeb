@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MystiickWeb.Core.Interfaces.Clients;
+﻿using MystiickWeb.Core.Interfaces.Clients;
 using MystiickWeb.Core.Interfaces.Services;
 using MystiickWeb.Core.Services;
 using MystiickWeb.Shared.Models;
@@ -18,18 +13,18 @@ public class PostServiceTests
     public async Task PostServiceTests_GetPost_CanGetPost()
     {
         // Arrange
-        Mock<IPostDataClient> mockPostClient = new();
-        mockPostClient.Setup(x => x.GetPost(It.IsAny<uint>())).Returns(Task.FromResult((BasePost)new ImagePost()));
-        mockPostClient.Setup(x => x.GetPostAttachments(It.IsAny<uint>())).Returns(Task.FromResult(new List<PostAttachment>()));
-        mockPostClient.Setup(x => x.GetLinkByID(It.IsAny<uint>())).Returns(Task.FromResult(new Link()));
+        var mockPostClient = Substitute.For<IPostDataClient>();        
+        mockPostClient.GetPost(default).ReturnsForAnyArgs(Task.FromResult((BasePost)new ImagePost()));
+        mockPostClient.GetPostAttachments(default).ReturnsForAnyArgs(Task.FromResult(new List<PostAttachment>()));
+        mockPostClient.GetLinkByID(default).ReturnsForAnyArgs(Task.FromResult(new Link()));
 
-        Mock<IImageDataClient> mockImageClient = new();
-        mockImageClient.Setup(x => x.GetImageByID(It.IsAny<uint>())).Returns(Task.FromResult(new ImageResult()));
+        var mockImageClient = Substitute.For<IImageDataClient>();
+        mockImageClient.GetImageByID(default).ReturnsForAnyArgs(Task.FromResult(new ImageResult()));
 
-        IPostService postService = new PostService(mockPostClient.Object, mockImageClient.Object);
+        IPostService postService = new PostService(mockPostClient, mockImageClient);
 
         // Act
-        var unit = await postService.GetPost(123);
+        BasePost unit = await postService.GetPost(123);
 
         // Assert
         Assert.IsNotNull(unit);
@@ -41,24 +36,24 @@ public class PostServiceTests
     public async Task PostServiceTests_GetPost_CanProcessAttachments()
     {
         // Arrange
-        Mock<IPostDataClient> mockPostClient = new();
-        mockPostClient.Setup(x => x.GetPost(It.IsAny<uint>())).Returns(Task.FromResult((BasePost)new ImagePost()));
-        mockPostClient.Setup(x => x.GetPostAttachments(It.IsAny<uint>())).Returns(Task.FromResult(
+        var mockPostClient = Substitute.For<IPostDataClient>();
+        mockPostClient.GetPost(default).ReturnsForAnyArgs(Task.FromResult((BasePost)new ImagePost()));
+        mockPostClient.GetPostAttachments(default).ReturnsForAnyArgs(Task.FromResult(
             new List<PostAttachment>()
             {
                 new PostAttachment() { AttachmentType = AttachmentType.Image },
                 new PostAttachment() { AttachmentType = AttachmentType.Link },
             }
         ));
-        mockPostClient.Setup(x => x.GetLinkByID(It.IsAny<uint>())).Returns(Task.FromResult(new Link()));
+        mockPostClient.GetLinkByID(default).ReturnsForAnyArgs(Task.FromResult(new Link()));
 
-        Mock<IImageDataClient> mockImageClient = new();
-        mockImageClient.Setup(x => x.GetImageByID(It.IsAny<uint>())).Returns(Task.FromResult(new ImageResult()));
+        var mockImageClient = Substitute.For<IImageDataClient>();
+        mockImageClient.GetImageByID(default).ReturnsForAnyArgs(Task.FromResult(new ImageResult()));
 
-        IPostService postService = new PostService(mockPostClient.Object, mockImageClient.Object);
+        IPostService postService = new PostService(mockPostClient, mockImageClient);
 
         // Act
-        var unit = await postService.GetPost(123);
+        BasePost unit = await postService.GetPost(123);
 
         // Assert
         Assert.IsNotNull(unit);
